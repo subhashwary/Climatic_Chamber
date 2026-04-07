@@ -1,0 +1,157 @@
+import tkinter as tk
+from tkinter import ttk
+import pyvisa
+import serial
+import time
+import threading
+import csv
+from datetime import datetime
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+# =========================
+# CONFIGURATION
+# =========================
+SERIAL_PORT = 'COM3'      # Change for your system
+BAUD_RATE = 9600
+
+PSU_ADDRESS = 'USB::0x1234::0x5678::INSTR'  # Change VISA address
+
+TEMP_HIGH = 65   # Power ON
+TEMP_LOW = -30   # Power OFF
+
+# =========================
+# INIT CONNECTIONS
+# =========================
+rm = pyvisa.ResourceManager()
+
+try:
+    psu = rm.open_resource(PSU_ADDRESS)
+except:
+    psu = None
+    print("Power Supply not connected")
+
+try:
+    ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
+except:
+    ser = None
+    print("Serial not connected")
+
+# =========================
+# GLOBAL VARIABLES
+# =========================
+running = False
+time_data = []
+temp_data = []
+power_state = "OFF"
+
+# =========================
+# FUNCTIONS
+# =========================
+
+def power_on():
+    global power_state
+    if psu:
+        psu.write("OUTP ON")
+    power_state = "ON"
+    power_label.config(text="Power: ON", foreground="green")
+
+def power_off():
+    global power_state
+    if psu:
+        psu.write("OUTP OFF")
+    power_state = "OFF"
+    power_label.config(text="Power: OFF", foreground="red")
+
+def read_temperature():
+    if ser:
+        try:
+            ser.write(b"TEMP\n")
+            value = ser.readline().decode().strip()
+            return float(value)
+        except:
+            return None
+    return None
+
+def log_data(timestamp, temp, power):
+    with open("log.csv", "a", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow([timestamp, temp, power])
+
+def update_loop():
+    global running
+
+    while running:
+        temp = read_temperature()
+        if temp is not None:
+            now = datetime.now()
+
+            # Store data
+            time_data.append(now)
+            temp_data.append(temp)
+
+            # Control logic
+            if temp >= TEMP_HIGH:
+                power_on()
+            elif temp <= TEMP_LOW:
+                power_off()
+
+            # Update GUI
+            temp_label.config(text=f"Temperature: {temp:.2f} °C")
+
+            # Log
+            log_data(now, temp, power_state)
+
+            # Update plot
+            ax.clear()
+            ax.plot(time_data, temp_data)
+            ax.set_title("Temperature vs Time")
+            ax.set_xlabel("Time")
+            ax.set_ylabel("Temp (°C)")
+            canvas.draw()
+
+        time.sleep(2)
+
+def start():
+    global running
+    running = True
+    threading.Thread(target=update_loop, daemon=True).start()
+
+def stop():
+    global running
+    running = False
+    power_off()
+
+# =========================
+# GUI SETUP
+# =========================
+root = tk.Tk()
+root.title("Climatic Chamber Interface")
+root.geometry("900x600")
+
+# Labels
+temp_label = ttk.Label(root, text="Temperature: -- °C", font=("Arial", 16))
+temp_label.pack(pady=10)
+
+power_label = ttk.Label(root, text="Power: OFF", font=("Arial", 16), foreground="red")
+power_label.pack(pady=10)
+
+# Buttons
+frame = ttk.Frame(root)
+frame.pack(pady=10)
+
+start_btn = ttk.Button(frame, text="Start Test", command=start)
+start_btn.grid(row=0, column=0, padx=10)
+
+stop_btn = ttk.Button(frame, text="Stop Test", command=stop)
+stop_btn.grid(row=0, column=1, padx=10)
+
+# Plot
+fig, ax = plt.subplots(figsize=(6, 4))
+canvas = FigureCanvasTkAgg(fig, master=root)
+canvas.get_tk_widget().pack()
+
+# =========================
+# RUN
+# =========================
+root.mainloop()
