@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voltage to Pressure GUI</title>
+
+<style>*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Courier New', monospace;
+  background: #1a1a1a;
+  color: #e0e0e0;
+  min-height: 100vh;
+  padding: 1.5rem;
+}
+
+.root {
+  max-width: 780px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── Top bar ── */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: #242424;
+  border: 0.5px solid #333;
+  border-radius: 10px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #3a3;
+  display: inline-block;
+  margin-right: 6px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+/* ── Two-panel grid ── */
+.panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.panel {
+  background: #1e1e1e;
+  border: 0.5px solid #333;
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.panel-title {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: #888;
+  text-transform: uppercase;
+  border-bottom: 0.5px solid #333;
+  padding-bottom: 8px;
+}
+
+.big-val {
+  font-size: 38px;
+  font-weight: 500;
+  color: #e0e0e0;
+  line-height: 1;
+}
+
+.unit {
+  font-size: 14px;
+  color: #888;
+  margin-left: 4px;
+}
+
+/* ── Progress bars ── */
+.bar-track {
+  height: 8px;
+  background: #2e2e2e;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.v-fill { background: #2a7fd4; }   /* blue  — voltage */
+.p-fill { background: #e05a2b; }   /* orange — pressure */
+
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #666;
+  margin-top: 2px;
+}
+
+/* ── Inputs ── */
+.input-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-row label { font-size: 11px; color: #888; }
+
+.input-row input[type="range"] {
+  width: 100%;
+  accent-color: #2a7fd4;
+  cursor: pointer;
+}
+
+.input-row input[type="number"] {
+  width: 100%;
+  font-size: 14px;
+  padding: 6px 8px;
+  border: 0.5px solid #444;
+  border-radius: 8px;
+  background: #2a2a2a;
+  color: #e0e0e0;
+  font-family: 'Courier New', monospace;
+  outline: none;
+}
+
+.input-row input[type="number"]:focus { border-color: #2a7fd4; }
+
+/* ── Formula display ── */
+.formula-box {
+  font-size: 11px;
+  color: #888;
+  background: #2a2a2a;
+  border-radius: 8px;
+  padding: 8px 10px;
+  border: 0.5px solid #333;
+  font-family: 'Courier New', monospace;
+  word-break: break-all;
+}
+
+/* ── Config row ── */
+.cfg-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.cfg-field { display: flex; flex-direction: column; gap: 3px; }
+.cfg-field label { font-size: 10px; color: #888; }
+
+.cfg-field input {
+  font-size: 12px;
+  padding: 4px 6px;
+  border: 0.5px solid #444;
+  border-radius: 8px;
+  background: #2a2a2a;
+  color: #e0e0e0;
+  font-family: 'Courier New', monospace;
+  width: 100%;
+  outline: none;
+}
+
+.cfg-field input:focus { border-color: #e05a2b; }
+
+/* ── Serial log ── */
+.serial-log {
+  background: #111;
+  border-radius: 8px;
+  border: 0.5px solid #333;
+  padding: 8px 10px;
+  font-size: 11px;
+  font-family: 'Courier New', monospace;
+  color: #888;
+  height: 120px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.log-line          { line-height: 1.7; }
+.log-line .ts      { color: #555; }
+.log-line .v       { color: #2a7fd4; }
+.log-line .p       { color: #e05a2b; }
+
+.serial-log::-webkit-scrollbar       { width: 4px; }
+.serial-log::-webkit-scrollbar-track { background: transparent; }
+.serial-log::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+
+/* ── Responsive ── */
+@media (max-width: 520px) {
+  .panels  { grid-template-columns: 1fr; }
+  .cfg-row { grid-template-columns: 1fr 1fr; }
+}</style>
+
+</head>
+<body>
+<div class="root">
+
+  <!-- Top status bar -->
+  <div class="top-bar">
+    <span style="font-size:12px; color:#aaa;">
+      <span class="status-dot"></span>Serial connected — simulated
+    </span>
+    <span style="font-size:11px; color:#666;" id="ts">—</span>
+  </div>
+
+  <!-- Left: Voltage | Right: Pressure -->
+  <div class="panels">
+
+    <!-- VOLTAGE PANEL -->
+    <div class="panel">
+      <div class="panel-title">Voltage input</div>
+      <div>
+        <span class="big-val" id="v-val">2.50</span>
+        <span class="unit">V</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill v-fill" id="v-bar" style="width:50%"></div>
+      </div>
+      <div class="label-row">
+        <span id="v-min-lbl">0 V</span>
+        <span id="v-max-lbl">5 V</span>
+      </div>
+      <div class="input-row">
+        <label>Simulate voltage (drag or type)</label>
+        <input type="range" min="0" max="5" step="0.01" value="2.5" id="v-slider">
+        <input type="number" min="0" max="5" step="0.01" value="2.50" id="v-input">
+      </div>
+    </div>
+
+    <!-- PRESSURE PANEL -->
+    <div class="panel">
+      <div class="panel-title">Pressure output</div>
+      <div>
+        <span class="big-val" id="p-val">125.0</span>
+        <span class="unit">kPa</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill p-fill" id="p-bar" style="width:50%"></div>
+      </div>
+      <div class="label-row">
+        <span id="p-min-lbl">0 kPa</span>
+        <span id="p-max-lbl">250 kPa</span>
+      </div>
+      <div class="formula-box" id="formula-disp">
+        P = (V / 5.0) × 250.0 kPa
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Config -->
+  <div class="panel">
+    <div class="panel-title">Conversion config</div>
+    <div class="cfg-row">
+      <div class="cfg-field">
+        <label>V min</label>
+        <input type="number" id="cfg-vmin" value="0" step="0.1">
+      </div>
+      <div class="cfg-field">
+        <label>V max</label>
+        <input type="number" id="cfg-vmax" value="5" step="0.1">
+      </div>
+      <div class="cfg-field">
+        <label>P min (kPa)</label>
+        <input type="number" id="cfg-pmin" value="0" step="1">
+      </div>
+      <div class="cfg-field">
+        <label>P max (kPa)</label>
+        <input type="number" id="cfg-pmax" value="250" step="1">
+      </div>
+    </div>
+  </div>
+
+  <!-- Serial log -->
+  <div class="panel">
+    <div class="panel-title">Serial log</div>
+    <div class="serial-log" id="serial-log"></div>
+  </div>
+
+</div>
+<script>// ── Element references ──────────────────────────────────────────────────────
+const vSlider    = document.getElementById('v-slider');
+const vInput     = document.getElementById('v-input');
+const vVal       = document.getElementById('v-val');
+const vBar       = document.getElementById('v-bar');
+const vMinLbl    = document.getElementById('v-min-lbl');
+const vMaxLbl    = document.getElementById('v-max-lbl');
+const pVal       = document.getElementById('p-val');
+const pBar       = document.getElementById('p-bar');
+const pMinLbl    = document.getElementById('p-min-lbl');
+const pMaxLbl    = document.getElementById('p-max-lbl');
+const formulaDisp = document.getElementById('formula-disp');
+const serialLog  = document.getElementById('serial-log');
+const tsEl       = document.getElementById('ts');
+
+// ── Read config fields ───────────────────────────────────────────────────────
+function getCfg() {
+  return {
+    vmin: parseFloat(document.getElementById('cfg-vmin').value) || 0,
+    vmax: parseFloat(document.getElementById('cfg-vmax').value) || 5,
+    pmin: parseFloat(document.getElementById('cfg-pmin').value) || 0,
+    pmax: parseFloat(document.getElementById('cfg-pmax').value) || 250
+  };
+}
+
+// ── Linear conversion: Voltage → Pressure ───────────────────────────────────
+function convert(v, cfg) {
+  const ratio = (v - cfg.vmin) / (cfg.vmax - cfg.vmin);
+  return cfg.pmin + ratio * (cfg.pmax - cfg.pmin);
+}
+
+// ── Main update — call this whenever voltage changes ────────────────────────
+function update(v) {
+  const cfg  = getCfg();
+  const p    = convert(v, cfg);
+  const vPct = (v - cfg.vmin) / (cfg.vmax - cfg.vmin) * 100;
+  const pPct = (p - cfg.pmin) / (cfg.pmax - cfg.pmin) * 100;
+
+  // Voltage panel
+  vVal.textContent      = v.toFixed(2);
+  vBar.style.width      = Math.max(0, Math.min(100, vPct)) + '%';
+  vMinLbl.textContent   = cfg.vmin + ' V';
+  vMaxLbl.textContent   = cfg.vmax + ' V';
+
+  // Pressure panel
+  pVal.textContent      = p.toFixed(1);
+  pBar.style.width      = Math.max(0, Math.min(100, pPct)) + '%';
+  pMinLbl.textContent   = cfg.pmin + ' kPa';
+  pMaxLbl.textContent   = cfg.pmax + ' kPa';
+
+  // Live formula
+  formulaDisp.textContent =
+    `P = (${v.toFixed(2)} - ${cfg.vmin}) / (${cfg.vmax} - ${cfg.vmin}) ` +
+    `× (${cfg.pmax} - ${cfg.pmin}) + ${cfg.pmin}  =  ${p.toFixed(2)} kPa`;
+
+  // Timestamp
+  const t = new Date().toLocaleTimeString('en-GB', { hour12: false });
+  tsEl.textContent = t;
+
+  // Append to serial log
+  const line = document.createElement('div');
+  line.className = 'log-line';
+  line.innerHTML =
+    `<span class="ts">[${t}]</span>  ` +
+    `<span class="v">V=${v.toFixed(2)}V</span>  →  ` +
+    `<span class="p">P=${p.toFixed(1)}kPa</span>`;
+  serialLog.prepend(line);
+  while (serialLog.children.length > 50) serialLog.removeChild(serialLog.lastChild);
+}
+
+// ── UI event listeners ───────────────────────────────────────────────────────
+vSlider.addEventListener('input', () => {
+  const v = parseFloat(vSlider.value);
+  vInput.value = v.toFixed(2);
+  update(v);
+});
+
+vInput.addEventListener('input', () => {
+  const v = parseFloat(vInput.value);
+  if (!isNaN(v)) { vSlider.value = v; update(v); }
+});
+
+['cfg-vmin', 'cfg-vmax', 'cfg-pmin', 'cfg-pmax'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => {
+    update(parseFloat(vSlider.value));
+  });
+});
+
+// ── Simulation (replace with real Web Serial read) ───────────────────────────
+// To use a real serial port in Chrome/Edge:
+//
+//   const port = await navigator.serial.requestPort();
+//   await port.open({ baudRate: 9600 });
+//   const reader = port.readable.getReader();
+//   while (true) {
+//     const { value, done } = await reader.read();
+//     const v = parseFloat(new TextDecoder().decode(value));
+//     if (!isNaN(v)) { vSlider.value = v; vInput.value = v.toFixed(2); update(v); }
+//   }
+
+let autoV = 2.5, dir = 0.05;
+setInterval(() => {
+  autoV += dir;
+  if (autoV >= 5 || autoV <= 0) dir *= -1;
+  vSlider.value = autoV;
+  vInput.value  = autoV.toFixed(2);
+  update(autoV);
+}, 600);
+
+// ── Initial render ───────────────────────────────────────────────────────────
+update(2.5);</script>
+</body>
+</html>
