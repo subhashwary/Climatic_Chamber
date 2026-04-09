@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sensor Dashboard</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            margin: 20px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header img {
+            height: 60px;
+        }
+
+        .title {
+            flex-grow: 1;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .container {
+            display: flex;
+            margin-top: 20px;
+        }
+
+        .left {
+            width: 50%;
+        }
+
+        .right {
+            width: 50%;
+            text-align: center;
+        }
+
+        .right img {
+            max-width: 80%;
+            margin-top: 10px;
+        }
+
+        .section-title {
+            margin-top: 10px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        /* BUTTON SECTION */
+        .button-section {
+            margin-top: 15px;
+        }
+
+        .reset-container {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .button-grid {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+        }
+
+        .left-buttons,
+        .right-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        button {
+            padding: 4px 8px;
+            font-size: 12px;
+            width:90px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <div class="header">
+        <img src="images/cense-logo.png">
+        <div class="title">Indian Institute of Science, Bangalore</div>
+        <img src="images/iisc-logo.jpg">
+    </div>
+
+    <hr>
+
+    <!-- MAIN CONTENT -->
+    <div class="container">
+
+        <!-- LEFT SIDE -->
+        <div class="left">
+            <h1>GTRE RAKE</h1>
+
+            <p>Pressure: <span id="pressure">--</span></p>
+            <p>Temperature: <span id="temperature">--</span></p>
+
+            <!-- BUTTON SECTION -->
+            <div class="button-section">
+
+                <div class="reset-container">
+                    <button onclick="resetDevice()">RESET</button>
+                </div>
+
+                <div class="button-grid">
+
+                    <div class="left-buttons">
+                        <button>Btn 1</button>
+                        <button>Btn 2</button>
+                        <button>Btn 3</button>
+                        <button>Btn 4</button>
+                        <button>Btn 5</button>
+                    </div>
+
+                    <div class="right-buttons">
+                        <button>Btn 6</button>
+                        <button>Btn 7</button>
+                        <button>Btn 8</button>
+                        <button>Btn 9</button>
+                        <button>Btn 10</button>
+                    </div>
+
+                </div>
+            </div>
+
+            <h2>Graph Plotting</h2>
+            <ul id="history"></ul>
+        </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="right">
+            <div class="section-title">Sensor Assembly</div>
+
+            <img src="images/sensor.png" alt="Sensor">
+
+            <div class="section-title">Realtime Monitoring Unit</div>
+        </div>
+
+    </div>
+
+    <script>
+        async function fetchData() {
+            const res = await fetch("http://127.0.0.1:5000/data");
+            const data = await res.json();
+
+            document.getElementById("pressure").innerText = data.pressure;
+            document.getElementById("temperature").innerText = data.temperature;
+        }
+
+        async function loadHistory() {
+            const res = await fetch("http://127.0.0.1:5000/history");
+            const data = await res.json();
+
+            const list = document.getElementById("history");
+            list.innerHTML = "";
+
+            data.forEach(item => {
+                const li = document.createElement("li");
+                li.innerText = `${item.timestamp} | P: ${item.pressure} | T: ${item.temperature}`;
+                list.appendChild(li);
+            });
+        }
+
+        async function resetDevice() {
+            await fetch("http://127.0.0.1:5000/reset", { method: "POST" });
+            alert("Reset command sent");
+        }
+        
+        setInterval(() => {
+            fetchData();
+            loadHistory();
+        }, 2000);
+    </script>
+
+</body>
+</html>
