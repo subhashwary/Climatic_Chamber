@@ -123,3 +123,13 @@
 
 </body>
 </html>
+
+
+
+<div class="right">
+    <div class="section-title">Sensor Assembly</div>
+
+    <img src="images/sensor.png" alt="Sensor Assembly">
+
+    <div class="section-title">Realtime Monitoring Unit</div>
+</div>
