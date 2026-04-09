@@ -1,0 +1,34 @@
+Buttons
+
+
+<div class="button-section">
+
+    <!-- Reset button -->
+    <div class="reset-container">
+        <button onclick="resetDevice()">RESET</button>
+    </div>
+
+    <!-- Two columns -->
+    <div class="button-grid">
+
+        <!-- Left buttons -->
+        <div class="left-buttons">
+            <button>Btn 1</button>
+            <button>Btn 2</button>
+            <button>Btn 3</button>
+            <button>Btn 4</button>
+            <button>Btn 5</button>
+        </div>
+
+        <!-- Right buttons -->
+        <div class="right-buttons">
+            <button>Btn 6</button>
+            <button>Btn 7</button>
+            <button>Btn 8</button>
+            <button>Btn 9</button>
+            <button>Btn 10</button>
+        </div>
+
+    </div>
+
+</div>
