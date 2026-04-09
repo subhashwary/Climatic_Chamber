@@ -95,7 +95,6 @@ button {
             font-weight: bold;
         }
 
-        /* NEW: Main layout */
         .container {
             display: flex;
             margin-top: 20px;
@@ -111,14 +110,41 @@ button {
         }
 
         .right img {
-            max-width: 90%;
-            height: auto;
+            max-width: 80%;
+            margin-top: 10px;
         }
 
         .section-title {
             margin-top: 10px;
             font-size: 20px;
             font-weight: bold;
+        }
+
+        /* BUTTON SECTION */
+        .button-section {
+            margin-top: 20px;
+        }
+
+        .reset-container {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .button-grid {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .left-buttons,
+        .right-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        button {
+            padding: 8px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -127,13 +153,9 @@ button {
 
     <!-- HEADER -->
     <div class="header">
-        <img src="images/cense-logo.png" alt="Left Logo">
-
-        <div class="title">
-            Indian Institute of Science, Bangalore
-        </div>
-
-        <img src="images/iisc-logo.jpg" alt="Right Logo">
+        <img src="images/cense-logo.png">
+        <div class="title">Indian Institute of Science, Bangalore</div>
+        <img src="images/iisc-logo.jpg">
     </div>
 
     <hr>
@@ -141,25 +163,53 @@ button {
     <!-- MAIN CONTENT -->
     <div class="container">
 
-        <!-- LEFT: Sensor Data -->
+        <!-- LEFT SIDE -->
         <div class="left">
             <h1>GTRE RAKE</h1>
 
             <p>Pressure: <span id="pressure">--</span></p>
             <p>Temperature: <span id="temperature">--</span></p>
 
-            <button onclick="resetDevice()">RESET</button>
+            <!-- BUTTON SECTION -->
+            <div class="button-section">
+
+                <div class="reset-container">
+                    <button onclick="resetDevice()">RESET</button>
+                </div>
+
+                <div class="button-grid">
+
+                    <div class="left-buttons">
+                        <button>Btn 1</button>
+                        <button>Btn 2</button>
+                        <button>Btn 3</button>
+                        <button>Btn 4</button>
+                        <button>Btn 5</button>
+                    </div>
+
+                    <div class="right-buttons">
+                        <button>Btn 6</button>
+                        <button>Btn 7</button>
+                        <button>Btn 8</button>
+                        <button>Btn 9</button>
+                        <button>Btn 10</button>
+                    </div>
+
+                </div>
+            </div>
 
             <h2>Graph Plotting</h2>
             <ul id="history"></ul>
         </div>
 
-        <!-- RIGHT: Sensor Assembly -->
+        <!-- RIGHT SIDE -->
         <div class="right">
-    <div class="section-title">Sensor Assembly</div>
+            <div class="section-title">Sensor Assembly</div>
 
-    <div class="section-title">Realtime Monitoring Unit</div>
-</div>
+            <img src="images/sensor.png" alt="Sensor">
+
+            <div class="section-title">Realtime Monitoring Unit</div>
+        </div>
 
     </div>
 
