@@ -19,67 +19,118 @@
             height: 60px;
         }
 
-        .title {
+        .title-container {
             flex-grow: 1;
             text-align: center;
-            font-size: 22px;
+        }
+
+        .title {
+            font-size: 44px;
             font-weight: bold;
+        }
+
+       .subtitle {
+            font-size: 32px;   /* same size as title */
+            font-weight: bold; /* make it bold */
+            margin-top: 4px;
         }
 
         .container {
-            display: flex;
             margin-top: 20px;
         }
 
-        .left {
-            width: 50%;
+        /* SENSOR SECTION */
+        .sensor-container {
+            display: flex;
+            border: 1px solid #ccc;
+            justify-content: space-between;
+            gap: 0px;
         }
 
-        .right {
-            width: 50%;
+        .sensor-box {
+            width: 48%;
+            padding: 20px;
             text-align: center;
         }
 
-        .right img {
-            max-width: 80%;
-            margin-top: 10px;
+        .sensor-box:first-child {
+            border-right: 2px solid #000;
         }
 
-        .section-title {
-            margin-top: 10px;
+        .btn-row {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 8px;
+        }
+
+        .sensor-title {
             font-size: 20px;
             font-weight: bold;
-        }
-
-        /* BUTTON SECTION */
-        .button-section {
-            margin-top: 15px;
-        }
-
-        .reset-container {
-            text-align: center;
             margin-bottom: 10px;
         }
 
-        .button-grid {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-        }
-
-        .left-buttons,
-        .right-buttons {
-            display: flex;
-            flex-direction: column;
+        /* BUTTONS INSIDE EACH PANEL */
+        .panel-buttons {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: 1fr;
             gap: 6px;
         }
 
+        /* TOP CONTROL BUTTONS */
+        .top-buttons {
+            margin-top: 20px;
+            text-align: center;
+        }
+
         button {
-            padding: 4px 8px;
-            font-size: 12px;
-            width:90px;
+            width: 45px;
+            height: 35px;
+            font-size: 10px;
+            padding: 2px;
             cursor: pointer;
         }
+
+        .start-btn {
+            background-color: green;
+            color: white;
+            border: none;
+        }
+
+        .stop-btn {
+            background-color: red;
+            color: white;
+            border: none;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 80px;
+            padding: 10px;
+            font-size: 20px;
+            border-top: 1px solid #ccc;
+            color: #555;
+        }
+
+        .main-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.sub-main {
+    text-align: center;
+    font-size: 18px;
+    margin-top: 4px;
+    color: #444;
+}
+
+        h1 {
+    text-align: center;
+}
+
     </style>
 </head>
 
@@ -88,7 +139,12 @@
     <!-- HEADER -->
     <div class="header">
         <img src="images/cense-logo.png">
-        <div class="title">Indian Institute of Science, Bangalore</div>
+
+        <div class="title-container">
+            <div class="title">Indian Institute of Science, Bangalore</div>
+            <div class="subtitle">Centre for Nano Science and Engineering</div>
+        </div>
+
         <img src="images/iisc-logo.jpg">
     </div>
 
@@ -97,52 +153,50 @@
     <!-- MAIN CONTENT -->
     <div class="container">
 
-        <!-- LEFT SIDE -->
-        <div class="left">
-            <h1>GTRE RAKE</h1>
+        <div class="main-title">GTRE RAKE Sensor Assembly</div>
+        <div class="sub-main">Realtime Monitoring</div>
+        
 
-            <p>Pressure: <span id="pressure">--</span></p>
-            <p>Temperature: <span id="temperature">--</span></p>
+        <!-- SENSOR DISPLAY -->
+        <div class="sensor-container">
 
-            <!-- BUTTON SECTION -->
-            <div class="button-section">
+            <!-- LEFT PANEL -->
+            <div class="sensor-box">
+                <div class="sensor-title">Pressure Sensor</div>
+                <p id="pressure">--</p>
 
-                <div class="reset-container">
-                    <button onclick="resetDevice()">RESET</button>
-                </div>
-
-                <div class="button-grid">
-
-                    <div class="left-buttons">
-                        <button>Btn 1</button>
-                        <button>Btn 2</button>
-                        <button>Btn 3</button>
-                        <button>Btn 4</button>
-                        <button>Btn 5</button>
-                    </div>
-
-                    <div class="right-buttons">
-                        <button>Btn 6</button>
-                        <button>Btn 7</button>
-                        <button>Btn 8</button>
-                        <button>Btn 9</button>
-                        <button>Btn 10</button>
-                    </div>
-
+                <div class="panel-buttons">
+                    <div class="btn-row"><span>Sensor 1</span><button>Btn 1</button><button>Btn 6</button></div>
+                    <div class="btn-row"><span>Sensor 2</span><button>Btn 2</button><button>Btn 7</button></div>
+                    <div class="btn-row"><span>Sensor 3</span><button>Btn 3</button><button>Btn 8</button></div>
+                    <div class="btn-row"><span>Sensor 4</span><button>Btn 4</button><button>Btn 9</button></div>
+                    <div class="btn-row"><span>Sensor 5</span><button>Btn 5</button><button>Btn 10</button></div>
                 </div>
             </div>
 
-            <h2>Graph Plotting</h2>
-            <ul id="history"></ul>
+            <!-- RIGHT PANEL -->
+            <div class="sensor-box">
+                <div class="sensor-title">Temperature Sensor</div>
+                <p id="temperature">--</p>
+
+                <div class="panel-buttons">
+                    <div class="btn-row"><span>Sensor 1</span><button>Btn 1</button><button>Btn 6</button></div>
+                    <div class="btn-row"><span>Sensor 2</span><button>Btn 2</button><button>Btn 7</button></div>
+                    <div class="btn-row"><span>Sensor 3</span><button>Btn 3</button><button>Btn 8</button></div>
+                    <div class="btn-row"><span>Sensor 4</span><button>Btn 4</button><button>Btn 9</button></div>
+                    <div class="btn-row"><span>Sensor 5</span><button>Btn 5</button><button>Btn 10</button></div>
+                </div>
+            </div>
+        </div>
+            </div>
+
         </div>
 
-        <!-- RIGHT SIDE -->
-        <div class="right">
-            <div class="section-title">Sensor Assembly</div>
-
-            <img src="images/sensor.png" alt="Sensor">
-
-            <div class="section-title">Realtime Monitoring Unit</div>
+        <!-- CONTROL BUTTONS -->
+        <div class="top-buttons">
+            <button onclick="startDevice()" class="start-btn">START</button>
+            <button onclick="stopDevice()" class="stop-btn">STOP</button>
+            <button onclick="resetDevice()">RESET</button>
         </div>
 
     </div>
@@ -156,31 +210,27 @@
             document.getElementById("temperature").innerText = data.temperature;
         }
 
-        async function loadHistory() {
-            const res = await fetch("http://127.0.0.1:5000/history");
-            const data = await res.json();
-
-            const list = document.getElementById("history");
-            list.innerHTML = "";
-
-            data.forEach(item => {
-                const li = document.createElement("li");
-                li.innerText = `${item.timestamp} | P: ${item.pressure} | T: ${item.temperature}`;
-                list.appendChild(li);
-            });
-        }
-
         async function resetDevice() {
             await fetch("http://127.0.0.1:5000/reset", { method: "POST" });
             alert("Reset command sent");
         }
-        
-        setInterval(() => {
-            fetchData();
-            loadHistory();
-        }, 2000);
+
+        async function startDevice() {
+            await fetch("http://127.0.0.1:5000/start", { method: "POST" });
+            alert("Start command sent");
+        }
+
+        async function stopDevice() {
+            await fetch("http://127.0.0.1:5000/stop", { method: "POST" });
+            alert("Stop command sent");
+        }
+
+        setInterval(fetchData, 2000);
     </script>
+
+    <footer class="footer">
+        Packaging and Systems Engineering Facility - 2026
+    </footer>
 
 </body>
 </html>
-
