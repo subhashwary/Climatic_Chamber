@@ -11,3 +11,23 @@
         <ul id="history"></ul>
     </div>
 </div>
+
+
+
+css
+.right {
+    width: 50%;
+    position: relative;
+}
+
+.graph-section {
+    position: absolute;
+    bottom: 40px;   /* controls how high from bottom */
+    right: 20px;    /* spacing from right edge */
+    width: 80%;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+    background: #f9f9f9;
+}
