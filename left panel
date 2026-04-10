@@ -1,0 +1,11 @@
+line 58
+
+   .sensor-box {
+    flex: 1;
+    padding: 12px 14px;   /* reduced padding → tighter fit */
+    text-align: center;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid #e0e0e0;
+}
