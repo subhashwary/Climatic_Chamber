@@ -10,99 +10,110 @@
     background-color: #f4f7fb; /* light technical grey-blue */
 }
 
-        .header {
+.header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: #0b3d91; /* IISc-style deep blue */
+
+    background-color: #d9e6f2;  /* light academic blue */
     padding: 10px;
     border-radius: 6px;
 }
 
 .title, .subtitle {
-    color: white;
+    color: #1f2d3a;   /* dark text for contrast */
 }
 
-        .header img {
+.header img {
             height: 60px;
         }
 
-        .title-container {
+.title-container {
             flex-grow: 1;
             text-align: center;
         }
 
-        .title {
+.title {
             font-size: 44px;
             font-weight: bold;
         }
 
-       .subtitle {
+.subtitle {
             font-size: 32px;   /* same size as title */
             font-weight: bold; /* make it bold */
             margin-top: 4px;
         }
 
-        .container {
+.container {
             margin-top: 20px;
         }
 
         /* SENSOR SECTION */
-        .sensor-container {
+.sensor-container {
     display: flex;
-    border: none; /* remove old border */
-    gap: 20px;
+    justify-content: center;
+    gap: 40px;              /* space between panels */
     margin-top: 25px;
+    align-items: flex-start;
 }
 
-   .sensor-box {
-    width: 48%;
-    padding: 20px;
+.sensor-box {
+    width: 40%;   /* control panel size */
+    
+    padding: 12px 14px;
     text-align: center;
     background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    border: 1px solid #e0e0e0;
+
+    border: 2px solid #2c3e50;
+    border-radius: 4px;
+    box-shadow: none;
+    
 }
-        .sensor-title {
+
+.sensor-title {
             font-size: 20px;
             font-weight: bold;
             margin-bottom: 10px;
         }
 
         /* BUTTONS INSIDE EACH PANEL */
-        .panel-buttons {
-    margin-top: 20px;
+.panel-buttons {
+    margin-top: 10px;
     display: grid;
-    grid-template-columns: 90px 50px 50px; /* increase width */
-    column-gap: 95px; /* 👈 adds space between Btn 1 and Btn 6 */
+    grid-template-columns: 90px 120px 120px;
+    column-gap: 10px;
     row-gap: 10px;
     align-items: center;
     justify-content: center;
+    width: 100%;
 }
 
 .panel-buttons button {
-    margin: auto;
+    width: 110px;
+    height: 32px;
+    font-size: 11px;
+    margin: 0;
 }
 
-        .output-header {
+.output-header {
     grid-column: 2 / 4; /* spans Volt + Psi columns */
     text-align: center;
     font-weight: bold;
     font-size: 14px;
 }
 
-        .btn-header {
+.btn-header {
     font-weight: bold;
     text-align: center;
 }
 
 .sensor-label {
     text-align: left;
+    font-weight: bold;   /* makes Sensor 1–5 bold */
 }
 
         /* TOP CONTROL BUTTONS */
-        .top-buttons {
+.top-buttons {
             margin-top: 20px;
             text-align: center;
         }
@@ -115,6 +126,15 @@
     border: 1px solid #ccc;
 }
 
+.top-buttons button {
+    width: 90px;      /* bigger width */
+    height: 45px;     /* taller button */
+    font-size: 14px;  /* bigger text */
+    margin: 5px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
 .start-btn {
     background-color: #28a745;
 }
@@ -123,20 +143,20 @@
     background-color: #dc3545;
 }
 
-        .footer {
+.footer {
             text-align: center;
-            margin-top: 30px;
+            margin-top: 40px;
             padding: 10px;
             font-size: 20px;
             border-top: 1px solid #ccc;
             color: #555;
         }
 
-        .main-title {
+.main-title {
     text-align: center;
-    font-size: 24px;
+    font-size: 30px;
     font-weight: bold;
-    margin-top: 10px;
+    margin-top: 45px;   /* increased from 10px */
 }
 
 .sub-main {
@@ -149,6 +169,38 @@
 
         h1 {
     text-align: center;
+}
+
+.sensor-title {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 12px; /* increased gap */
+}
+
+#pressure, #temperature {
+    margin-bottom: 18px; /* space below sensor reading */
+    font-size: 18px;
+}
+
+.btn-box {
+    width: 100%;
+    height: 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    background-color: #f4f7fb;
+
+    border: 2px solid #2c3e50;   /* strong rectangle border */
+    border-radius: 3px;          /* slight rounding */
+
+    color: #1f2d3a;
+
+    box-sizing: border-box;
 }
 
     </style>
@@ -168,8 +220,6 @@
         <img src="images/iisc-logo.jpg">
     </div>
 
-    <hr>
-
     <!-- MAIN CONTENT -->
     <div class="container">
 
@@ -183,49 +233,52 @@
             <!-- LEFT PANEL -->
             <div class="sensor-box">
                 <div class="sensor-title">Pressure Sensor</div>
-                <p id="pressure">--</p>
+                <p id="pressure"></p>
 
                 <div class="panel-buttons">
     <!-- OUTPUT ROW -->
     <div></div>
 <div class="btn-header">Output Voltage</div>
-<div class="btn-header">Output Voltage</div>
+<div class="btn-header">Pressure</div>
 
     <!-- COLUMN HEADERS -->
     <div></div>
-    <div class="btn-header">Volt</div>
-    <div class="btn-header">Psi</div>
+    <div class="btn-header">(Volt)</div>
+    <div class="btn-header">(Psi)</div>
 
     <!-- SENSOR ROWS -->
-    <div class="sensor-label">Sensor 1</div><button>Btn 1</button><button>Btn 6</button>
-    <div class="sensor-label">Sensor 2</div><button>Btn 2</button><button>Btn 7</button>
-    <div class="sensor-label">Sensor 3</div><button>Btn 3</button><button>Btn 8</button>
-    <div class="sensor-label">Sensor 4</div><button>Btn 4</button><button>Btn 9</button>
-    <div class="sensor-label">Sensor 5</div><button>Btn 5</button><button>Btn 10</button>
+    <div class="sensor-label">Sensor 1</div><div class="btn-box"></div><div class="btn-box"></div>
+    <div class="sensor-label">Sensor 2</div><div class="btn-box"></div><div class="btn-box"></div>
+    <div class="sensor-label">Sensor 3</div><div class="btn-box"></div><div class="btn-box"></div>
+    <div class="sensor-label">Sensor 4</div><div class="btn-box"></div><div class="btn-box"></div>
+    <div class="sensor-label">Sensor 5</div><div class="btn-box"></div><div class="btn-box"></div>
 </div>
             </div>
 
             <!-- RIGHT PANEL -->
             <div class="sensor-box">
                 <div class="sensor-title">Temperature Sensor</div>
-                <p id="temperature">--</p>
+                <p id="temperature"></p>
 
                 <div class="panel-buttons">
-    <!-- OUTPUT ROW -->
+
+    <!-- HEADER ROW -->
     <div></div>
-    <div class="output-header">Output</div>
+    <div class="btn-header">Output Voltage</div>
+    <div class="btn-header">Temperature</div>
 
     <!-- COLUMN HEADERS -->
     <div></div>
-    <div class="btn-header">Volt</div>
-    <div class="btn-header">°C</div>
+    <div class="btn-header">(Volt)</div>
+    <div class="btn-header">(°C)</div>
 
     <!-- SENSOR ROWS -->
-    <div class="sensor-label">Sensor 1</div><button>Btn 1</button><button>Btn 6</button>
-    <div class="sensor-label">Sensor 2</div><button>Btn 2</button><button>Btn 7</button>
-    <div class="sensor-label">Sensor 3</div><button>Btn 3</button><button>Btn 8</button>
-    <div class="sensor-label">Sensor 4</div><button>Btn 4</button><button>Btn 9</button>
-    <div class="sensor-label">Sensor 5</div><button>Btn 5</button><button>Btn 10</button>
+    <div class="sensor-label">Sensor 1</div><div class="btn-box"></div><div class="btn-box"></div>
+    <div class="sensor-label">Sensor 2</div><div class="btn-box"></div><div class="btn-box"></div>
+    <div class="sensor-label">Sensor 3</div><div class="btn-box"></div><div class="btn-box"></div>
+    <div class="sensor-label">Sensor 4</div><div class="btn-box"></div><div class="btn-box"></div>
+    <div class="sensor-label">Sensor 5</div><div class="btn-box"></div><div class="btn-box"></div>
+
 </div>
             </div>
         </div>
