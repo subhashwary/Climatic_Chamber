@@ -1,0 +1,13 @@
+<div class="right">
+    <div class="section-title">Sensor Assembly</div>
+
+    <!-- <img src="images/sensor.png" alt="Sensor"> -->
+
+    <div class="section-title">Realtime Monitoring Unit</div>
+
+    <!-- GRAPH SECTION -->
+    <div class="graph-section">
+        <h2>Graph Plotting</h2>
+        <ul id="history"></ul>
+    </div>
+</div>
