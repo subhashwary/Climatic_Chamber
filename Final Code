@@ -4,7 +4,7 @@
     <title>Sensor Dashboard</title>
 
     <style>
-        body {
+    body {
     font-family: Arial;
     margin: 20px;
     background-color: #f4f7fb; /* light technical grey-blue */
@@ -55,19 +55,15 @@
     margin-top: 25px;
 }
 
-        .sensor-box {
+   .sensor-box {
     width: 48%;
     padding: 20px;
     text-align: center;
     background-color: #ffffff;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid #e0e0e0;
 }
-
-        .sensor-box:first-child {
-            border-right: 2px solid #000;
-        }
-
         .sensor-title {
             font-size: 20px;
             font-weight: bold;
@@ -78,10 +74,16 @@
         .panel-buttons {
     margin-top: 20px;
     display: grid;
-    grid-template-columns: 110px 80px 80px; /* Sensor | Volt | Psi */
+    grid-template-columns: 90px 50px 50px; /* increase width */
+    column-gap: 95px; /* 👈 adds space between Btn 1 and Btn 6 */
     row-gap: 10px;
     align-items: center;
-        }
+    justify-content: center;
+}
+
+.panel-buttons button {
+    margin: auto;
+}
 
         .output-header {
     grid-column: 2 / 4; /* spans Volt + Psi columns */
@@ -123,7 +125,7 @@
 
         .footer {
             text-align: center;
-            margin-top: 80px;
+            margin-top: 30px;
             padding: 10px;
             font-size: 20px;
             border-top: 1px solid #ccc;
@@ -159,8 +161,8 @@
         <img src="images/cense-logo.png">
 
         <div class="title-container">
-            <div class="title">Indian Institute of Science, Bangalore</div>
-            <div class="subtitle">Centre for Nano Science and Engineering</div>
+            <div class="title">Centre for Nano Science and Engineering</div>
+            <div class="subtitle">Indian Institute of Science, Bangalore</div>
         </div>
 
         <img src="images/iisc-logo.jpg">
@@ -186,7 +188,8 @@
                 <div class="panel-buttons">
     <!-- OUTPUT ROW -->
     <div></div>
-    <div class="output-header">Output</div>
+<div class="btn-header">Output Voltage</div>
+<div class="btn-header">Output Voltage</div>
 
     <!-- COLUMN HEADERS -->
     <div></div>
