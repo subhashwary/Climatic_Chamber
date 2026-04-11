@@ -144,13 +144,17 @@
 }
 
 .footer {
-            text-align: center;
-            margin-top: 40px;
-            padding: 10px;
-            font-size: 20px;
-            border-top: 1px solid #ccc;
-            color: #555;
-        }
+    text-align: center;
+    margin-top: 40px;
+    padding: 14px;
+    font-size: 18px;
+    font-weight: 500;
+
+    color: #1f2d3a;
+    background: #dfe9f3;
+
+    letter-spacing: 0.5px;
+}
 
 .main-title {
     text-align: center;
