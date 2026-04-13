@@ -517,50 +517,84 @@ input.btn-box {
             <button onclick="stopDevice()" class="stop-btn">STOP</button>
             <button onclick="resetDevice()">RESET</button>
         </div>
-
     </div>
 
     <script>
+const BASE_URL = "http://127.0.0.1:5000";
 
-        let isRunning = false;
+let isRunning = false;
 
-        async function fetchData() {
-    const res = await fetch("http://127.0.0.1:5000/data");
-    const data = await res.json();
+// ---------------- FETCH DATA ----------------
+async function fetchData() {
+    try {
+        const res = await fetch(`${BASE_URL}/data`);
+        const data = await res.json();
 
-    console.log("DATA:", data);
+        document.getElementById("pressure").innerText = data.pressure;
+        document.getElementById("temperature").innerText = data.temperature;
 
-    document.getElementById("pressure").innerText = data.pressure;
-    document.getElementById("temperature").innerText = data.temperature;
+        for (let i = 1; i <= 5; i++) {
+            document.getElementById(`p${i}_volt`).value = data[`p${i}_volt`] ?? "";
+            document.getElementById(`t${i}_volt`).value = data[`t${i}_volt`] ?? "";
 
-    // 🔥 AUTO-FILL SENSOR 1 VOLTAGE
-for (let i = 1; i <= 5; i++) {
-    document.getElementById(`p${i}_volt`).value = data[`p${i}_volt`] || "";
-    document.getElementById(`t${i}_volt`).value = data[`t${i}_volt`] || "";
-
-    updatePressure(i);
-    updateTemperature(i);
+            updatePressure(i);
+            updateTemperature(i);
+        }
+    } catch (err) {
+        console.log("Fetch error:", err);
+    }
 }
 
-    // 🔥 trigger calculation automatically
-    updatePressure(1);
-    updateTemperature(1);
+// ---------------- UPDATE PRESSURE ----------------
+function updatePressure(sensor) {
+    let volt = parseFloat(document.getElementById(`p${sensor}_volt`).value);
+
+    if (isNaN(volt)) {
+        document.getElementById(`p${sensor}_psi`).innerText = "";
+        return;
+    }
+
+    let psi = volt * 100;
+    document.getElementById(`p${sensor}_psi`).innerText = psi.toFixed(2);
+}
+
+// ---------------- UPDATE TEMPERATURE ----------------
+function updateTemperature(sensor) {
+    let volt = parseFloat(document.getElementById(`t${sensor}_volt`).value);
+
+    if (isNaN(volt)) {
+        document.getElementById(`t${sensor}_temp`).innerText = "";
+        return;
+    }
+
+    let temp = volt * 100;
+    document.getElementById(`t${sensor}_temp`).innerText = temp.toFixed(2);
+}
+
+// ---------------- CONTROL ----------------
+async function startDevice() {
+    isRunning = true;
+    await fetch(`${BASE_URL}/start`, { method: "POST" });
+
+    clearInterval(window.dataInterval);
+    window.dataInterval = setInterval(fetchData, 500);
+}
+
+async function stopDevice() {
+    clearInterval(window.dataInterval);
+    await fetch(`${BASE_URL}/stop`, { method: "POST" });
+    isRunning = false;
 }
 
 async function resetDevice() {
     clearInterval(window.dataInterval);
-    isRunning = false;   // 🔥 reset state
+    isRunning = false;
 
-    try {
-        await fetch("http://127.0.0.1:5000/reset", { method: "POST" });
-    } catch (error) {
-        console.log("Backend not responding");
-    }
+    await fetch(`${BASE_URL}/reset`, { method: "POST" });
 
     for (let i = 1; i <= 5; i++) {
         document.getElementById(`p${i}_volt`).value = "";
         document.getElementById(`p${i}_psi`).innerText = "";
-
         document.getElementById(`t${i}_volt`).value = "";
         document.getElementById(`t${i}_temp`).innerText = "";
     }
@@ -571,41 +605,15 @@ async function resetDevice() {
     window.dataInterval = setInterval(fetchData, 2000);
 }
 
-function startDevice() {
-
-    isRunning = true;
-
-    // 🔥 Recalculate all existing values
-    for (let i = 1; i <= 5; i++) {
-        updatePressure(i);
-        updateTemperature(i);
-    }
-
-    clearInterval(window.dataInterval);
-}
-
-async function stopDevice() {
-    clearInterval(window.dataInterval);
-
-    await fetch("http://127.0.0.1:5000/stop", { method: "POST" });
-
-    isRunning = false;  // 🔥 block calculations
-
-    console.log("Stopped");
-}
-
-        window.dataInterval = setInterval(fetchData, 2000);
-
+// ---------------- CONNECT ----------------
 async function connectDevice() {
     try {
         const port = document.getElementById("comPort").value;
         const baud = document.getElementById("baudRate").value;
 
-        const res = await fetch("http://127.0.0.1:5000/connect", {
+        const res = await fetch(`${BASE_URL}/connect`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: {"Content-Type": "application/json"},
             body: JSON.stringify({
                 com_port: port,
                 baud_rate: baud
@@ -613,57 +621,23 @@ async function connectDevice() {
         });
 
         const data = await res.json();
-        console.log("RESPONSE:", data);
 
         if (data.status === "connected") {
             alert("Device Connected ✅");
-            window.dataInterval = setInterval(fetchData, 1000);
+            clearInterval(window.dataInterval);
+            window.dataInterval = setInterval(fetchData, 500);
         } else {
-            alert("❌ " + data.message);  // 👈 SHOW REAL ERROR
+            alert("❌ " + data.message);
         }
 
     } catch (error) {
-        console.error("ERROR:", error);
         alert("Backend not reachable ❌");
     }
 }
 
-function updatePressure(sensor) {
-    let volt = document.getElementById(`p${sensor}_volt`).value;
-
-    // 🚫 Block if not started
-    // 🔥 allow backend data always
-if (!isRunning && document.getElementById(`p${sensor}_volt`).value === "") {
-    return;
-}
-
-    let psi = volt * 100;
-
-    if (volt === "") {
-        document.getElementById(`p${sensor}_psi`).innerText = "";
-    } else {
-        document.getElementById(`p${sensor}_psi`).innerText = psi.toFixed(2);
-    }
-}
-
-function updateTemperature(sensor) {
-    let volt = document.getElementById(`t${sensor}_volt`).value;
-
-    // 🔥 allow backend data always
-    if (!isRunning && volt === "") {
-        return;
-    }
-
-    let temp = volt * 100;
-
-    if (volt === "") {
-        document.getElementById(`t${sensor}_temp`).innerText = "";
-    } else {
-        document.getElementById(`t${sensor}_temp`).innerText = temp.toFixed(2);
-    }
-}
-
-    </script>
+// ---------------- AUTO START FETCH ----------------
+window.dataInterval = setInterval(fetchData, 2000);
+</script>
 
 <footer class="footer">
     <div class="footer-center">
