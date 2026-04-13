@@ -9,3 +9,13 @@ Traceback (most recent call last):
     from flask_cors import CORS
 ModuleNotFoundError: No module named 'flask_cors'
 PS D:\python_sql> 
+
+
+PS D:\python_sql> from flask_cors import CORS
+At line:1 char:1
++ from flask_cors import CORS
++ ~~~~
+The 'from' keyword is not supported in this version of the language.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ReservedKeywordNotAllowed
+ 
