@@ -22,21 +22,21 @@ def connect():
 
     print(f"Received from UI → Port: {port}, Baud: {baud}")
 
-try:
-    print("TRYING SERIAL OPEN...")
-    ser = serial.Serial(port, baud, timeout=1)
-    print("SERIAL OPENED SUCCESSFULLY")
+    try:
+        print("TRYING SERIAL OPEN...")
+        ser = serial.Serial(port, baud, timeout=1)
 
-    time.sleep(2)
+        time.sleep(2)
 
-    print(f"Connected to {port} at {baud}")
-    print(f"Port open: {ser.is_open}")
+        print("SERIAL OPENED SUCCESSFULLY")
+        print(f"Connected to {port} at {baud}")
+        print(f"Port open: {ser.is_open}")
 
-    return jsonify({"status": "connected"})
+        return jsonify({"status": "connected"})
 
-except Exception as e:
-    print(f"❌ ERROR: {e}")
-    return jsonify({"status": "error", "message": str(e)})
+    except Exception as e:
+        print(f"❌ ERROR: {e}")
+        return jsonify({"status": "error", "message": str(e)})
 
 # ✅ DATA ROUTE
 @app.route('/data')
