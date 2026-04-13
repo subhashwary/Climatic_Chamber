@@ -593,10 +593,12 @@ async function stopDevice() {
         window.dataInterval = setInterval(fetchData, 2000);
 
 async function connectDevice() {
+    console.log("CONNECT BUTTON CLICKED");  // 👈 ADD THIS
+
     const port = document.getElementById("comPort").value;
     const baud = document.getElementById("baudRate").value;
 
-    const res = await fetch("http://127.0.0.1:5000/connect", {
+    await fetch("http://127.0.0.1:5000/connect", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -606,6 +608,9 @@ async function connectDevice() {
             baud_rate: baud
         })
     });
+
+    alert("Connection request sent");
+}
 
     const data = await res.json();
 
