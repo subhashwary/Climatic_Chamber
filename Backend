@@ -1,0 +1,66 @@
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+import serial
+
+app = Flask(__name__)
+CORS(app)
+
+ser = None  # global serial object
+
+@app.route('/connect', methods=['POST'])
+def connect():
+    global ser
+    data = request.json
+
+    port = data.get("com_port")
+    baud = int(data.get("baud_rate"))
+
+    try:
+        ser = serial.Serial(port, baud, timeout=1)
+
+        print(f"✅ Connected to {port} at {baud}")
+        print(f"Port open: {ser.is_open}")
+
+        return jsonify({"status": "connected"})
+    except Exception as e:
+        print(f"❌ ERROR: {e}")
+        return jsonify({"status": "error", "message": str(e)})
+
+@app.route('/data')
+def get_data():
+    global ser
+
+    if ser is None or not ser.is_open:
+        return jsonify({
+            "pressure": "Not Connected",
+            "temperature": "Not Connected",
+            "p1_volt": "",
+            "t1_volt": ""
+        })
+
+    try:
+        line = ser.readline().decode().strip()
+
+        # Example Arduino output: 2.5,1.8
+        parts = line.split(",")
+
+        p1 = float(parts[0])
+        t1 = float(parts[1])
+
+        return jsonify({
+            "pressure": "Live",
+            "temperature": "Live",
+            "p1_volt": p1,
+            "t1_volt": t1
+        })
+
+    except:
+        return jsonify({
+            "pressure": "Waiting...",
+            "temperature": "Waiting...",
+            "p1_volt": "",
+            "t1_volt": ""
+        })
+
+if __name__ == "__main__":
+    app.run(debug=True)
