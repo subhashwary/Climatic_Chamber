@@ -19,4 +19,15 @@ The 'from' keyword is not supported in this version of the language.
     + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
     + FullyQualifiedErrorId : ReservedKeywordNotAllowed
  
-C:/Users/mahim/AppData/Local/Python/pythoncore-3.14-64/python.exe -m pip install flask-cors
+
+PS D:\python_sql> python -m pip show flask-cors
+Name: flask-cors
+Version: 6.0.2
+Summary: A Flask extension simplifying CORS support
+Home-page: https://corydolphin.github.io/flask-cors/
+Author: 
+Author-email: Cory Dolphin <corydolphin@gmail.com>
+License-Expression: MIT
+Location: C:\Users\mahim\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages
+Requires: flask, Werkzeug
+Required-by: 
