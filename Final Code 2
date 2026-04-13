@@ -136,7 +136,7 @@ input.btn-box {
 }
 
 .panel-buttons > * {
-    height: 14px;
+    height: 34px;
 }
 
 .sensor-title {
@@ -160,7 +160,7 @@ input.btn-box {
     display: grid;
     grid-template-columns: 0.45fr 1fr 1fr;
     column-gap: 10px;
-    row-gap: 10px;
+    row-gap: 4px;
     align-items: center;
     width: 100%;
 }
@@ -389,7 +389,7 @@ input.btn-box {
 
     <!-- HEADER -->
     <div class="header">
-        <img src="images/cense-logo.png">
+        <img src="images/cense-logoo.png">
 
         <div class="title-container">
             <div class="title">Centre for Nano Science and Engineering</div>
@@ -397,7 +397,7 @@ input.btn-box {
             <div class="subtitle">Bangalore, 560012</div>
         </div>
 
-        <img src="images/iisc-logo.jpg">
+        <img src="images/IISc_Master_Seal_Black.jpg">
     </div>
 
 <!-- CONNECTION SETTINGS (TOP RIGHT) -->
@@ -405,7 +405,7 @@ input.btn-box {
 
     <div class="connection-row">
         <label>COM Port:</label>
-        <input type="text" id="comPort" placeholder="COM3">
+        <input type="text" id="comPort" placeholder="COM6">
     </div>
 
     <div class="connection-row">
@@ -416,7 +416,6 @@ input.btn-box {
     <button onclick="connectDevice()">CONNECT</button>
 
 </div>
-
 
     <!-- MAIN CONTENT -->
     <div class="container">
@@ -526,12 +525,22 @@ input.btn-box {
         let isRunning = false;
 
         async function fetchData() {
-            const res = await fetch("http://127.0.0.1:5000/data");
-            const data = await res.json();
+    const res = await fetch("http://127.0.0.1:5000/data");
+    const data = await res.json();
 
-            document.getElementById("pressure").innerText = data.pressure;
-            document.getElementById("temperature").innerText = data.temperature;
-        }
+    console.log("DATA:", data);
+
+    document.getElementById("pressure").innerText = data.pressure;
+    document.getElementById("temperature").innerText = data.temperature;
+
+    // 🔥 AUTO-FILL SENSOR 1 VOLTAGE
+    document.getElementById("p1_volt").value = data.p1_volt;
+    document.getElementById("t1_volt").value = data.t1_volt;
+
+    // 🔥 trigger calculation automatically
+    updatePressure(1);
+    updateTemperature(1);
+}
 
 async function resetDevice() {
     clearInterval(window.dataInterval);
@@ -569,7 +578,6 @@ function startDevice() {
     }
 
     clearInterval(window.dataInterval);
-    window.dataInterval = setInterval(fetchData, 2000);
 }
 
 async function stopDevice() {
@@ -584,11 +592,11 @@ async function stopDevice() {
 
         window.dataInterval = setInterval(fetchData, 2000);
 
-   async function connectDevice() {
+async function connectDevice() {
     const port = document.getElementById("comPort").value;
     const baud = document.getElementById("baudRate").value;
 
-    await fetch("http://127.0.0.1:5000/connect", {
+    const res = await fetch("http://127.0.0.1:5000/connect", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -599,17 +607,26 @@ async function stopDevice() {
         })
     });
 
-    alert("Connection request sent");
+    const data = await res.json();
+
+    if (data.status === "connected") {
+        alert("Device Connected ✅");
+
+        // 🔥 start data only AFTER connection
+        window.dataInterval = setInterval(fetchData, 1000);
+    } else {
+        alert("Connection Failed ❌");
+    }
 }
 
 function updatePressure(sensor) {
     let volt = document.getElementById(`p${sensor}_volt`).value;
 
     // 🚫 Block if not started
-    if (!isRunning) {
-        document.getElementById(`p${sensor}_psi`).innerText = "";
-        return;
-    }
+    // 🔥 allow backend data always
+if (!isRunning && document.getElementById(`p${sensor}_volt`).value === "") {
+    return;
+}
 
     let psi = volt * 100;
 
@@ -623,8 +640,8 @@ function updatePressure(sensor) {
 function updateTemperature(sensor) {
     let volt = document.getElementById(`t${sensor}_volt`).value;
 
-    if (!isRunning) {
-        document.getElementById(`t${sensor}_temp`).innerText = "";
+    // 🔥 allow backend data always
+    if (!isRunning && volt === "") {
         return;
     }
 
