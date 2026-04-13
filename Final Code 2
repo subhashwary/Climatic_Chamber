@@ -534,8 +534,13 @@ input.btn-box {
     document.getElementById("temperature").innerText = data.temperature;
 
     // 🔥 AUTO-FILL SENSOR 1 VOLTAGE
-    document.getElementById("p1_volt").value = data.p1_volt;
-    document.getElementById("t1_volt").value = data.t1_volt;
+for (let i = 1; i <= 5; i++) {
+    document.getElementById(`p${i}_volt`).value = data[`p${i}_volt`] || "";
+    document.getElementById(`t${i}_volt`).value = data[`t${i}_volt`] || "";
+
+    updatePressure(i);
+    updateTemperature(i);
+}
 
     // 🔥 trigger calculation automatically
     updatePressure(1);
@@ -567,7 +572,6 @@ async function resetDevice() {
 }
 
 function startDevice() {
-    fetch("http://127.0.0.1:5000/start", { method: "POST" });
 
     isRunning = true;
 
