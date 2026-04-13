@@ -552,7 +552,7 @@ async function resetDevice() {
     isRunning = false;   // 🔥 reset state
 
     try {
-        await fetch("http://127.0.0.1:5000/reset", { method: "POST" });
+        await fetch("http://127.0.0.1:5050/reset", { method: "POST" });
     } catch (error) {
         console.log("Backend not responding");
     }
@@ -587,7 +587,7 @@ function startDevice() {
 async function stopDevice() {
     clearInterval(window.dataInterval);
 
-    await fetch("http://127.0.0.1:5000/stop", { method: "POST" });
+    await fetch("http://127.0.0.1:5050/stop", { method: "POST" });
 
     isRunning = false;  // 🔥 block calculations
 
@@ -601,7 +601,7 @@ async function connectDevice() {
         const port = document.getElementById("comPort").value;
         const baud = document.getElementById("baudRate").value;
 
-        const res = await fetch("http://127.0.0.1:5000/connect", {
+        const res = await fetch("http://127.0.0.1:5050/connect", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
