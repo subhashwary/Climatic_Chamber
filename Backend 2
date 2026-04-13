@@ -6,7 +6,8 @@ import time
 app = Flask(__name__)
 CORS(app)
 
-ser = None
+ser = None  # global serial object
+
 
 # ---------------- CONNECT ----------------
 @app.route('/connect', methods=['POST'])
@@ -17,23 +18,27 @@ def connect():
     port = data.get("com_port")
     baud = int(data.get("baud_rate"))
 
+    print("CONNECT API HIT")
+    print("PORT:", port)
+    print("BAUD:", baud)
+
     try:
-        print(f"Connecting to {port} at {baud}")
+        print("TRYING SERIAL OPEN...")
 
         ser = serial.Serial(port, baud, timeout=1)
         time.sleep(2)
-        ser.reset_input_buffer()
 
-        print("Serial Connected ✔")
+        print("SERIAL OPENED SUCCESSFULLY")
+        print(f"Connected to {port} at {baud}")
 
         return jsonify({"status": "connected"})
 
     except Exception as e:
-        print("Serial Error:", e)
+        print("SERIAL ERROR:", e)
         return jsonify({"status": "error", "message": str(e)})
 
 
-# ---------------- DATA STREAM ----------------
+# ---------------- DATA ----------------
 @app.route('/data')
 def get_data():
     global ser
@@ -48,14 +53,22 @@ def get_data():
         line = ser.readline().decode(errors='ignore').strip()
         print("RAW:", line)
 
-        if not line:
-            return jsonify({"pressure": "Waiting...", "temperature": "Waiting..."})
+        # ❗ FILTER BAD LINES
+        if not line or "," not in line:
+            return jsonify({
+                "pressure": "Waiting...",
+                "temperature": "Waiting..."
+            })
 
         parts = line.split(",")
 
+        # ❗ FIX: ignore bad packet
         if len(parts) != 10:
-            print("Invalid packet:", parts)
-            return jsonify({"pressure": "Bad Data", "temperature": "Bad Data"})
+            print("Skipping bad packet:", parts)
+            return jsonify({
+                "pressure": "Syncing...",
+                "temperature": "Syncing..."
+            })
 
         values = list(map(float, parts))
 
@@ -77,15 +90,19 @@ def get_data():
         })
 
     except Exception as e:
-        print("Read Error:", e)
-        return jsonify({"pressure": "Error", "temperature": "Error"})
+        print("READ ERROR:", e)
+        return jsonify({
+            "pressure": "Error",
+            "temperature": "Error"
+        })
 
 
-# ---------------- START ----------------
+# ---------------- START (optional) ----------------
 @app.route('/start', methods=['POST'])
 def start():
     return jsonify({"status": "started"})
 
 
+# ---------------- RUN SERVER ----------------
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True, use_reloader=False)
