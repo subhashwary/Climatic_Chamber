@@ -50,11 +50,11 @@ def get_data():
         })
 
     try:
-        # Read Arduino line
         line = ser.readline().decode(errors='ignore').strip()
         print("RAW:", line)
 
-        if not line:
+        # ❗ FILTER BAD LINES
+        if not line or "," not in line:
             return jsonify({
                 "pressure": "Waiting...",
                 "temperature": "Waiting..."
@@ -62,11 +62,12 @@ def get_data():
 
         parts = line.split(",")
 
+        # ❗ FIX: ignore bad packet
         if len(parts) != 10:
-            print("Invalid data length")
+            print("Skipping bad packet:", parts)
             return jsonify({
-                "pressure": "Bad Data",
-                "temperature": "Bad Data"
+                "pressure": "Syncing...",
+                "temperature": "Syncing..."
             })
 
         values = list(map(float, parts))
