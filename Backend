@@ -38,40 +38,45 @@ def get_data():
     if ser is None or not ser.is_open:
         return jsonify({
             "pressure": "Not Connected",
-            "temperature": "Not Connected",
-            "p1_volt": "",
-            "t1_volt": ""
+            "temperature": "Not Connected"
         })
 
     try:
         line = ser.readline().decode().strip()
-        print("RAW:", line)   # 🔥 DEBUG
+        print("RAW:", line)
 
         if not line:
             raise ValueError("Empty")
 
         parts = line.split(",")
 
-        if len(parts) < 2:
-            raise ValueError("Incomplete")
+        if len(parts) != 10:
+            raise ValueError("Expected 10 values")
 
-        p1 = float(parts[0])
-        t1 = float(parts[1])
+        values = list(map(float, parts))
 
         return jsonify({
             "pressure": "Live",
             "temperature": "Live",
-            "p1_volt": p1,
-            "t1_volt": t1
+
+            "p1_volt": values[0],
+            "p2_volt": values[1],
+            "p3_volt": values[2],
+            "p4_volt": values[3],
+            "p5_volt": values[4],
+
+            "t1_volt": values[5],
+            "t2_volt": values[6],
+            "t3_volt": values[7],
+            "t4_volt": values[8],
+            "t5_volt": values[9],
         })
 
     except Exception as e:
         print("ERROR:", e)
         return jsonify({
             "pressure": "Waiting...",
-            "temperature": "Waiting...",
-            "p1_volt": "",
-            "t1_volt": ""
+            "temperature": "Waiting..."
         })
 
 # ✅ START ROUTE (OUTSIDE)
