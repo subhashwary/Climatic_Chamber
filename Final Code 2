@@ -22,7 +22,12 @@
 
 .panel-buttons {
     margin-top: 10px;
-    margin-bottom: 25px;   /* 🔥 adds space below Sensor 5 */
+    display: grid;
+    grid-template-columns: 0.45fr 1fr 1fr;
+    column-gap: 10px;
+    row-gap: 4px;   /* 🔥 reduce from 10px → 4px */
+    align-items: center;
+    width: 100%;
 }
 
 .title, .subtitle {
@@ -32,18 +37,9 @@
 .btn-header {
     font-weight: bold;
     text-align: center;
-    padding: 0;              /* remove extra space */
-    line-height: 1.1;
-}
-
-/* 🔥 Pull the first header row DOWN */
-.panel-buttons .btn-header:nth-child(-n+3) {
-    transform: translateY(6px);
-}
-
-/* 🔥 Pull the unit row UP slightly */
-.panel-buttons .btn-header:nth-child(n+4):nth-child(-n+6) {
-    transform: translateY(-4px);
+    padding: 0;        /* 🔥 remove vertical padding */
+    margin: 0;         /* 🔥 remove extra gap */
+    line-height: 1;    /* 🔥 tighter text */
 }
 
 .header img {
@@ -140,7 +136,7 @@ input.btn-box {
 }
 
 .panel-buttons > * {
-    height: 42px;
+    height: 14px;
 }
 
 .sensor-title {
@@ -193,7 +189,7 @@ input.btn-box {
 
 .sensor-label {
     justify-self: end;      /* push label toward Volt */
-    padding-right: 10px;
+    padding-right: 6px;
     font-weight: bold;
 }
 
@@ -349,20 +345,27 @@ input.btn-box {
 .connection-box {
     position: absolute;
 
-    top: 240px;     /* ⬅️ move it DOWN (adjust between 160–220 if needed) */
-    right: 20px;    
+    top: 175px;
+    right: 20px;
 
     display: flex;
-    align-items: center;
-    gap: 8px;
+    flex-direction: column;   /* 🔥 stack vertically */
+    align-items: flex-start;
+    gap: 6px;
 
     background: #ffffff;
-    padding: 8px 10px;
+    padding: 10px;
 
-    border: 2px solid #2c3e50;   /* match sensor panel border */
+    border: 2px solid #2c3e50;
     border-radius: 6px;
 
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.connection-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .connection-box input {
@@ -399,13 +402,19 @@ input.btn-box {
 
 <!-- CONNECTION SETTINGS (TOP RIGHT) -->
 <div class="connection-box">
-    <label>COM Port:</label>
-    <input type="text" id="comPort" placeholder="COM3">
 
-    <label>Baud:</label>
-    <input type="number" id="baudRate" placeholder="9600">
+    <div class="connection-row">
+        <label>COM Port:</label>
+        <input type="text" id="comPort" placeholder="COM3">
+    </div>
+
+    <div class="connection-row">
+        <label>Baud:</label>
+        <input type="number" id="baudRate" placeholder="9600">
+    </div>
 
     <button onclick="connectDevice()">CONNECT</button>
+
 </div>
 
 
