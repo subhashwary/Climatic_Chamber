@@ -8,6 +8,10 @@ CORS(app)
 
 ser = None  # global serial object
 
+@app.route('/')
+def home():
+    return "Backend Running OK"
+
 @app.route('/connect', methods=['POST'])
 def connect():
     global ser
@@ -85,4 +89,4 @@ def start():
     return jsonify({"status": "started"})
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5050, debug=True, use_reloader=False)
+    app.run(host="127.0.0.1", port=5000, debug=True, use_reloader=False)
