@@ -11,23 +11,85 @@ ModuleNotFoundError: No module named 'flask_cors'
 PS D:\python_sql> 
 
 
-PS D:\python_sql> from flask_cors import CORS
-At line:1 char:1
-+ from flask_cors import CORS
-+ ~~~~
-The 'from' keyword is not supported in this version of the language.
-    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
-    + FullyQualifiedErrorId : ReservedKeywordNotAllowed
- 
 
-PS D:\python_sql> python -m pip show flask-cors
-Name: flask-cors
-Version: 6.0.2
-Summary: A Flask extension simplifying CORS support
-Home-page: https://corydolphin.github.io/flask-cors/
-Author: 
-Author-email: Cory Dolphin <corydolphin@gmail.com>
-License-Expression: MIT
-Location: C:\Users\mahim\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages
-Requires: flask, Werkzeug
-Required-by: 
+PS D:\python_sql> & C:/Users/mahim/AppData/Local/Python/pythoncore-3.14-64/python.exe d:/python_sql/backend.py
+ * Serving Flask app 'backend'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:5000
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 962-305-012
+127.0.0.1 - - [13/Apr/2026 11:26:51] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:26:52] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:26:54] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:26:54] "OPTIONS /connect HTTP/1.1" 200 -
+Received from UI → Port: COM3, Baud: 115200
+✅ Connected to COM3 at 115200
+Port open: True
+127.0.0.1 - - [13/Apr/2026 11:26:54] "POST /connect HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:27:04] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:27:05] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:27:06] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:27:06] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:27:07] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:27:08] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:27:08] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:27:09] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:27:10] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:27:10] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:27:11] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:27:12] "POST /start HTTP/1.1" 404 -
+127.0.0.1 - - [13/Apr/2026 11:27:12] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:27:13] "POST /start HTTP/1.1" 404 -
+127.0.0.1 - - [13/Apr/2026 11:27:14] "POST /start HTTP/1.1" 404 -
+127.0.0.1 - - [13/Apr/2026 11:27:14] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:27:14] "POST /start HTTP/1.1" 404 -
+127.0.0.1 - - [13/Apr/2026 11:27:16] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:27:16] "OPTIONS /connect HTTP/1.1" 200 -
+Received from UI → Port: COM3, Baud: 115200
+❌ ERROR: could not open port 'COM3': PermissionError(13, 'Access is denied.', None, 5)
+127.0.0.1 - - [13/Apr/2026 11:27:16] "POST /connect HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:27:18] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:27:20] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:27:22] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:27:24] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:27:24] "POST /start HTTP/1.1" 404 -
+127.0.0.1 - - [13/Apr/2026 11:27:26] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:27:26] "OPTIONS /connect HTTP/1.1" 200 -
+Received from UI → Port: COM3, Baud: 115200
+❌ ERROR: could not open port 'COM3': PermissionError(13, 'Access is denied.', None, 5)
+127.0.0.1 - - [13/Apr/2026 11:27:26] "POST /connect HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:01] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:02] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:04] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:06] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:08] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:10] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:12] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:14] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:16] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:18] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:20] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:22] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:24] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:26] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:28] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:30] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:32] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:34] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:37] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:39] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:41] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:42] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:44] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:46] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:48] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:50] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:52] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:54] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:56] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:29:58] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:30:00] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [13/Apr/2026 11:30:02] "GET /data HTTP/1.1" 200 -
