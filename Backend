@@ -8,37 +8,37 @@ CORS(app)
 
 ser = None  # global serial object
 
-@app.route('/')
-def home():
-    return "Backend Running OK"
 
+# ---------------- CONNECT ----------------
 @app.route('/connect', methods=['POST'])
 def connect():
     global ser
-    data = request.json
 
+    data = request.json
     port = data.get("com_port")
     baud = int(data.get("baud_rate"))
 
-    print(f"Received from UI → Port: {port}, Baud: {baud}")
+    print("CONNECT API HIT")
+    print("PORT:", port)
+    print("BAUD:", baud)
 
     try:
         print("TRYING SERIAL OPEN...")
-        ser = serial.Serial(port, baud, timeout=1)
 
+        ser = serial.Serial(port, baud, timeout=1)
         time.sleep(2)
 
         print("SERIAL OPENED SUCCESSFULLY")
         print(f"Connected to {port} at {baud}")
-        print(f"Port open: {ser.is_open}")
 
         return jsonify({"status": "connected"})
 
     except Exception as e:
-        print(f"❌ ERROR: {e}")
+        print("SERIAL ERROR:", e)
         return jsonify({"status": "error", "message": str(e)})
 
-# ✅ DATA ROUTE
+
+# ---------------- DATA ----------------
 @app.route('/data')
 def get_data():
     global ser
@@ -50,16 +50,24 @@ def get_data():
         })
 
     try:
-        line = ser.readline().decode().strip()
+        # Read Arduino line
+        line = ser.readline().decode(errors='ignore').strip()
         print("RAW:", line)
 
         if not line:
-            raise ValueError("Empty")
+            return jsonify({
+                "pressure": "Waiting...",
+                "temperature": "Waiting..."
+            })
 
         parts = line.split(",")
 
         if len(parts) != 10:
-            raise ValueError("Expected 10 values")
+            print("Invalid data length")
+            return jsonify({
+                "pressure": "Bad Data",
+                "temperature": "Bad Data"
+            })
 
         values = list(map(float, parts))
 
@@ -81,16 +89,19 @@ def get_data():
         })
 
     except Exception as e:
-        print("ERROR:", e)
+        print("READ ERROR:", e)
         return jsonify({
-            "pressure": "Waiting...",
-            "temperature": "Waiting..."
+            "pressure": "Error",
+            "temperature": "Error"
         })
 
-# ✅ START ROUTE (OUTSIDE)
+
+# ---------------- START (optional) ----------------
 @app.route('/start', methods=['POST'])
 def start():
     return jsonify({"status": "started"})
 
+
+# ---------------- RUN SERVER ----------------
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True, use_reloader=False)
