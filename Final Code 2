@@ -593,34 +593,38 @@ async function stopDevice() {
         window.dataInterval = setInterval(fetchData, 2000);
 
 async function connectDevice() {
-    console.log("CONNECT BUTTON CLICKED");  // 👈 ADD THIS
+    try {
+        console.log("CONNECT BUTTON CLICKED");
 
-    const port = document.getElementById("comPort").value;
-    const baud = document.getElementById("baudRate").value;
+        const port = document.getElementById("comPort").value;
+        const baud = document.getElementById("baudRate").value;
 
-    await fetch("http://127.0.0.1:5000/connect", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            com_port: port,
-            baud_rate: baud
-        })
-    });
+        const res = await fetch("http://127.0.0.1:5000/connect", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                com_port: port,
+                baud_rate: baud
+            })
+        });
 
-    alert("Connection request sent");
-}
+        const data = await res.json();
+        console.log("RESPONSE:", data);
 
-    const data = await res.json();
+        if (data.status === "connected") {
+            alert("Device Connected ✅");
 
-    if (data.status === "connected") {
-        alert("Device Connected ✅");
+            // start fetching ONLY after connection
+            window.dataInterval = setInterval(fetchData, 1000);
+        } else {
+            alert("Connection Failed ❌");
+        }
 
-        // 🔥 start data only AFTER connection
-        window.dataInterval = setInterval(fetchData, 1000);
-    } else {
-        alert("Connection Failed ❌");
+    } catch (error) {
+        console.error("ERROR:", error);
+        alert("Error connecting to backend");
     }
 }
 
