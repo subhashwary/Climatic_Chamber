@@ -1,3 +1,4 @@
+import webbrowser
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 import serial
@@ -121,4 +122,5 @@ def reset():
 
 # ---------------- RUN ----------------
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5000, debug=True, use_reloader=False)
+    webbrowser.open("http://127.0.0.1:5000")
+    app.run(host="127.0.0.1", port=5000, debug=False, use_reloader=False)
