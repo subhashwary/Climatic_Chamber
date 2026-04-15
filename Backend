@@ -1,4 +1,4 @@
-pyinstaller --onefile --add-data "index.html;." --add-data "images;images" backend.py
+python -m PyInstaller --onefile --add-data "index.html;." --add-data "images;images" backend.py
 
 
 --add-data "index.html;."
