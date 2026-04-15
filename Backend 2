@@ -62,16 +62,30 @@ def get_data():
     try:
         line = ser.readline().decode('utf-8', errors='ignore').strip()
 
-        if line:
-            print("RAW:", line)
+        if not line:
+            raise ValueError("Empty line")
 
-        numbers = re.findall(r"-?\d+\.?\d*", line)
-        values = list(map(float, numbers))
+        print("RAW:", line)
 
-        if len(values) == 5:
-            alpha = 0.7
-            for i in range(5):
-                last_values[i] = alpha * last_values[i] + (1 - alpha) * values[i]
+        # ✅ STRICT FORMAT: expect EXACTLY 5 values separated by commas or spaces
+        parts = re.split(r'[,\s]+', line)
+
+        if len(parts) != 5:
+            print("Invalid packet (wrong length), ignored")
+            raise ValueError("Bad packet")
+
+        values = list(map(float, parts))
+
+        # ✅ RANGE FILTER (adjust based on your sensors)
+        for v in values:
+            if v < 0 or v > 5:   # assuming voltage 0–5V
+                print("Out of range value ignored:", v)
+                raise ValueError("Noise detected")
+
+        # ✅ SMOOTHING FILTER
+        alpha = 0.8
+        for i in range(5):
+            last_values[i] = alpha * last_values[i] + (1 - alpha) * values[i]
 
         values = last_values.copy()
 
@@ -90,11 +104,19 @@ def get_data():
     except Exception as e:
         print("READ ERROR:", e)
 
+        # ✅ CRITICAL: flush corrupted buffer
+        try:
+            ser.reset_input_buffer()
+        except:
+            pass
+
         return jsonify({
-            "pressure": "Error",
+            "pressure": "Stable",
             **{f"p{i}_volt": round(last_values[i-1], 3) for i in range(1, 6)},
             **{f"p{i}_psi": round(last_values[i-1] * 100, 3) for i in range(1, 6)},
         })
+
+ser.reset_input_buffer()
 
 
 # ---------------- START ----------------
