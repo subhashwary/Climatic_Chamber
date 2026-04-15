@@ -533,13 +533,23 @@ async function fetchData() {
         document.getElementById("pressure").innerText = data.pressure;
         document.getElementById("temperature").innerText = data.temperature;
 
-        for (let i = 1; i <= 5; i++) {
-            document.getElementById(`p${i}_volt`).value = data[`p${i}_volt`] ?? "";
-            document.getElementById(`t${i}_volt`).value = data[`t${i}_volt`] ?? "";
+for (let i = 1; i <= 5; i++) {
 
-            updatePressure(i);
-            updateTemperature(i);
-        }
+    // ✅ Voltage (3 decimal places)
+    document.getElementById(`p${i}_volt`).value =
+        data[`p${i}_volt`] !== "" ? Number(data[`p${i}_volt`]).toFixed(3) : "";
+
+    // ❌ Stop using JS calculation
+    // updatePressure(i);
+
+    // ✅ Use backend-calculated PSI (3 decimal places)
+    document.getElementById(`p${i}_psi`).innerText =
+        data[`p${i}_psi`] !== "" ? Number(data[`p${i}_psi`]).toFixed(3) : "";
+
+    // 🔴 Optional: remove temperature (since no real data)
+    document.getElementById(`t${i}_volt`).value = "";
+    document.getElementById(`t${i}_temp`).innerText = "";
+}
     } catch (err) {
         console.log("Fetch error:", err);
     }
