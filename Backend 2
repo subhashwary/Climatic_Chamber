@@ -38,10 +38,8 @@ def connect():
 
         ser = serial.Serial(port, baud, timeout=1)
 
-time.sleep(2)  # allow Arduino reset
-
-# ✅ CLEAN START (VERY IMPORTANT)
-ser.reset_input_buffer()
+        time.sleep(2)  # Arduino reset
+        ser.reset_input_buffer()  # ✅ VERY IMPORTANT
 
         print(f"Connected to {port} at {baud}")
         return jsonify({"status": "connected"})
@@ -49,7 +47,6 @@ ser.reset_input_buffer()
     except Exception as e:
         print("SERIAL ERROR:", e)
         return jsonify({"status": "error", "message": str(e)})
-
 
 # ---------------- DATA ----------------
 @app.route('/data')
@@ -71,27 +68,27 @@ def get_data():
 
         print("RAW:", line)
 
-        # ✅ STRICT FORMAT CHECK (no garbage allowed)
-if not re.match(r'^-?\d+(\.\d+)?([,\s]-?\d+(\.\d+)?){4}$', line):
-    print("Rejected (format mismatch)")
-    raise ValueError("Invalid format")
+        # ✅ STRICT FORMAT CHECK
+        if not re.match(r'^-?\d+(\.\d+)?([,\s]-?\d+(\.\d+)?){4}$', line):
+            print("Rejected (format mismatch)")
+            raise ValueError("Invalid format")
 
-parts = re.split(r'[,\s]+', line)
-values = list(map(float, parts))
+        parts = re.split(r'[,\s]+', line)
+        values = list(map(float, parts))
 
-# ✅ Reject sudden spikes
-for i in range(5):
-    if abs(values[i] - last_values[i]) > 2:
-        print("Spike detected:", values[i])
-        raise ValueError("Noise spike")
+        # ✅ SPIKE FILTER
+        for i in range(5):
+            if abs(values[i] - last_values[i]) > 2:
+                print("Spike detected:", values[i])
+                raise ValueError("Noise spike")
 
-        # ✅ RANGE FILTER (adjust based on your sensors)
+        # ✅ RANGE FILTER
         for v in values:
-            if v < 0 or v > 5:   # assuming voltage 0–5V
-                print("Out of range value ignored:", v)
-                raise ValueError("Noise detected")
+            if v < 0 or v > 5:
+                print("Out of range:", v)
+                raise ValueError("Noise")
 
-        # ✅ SMOOTHING FILTER
+        # ✅ SMOOTHING
         alpha = 0.8
         for i in range(5):
             last_values[i] = alpha * last_values[i] + (1 - alpha) * values[i]
@@ -113,7 +110,7 @@ for i in range(5):
     except Exception as e:
         print("READ ERROR:", e)
 
-        # ✅ CRITICAL: flush corrupted buffer
+        # ✅ CLEAR GARBAGE BUFFER
         try:
             ser.reset_input_buffer()
         except:
