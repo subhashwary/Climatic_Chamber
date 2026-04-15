@@ -71,14 +71,19 @@ def get_data():
 
         print("RAW:", line)
 
-        # ✅ STRICT FORMAT: expect EXACTLY 5 values separated by commas or spaces
-        parts = re.split(r'[,\s]+', line)
+        # ✅ STRICT FORMAT CHECK (no garbage allowed)
+if not re.match(r'^-?\d+(\.\d+)?([,\s]-?\d+(\.\d+)?){4}$', line):
+    print("Rejected (format mismatch)")
+    raise ValueError("Invalid format")
 
-        if len(parts) != 5:
-            print("Invalid packet (wrong length), ignored")
-            raise ValueError("Bad packet")
+parts = re.split(r'[,\s]+', line)
+values = list(map(float, parts))
 
-        values = list(map(float, parts))
+# ✅ Reject sudden spikes
+for i in range(5):
+    if abs(values[i] - last_values[i]) > 2:
+        print("Spike detected:", values[i])
+        raise ValueError("Noise spike")
 
         # ✅ RANGE FILTER (adjust based on your sensors)
         for v in values:
@@ -119,9 +124,6 @@ def get_data():
             **{f"p{i}_volt": round(last_values[i-1], 3) for i in range(1, 6)},
             **{f"p{i}_psi": round(last_values[i-1] * 100, 3) for i in range(1, 6)},
         })
-
-ser.reset_input_buffer()
-
 
 # ---------------- START ----------------
 @app.route('/start', methods=['POST'])
