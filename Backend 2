@@ -1,5 +1,4 @@
 from flask import Flask, jsonify, request, send_from_directory
-from flask import Flask, jsonify, request
 from flask_cors import CORS
 import serial
 import time
@@ -9,13 +8,14 @@ app = Flask(__name__)
 CORS(app)
 
 ser = None
-
-# Only 5 real channels
 last_values = [0.0] * 5
 
+
+# ✅ SERVE FRONTEND
 @app.route('/')
 def serve_ui():
     return send_from_directory('.', 'index.html')
+
 
 # ---------------- CONNECT ----------------
 @app.route('/connect', methods=['POST'])
@@ -36,7 +36,7 @@ def connect():
             time.sleep(1)
 
         ser = serial.Serial(port, baud, timeout=1)
-        time.sleep(2)  # Arduino reset delay
+        time.sleep(2)
 
         print(f"Connected to {port} at {baud}")
         return jsonify({"status": "connected"})
@@ -64,30 +64,21 @@ def get_data():
         if line:
             print("RAW:", line)
 
-        # Extract numbers from serial line
         numbers = re.findall(r"-?\d+\.?\d*", line)
         values = list(map(float, numbers))
 
-        # ✅ STRICT: accept only exactly 5 values
         if len(values) == 5:
-            alpha = 0.7  # smoother but still responsive
+            alpha = 0.7
             for i in range(5):
                 last_values[i] = alpha * last_values[i] + (1 - alpha) * values[i]
 
-        # Always use last stable values
         values = last_values.copy()
 
-        # ✅ Calibration / conversion (EDIT HERE if needed)
-        # Example: PSI = m*V + c (currently simple scaling)
-        psi_values = [v * 100 for v in values]
-
-        # ✅ Force 3 decimal precision (as FLOAT, not string)
+        psi_values = [round(v * 100, 3) for v in values]
         volt_values = [round(v, 3) for v in values]
-        psi_values = [round(p, 3) for p in psi_values]
 
         return jsonify({
             "pressure": "Live",
-
             "p1_volt": volt_values[0], "p1_psi": psi_values[0],
             "p2_volt": volt_values[1], "p2_psi": psi_values[1],
             "p3_volt": volt_values[2], "p3_psi": psi_values[2],
@@ -98,7 +89,6 @@ def get_data():
     except Exception as e:
         print("READ ERROR:", e)
 
-        # Return last known safe values
         return jsonify({
             "pressure": "Error",
             **{f"p{i}_volt": round(last_values[i-1], 3) for i in range(1, 6)},
@@ -109,12 +99,14 @@ def get_data():
 # ---------------- START ----------------
 @app.route('/start', methods=['POST'])
 def start():
+    print("START pressed")
     return jsonify({"status": "started"})
 
 
 # ---------------- STOP ----------------
 @app.route('/stop', methods=['POST'])
 def stop():
+    print("STOP pressed")
     return jsonify({"status": "stopped"})
 
 
@@ -123,6 +115,7 @@ def stop():
 def reset():
     global last_values
     last_values = [0.0] * 5
+    print("RESET pressed")
     return jsonify({"status": "reset"})
 
 
