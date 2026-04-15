@@ -445,23 +445,23 @@ input.btn-box {
 
     <!-- SENSOR ROWS -->
 <div class="sensor-label">Sensor 1</div>
-<input type="text" class="btn-box" id="p1_volt" oninput="updatePressure(1)">
+<input type="text" class="btn-box" id="p1_volt">
 <div class="btn-box" id="p1_psi"></div>
 
 <div class="sensor-label">Sensor 2</div>
-<input type="text" class="btn-box" id="p2_volt" oninput="updatePressure(2)">
+<input type="text" class="btn-box" id="p2_volt">
 <div class="btn-box" id="p2_psi"></div>
 
 <div class="sensor-label">Sensor 3</div>
-<input type="text" class="btn-box" id="p3_volt" oninput="updatePressure(3)">
+<input type="text" class="btn-box" id="p3_volt">
 <div class="btn-box" id="p3_psi"></div>
 
 <div class="sensor-label">Sensor 4</div>
-<input type="text" class="btn-box" id="p4_volt" oninput="updatePressure(4)">
+<input type="text" class="btn-box" id="p4_volt">
 <div class="btn-box" id="p4_psi"></div>
 
 <div class="sensor-label">Sensor 5</div>
-<input type="text" class="btn-box" id="p5_volt" oninput="updatePressure(5)">
+<input type="text" class="btn-box" id="p5_volt">
 <div class="btn-box" id="p5_psi"></div>
 
 </div>
@@ -485,23 +485,23 @@ input.btn-box {
 
     <!-- SENSOR ROWS -->
     <div class="sensor-label">Sensor 1</div>
-<input type="text" class="btn-box" id="t1_volt" oninput="updateTemperature(1)">
+<input type="text" class="btn-box" id="t1_volt">
 <div class="btn-box" id="t1_temp"></div>
 
 <div class="sensor-label">Sensor 2</div>
-<input type="text" class="btn-box" id="t2_volt" oninput="updateTemperature(2)">
+<input type="text" class="btn-box" id="t2_volt">
 <div class="btn-box" id="t2_temp"></div>
 
 <div class="sensor-label">Sensor 3</div>
-<input type="text" class="btn-box" id="t3_volt" oninput="updateTemperature(3)">
+<input type="text" class="btn-box" id="t3_volt">
 <div class="btn-box" id="t3_temp"></div>
 
 <div class="sensor-label">Sensor 4</div>
-<input type="text" class="btn-box" id="t4_volt" oninput="updateTemperature(4)">
+<input type="text" class="btn-box" id="t4_volt">
 <div class="btn-box" id="t4_temp"></div>
 
 <div class="sensor-label">Sensor 5</div>
-<input type="text" class="btn-box" id="t5_volt" oninput="updateTemperature(5)">
+<input type="text" class="btn-box" id="t5_volt">
 <div class="btn-box" id="t5_temp"></div>
 
 </div>
@@ -550,32 +550,6 @@ for (let i = 1; i <= 5; i++) {
     } catch (err) {
         console.log("Fetch error:", err);
     }
-}
-
-// ---------------- UPDATE PRESSURE ----------------
-function updatePressure(sensor) {
-    let volt = parseFloat(document.getElementById(`p${sensor}_volt`).value);
-
-    if (isNaN(volt)) {
-        document.getElementById(`p${sensor}_psi`).innerText = "";
-        return;
-    }
-
-    let psi = volt * 100;
-    document.getElementById(`p${sensor}_psi`).innerText = psi.toFixed(2);
-}
-
-// ---------------- UPDATE TEMPERATURE ----------------
-function updateTemperature(sensor) {
-    let volt = parseFloat(document.getElementById(`t${sensor}_volt`).value);
-
-    if (isNaN(volt)) {
-        document.getElementById(`t${sensor}_temp`).innerText = "";
-        return;
-    }
-
-    let temp = volt * 100;
-    document.getElementById(`t${sensor}_temp`).innerText = temp.toFixed(2);
 }
 
 // ---------------- CONTROL ----------------
