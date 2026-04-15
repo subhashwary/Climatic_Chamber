@@ -76,24 +76,25 @@ def get_data():
 
         # 🔥 OPTIONAL conversion (for display)
         # For now: simple scaling (you can change later)
-        psi_values = [v * 100 for v in values]
+        psi_values = [round(v * 100, 3) for v in values]
+        volt_values = [round(v, 3) for v in values]
 
         return jsonify({
             "pressure": "Live",
-
-            "p1_volt": values[0],
+        
+            "p1_volt": volt_values[0],
             "p1_psi": psi_values[0],
-
-            "p2_volt": values[1],
+        
+            "p2_volt": volt_values[1],
             "p2_psi": psi_values[1],
-
-            "p3_volt": values[2],
+        
+            "p3_volt": volt_values[2],
             "p3_psi": psi_values[2],
-
-            "p4_volt": values[3],
+        
+            "p4_volt": volt_values[3],
             "p4_psi": psi_values[3],
-
-            "p5_volt": values[4],
+        
+            "p5_volt": volt_values[4],
             "p5_psi": psi_values[4],
         })
 
