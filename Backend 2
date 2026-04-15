@@ -61,72 +61,46 @@ def get_data():
 
     try:
         line = ser.readline().decode('utf-8', errors='ignore').strip()
-
-        if not line:
-            raise ValueError("Empty line")
-
         print("RAW:", line)
 
-        # ✅ Split values
-        parts = re.split(r'[,\s]+', line)
+        if line:
+            parts = re.split(r'[,\s]+', line)[:5]
 
-        if len(parts) < 5:
-            print("Rejected (too few values)")
-            raise ValueError("Invalid format")
+            if len(parts) == 5:
+                try:
+                    values = list(map(float, parts))
 
-        parts = parts[:5]
-        values = list(map(float, parts))
+                    # validate range (DO NOT DROP STREAM)
+                    if all(0 <= v <= 5 for v in values):
 
-        # ✅ RANGE FILTER
-        for v in values:
-            if v < 0 or v > 5:
-                print("Out of range:", v)
-                raise ValueError("Noise")
+                        # FIRST VALID DATA
+                        if last_values == [0.0]*5:
+                            last_values = values.copy()
+                        else:
+                            alpha = 0.7
+                            for i in range(5):
+                                last_values[i] = (
+                                    alpha * last_values[i] +
+                                    (1 - alpha) * values[i]
+                                )
 
-        # ✅ SPIKE FILTER
-        if any(last_values):
-            for i in range(5):
-                if abs(values[i] - last_values[i]) > 2:
-                    print("Spike detected:", values[i])
-                    raise ValueError("Noise spike")
+                        print("UPDATED:", last_values)
 
-        # ✅ FIRST READ OR SMOOTHING
-        if not any(last_values):
-            last_values = values.copy()
-        else:
-            alpha = 0.8
-            for i in range(5):
-                last_values[i] = alpha * last_values[i] + (1 - alpha) * values[i]
-
-        print("PARSED:", values)
-        print("LAST:", last_values)
-
-        values = last_values.copy()
-
-        # ✅ CONVERSIONS
-        psi_values = [round(v * 100, 3) for v in values]
-        volt_values = [round(v, 3) for v in values]
-
-        return jsonify({
-            "pressure": "Live",
-            **{f"p{i+1}_volt": volt_values[i] for i in range(5)},
-            **{f"p{i+1}_psi": psi_values[i] for i in range(5)},
-        })
+                except Exception as e:
+                    print("Conversion error:", e)
 
     except Exception as e:
-        print("READ ERROR:", e)
+        print("Serial error:", e)
 
-        try:
-            ser.reset_input_buffer()
-        except:
-            pass
+    # ALWAYS RETURN LAST KNOWN GOOD DATA (NO STABLE STATE)
+    psi_values = [round(v * 100, 3) for v in last_values]
+    volt_values = [round(v, 3) for v in last_values]
 
-        return jsonify({
-            "pressure": "Stable",
-            **{f"p{i+1}_volt": round(last_values[i], 3) for i in range(5)},
-            **{f"p{i+1}_psi": round(last_values[i] * 100, 3) for i in range(5)},
-        })
-
+    return jsonify({
+        "pressure": "Live",
+        **{f"p{i+1}_volt": volt_values[i] for i in range(5)},
+        **{f"p{i+1}_psi": psi_values[i] for i in range(5)},
+    })
 # ---------------- START ----------------
 @app.route('/start', methods=['POST'])
 def start():
