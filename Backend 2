@@ -69,7 +69,11 @@ def get_data():
         print("RAW:", line)
 
         # ✅ STRICT FORMAT CHECK
-        if not re.match(r'^-?\d+(\.\d+)?([,\s]-?\d+(\.\d+)?){4}$', line):
+        parts = re.split(r'[,\s]+', line)
+
+if len(parts) != 5:
+    print("Rejected (wrong length)")
+    raise ValueError("Invalid format")
             print("Rejected (format mismatch)")
             raise ValueError("Invalid format")
 
