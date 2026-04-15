@@ -445,23 +445,23 @@ input.btn-box {
 
     <!-- SENSOR ROWS -->
 <div class="sensor-label">Sensor 1</div>
-<input type="text" class="btn-box" id="p1_volt">
+<input type="text" class="btn-box" id="p1_volt" readonly>
 <div class="btn-box" id="p1_psi"></div>
 
 <div class="sensor-label">Sensor 2</div>
-<input type="text" class="btn-box" id="p2_volt">
+<input type="text" class="btn-box" id="p2_volt" readonly>
 <div class="btn-box" id="p2_psi"></div>
 
 <div class="sensor-label">Sensor 3</div>
-<input type="text" class="btn-box" id="p3_volt">
+<input type="text" class="btn-box" id="p3_volt" readonly>
 <div class="btn-box" id="p3_psi"></div>
 
 <div class="sensor-label">Sensor 4</div>
-<input type="text" class="btn-box" id="p4_volt">
+<input type="text" class="btn-box" id="p4_volt" readonly>
 <div class="btn-box" id="p4_psi"></div>
 
 <div class="sensor-label">Sensor 5</div>
-<input type="text" class="btn-box" id="p5_volt">
+<input type="text" class="btn-box" id="p5_volt" readonly>
 <div class="btn-box" id="p5_psi"></div>
 
 </div>
@@ -485,23 +485,23 @@ input.btn-box {
 
     <!-- SENSOR ROWS -->
     <div class="sensor-label">Sensor 1</div>
-<input type="text" class="btn-box" id="t1_volt">
+<input type="text" class="btn-box" id="t1_volt" readonly>
 <div class="btn-box" id="t1_temp"></div>
 
 <div class="sensor-label">Sensor 2</div>
-<input type="text" class="btn-box" id="t2_volt">
+<input type="text" class="btn-box" id="t2_volt" readonly>
 <div class="btn-box" id="t2_temp"></div>
 
 <div class="sensor-label">Sensor 3</div>
-<input type="text" class="btn-box" id="t3_volt">
+<input type="text" class="btn-box" id="t3_volt" readonly>
 <div class="btn-box" id="t3_temp"></div>
 
 <div class="sensor-label">Sensor 4</div>
-<input type="text" class="btn-box" id="t4_volt">
+<input type="text" class="btn-box" id="t4_volt" readonly>
 <div class="btn-box" id="t4_temp"></div>
 
 <div class="sensor-label">Sensor 5</div>
-<input type="text" class="btn-box" id="t5_volt">
+<input type="text" class="btn-box" id="t5_volt" readonly>
 <div class="btn-box" id="t5_temp"></div>
 
 </div>
@@ -531,22 +531,25 @@ async function fetchData() {
         const data = await res.json();
 
         document.getElementById("pressure").innerText = data.pressure;
-        document.getElementById("temperature").innerText = data.temperature;
+        document.getElementById("temperature").innerText = data.temperature || "";
 
-for (let i = 1; i <= 5; i++) {
+        for (let i = 1; i <= 5; i++) {
 
-    // ✅ Voltage (strict 3 decimal display)
-    document.getElementById(`p${i}_volt`).value =
-        data[`p${i}_volt`] !== "" ? Number(data[`p${i}_volt`]).toFixed(3) : "";
+            // ✅ Voltage
+            const volt = parseFloat(data[`p${i}_volt`]);
+            document.getElementById(`p${i}_volt`).value =
+                !isNaN(volt) ? volt.toFixed(3) : "";
 
-    // ✅ PSI from backend (strict 3 decimal)
-    document.getElementById(`p${i}_psi`).innerText =
-        data[`p${i}_psi`] !== "" ? Number(data[`p${i}_psi`]).toFixed(3) : "";
+            // ✅ PSI
+            const psi = parseFloat(data[`p${i}_psi`]);
+            document.getElementById(`p${i}_psi`).innerText =
+                !isNaN(psi) ? psi.toFixed(3) : "";
 
-    // ❌ Remove temperature (since not coming from backend)
-    document.getElementById(`t${i}_volt`).value = "";
-    document.getElementById(`t${i}_temp`).innerText = "";
-}
+            // Temperature (unused for now)
+            document.getElementById(`t${i}_volt`).value = "";
+            document.getElementById(`t${i}_temp`).innerText = "";
+        }
+
     } catch (err) {
         console.log("Fetch error:", err);
     }
@@ -554,7 +557,16 @@ for (let i = 1; i <= 5; i++) {
 
 // ---------------- CONTROL ----------------
 async function startDevice() {
+    const res = await fetch(`${BASE_URL}/data`);
+    const data = await res.json();
+
+    if (data.pressure === "Not Connected") {
+        alert("⚠️ Please connect device first");
+        return;
+    }
+
     isRunning = true;
+
     await fetch(`${BASE_URL}/start`, { method: "POST" });
 
     clearInterval(window.dataInterval);
