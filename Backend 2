@@ -48,7 +48,6 @@ def connect():
         print("SERIAL ERROR:", e)
         return jsonify({"status": "error", "message": str(e)})
 
-# ---------------- DATA ----------------
 @app.route('/data')
 def get_data():
     global ser, last_values
@@ -71,29 +70,36 @@ def get_data():
         # ✅ Split values
         parts = re.split(r'[,\s]+', line)
 
-        # ✅ STRICT FORMAT CHECK
-        if len(parts) != 5:
-            print("Rejected (wrong length)")
+        if len(parts) < 5:
+            print("Rejected (too few values)")
             raise ValueError("Invalid format")
 
+        parts = parts[:5]
         values = list(map(float, parts))
 
-        # ✅ RANGE FILTER (0–5V)
+        # ✅ RANGE FILTER
         for v in values:
             if v < 0 or v > 5:
                 print("Out of range:", v)
                 raise ValueError("Noise")
 
         # ✅ SPIKE FILTER
-        for i in range(5):
-            if abs(values[i] - last_values[i]) > 2:
-                print("Spike detected:", values[i])
-                raise ValueError("Noise spike")
+        if any(last_values):
+            for i in range(5):
+                if abs(values[i] - last_values[i]) > 2:
+                    print("Spike detected:", values[i])
+                    raise ValueError("Noise spike")
 
-        # ✅ SMOOTHING
-        alpha = 0.8
-        for i in range(5):
-            last_values[i] = alpha * last_values[i] + (1 - alpha) * values[i]
+        # ✅ FIRST READ OR SMOOTHING
+        if not any(last_values):
+            last_values = values.copy()
+        else:
+            alpha = 0.8
+            for i in range(5):
+                last_values[i] = alpha * last_values[i] + (1 - alpha) * values[i]
+
+        print("PARSED:", values)
+        print("LAST:", last_values)
 
         values = last_values.copy()
 
@@ -110,7 +116,6 @@ def get_data():
     except Exception as e:
         print("READ ERROR:", e)
 
-        # ✅ CLEAR BUFFER
         try:
             ser.reset_input_buffer()
         except:
