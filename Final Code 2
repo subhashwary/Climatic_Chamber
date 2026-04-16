@@ -336,6 +336,10 @@ input.btn-box {
     box-sizing: border-box;
 }
 
+input.btn-box {
+    font-size: 16px;
+}
+
 /* Make input behave exactly like div */
 input.btn-box {
     padding: 0;
