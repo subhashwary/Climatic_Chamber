@@ -325,7 +325,7 @@ input.btn-box {
 
     text-align: center;
 
-    font-size: 12px;
+    font-size: 16px;
     font-weight: 600;
 
     background-color: #f4f7fb;
