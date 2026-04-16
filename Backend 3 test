@@ -1,0 +1,158 @@
+import webbrowser
+from flask import Flask, jsonify, request, send_from_directory, Response
+from flask_cors import CORS
+import serial
+import time
+import threading
+import csv
+import io
+
+app = Flask(__name__)
+CORS(app)
+
+ser = None
+
+last_values = [0.0] * 5
+last_update_time = 0
+
+# ✅ DATA LOG STORAGE
+data_log = []
+
+
+# ---------------- SERVE FRONTEND ----------------
+@app.route('/')
+def serve_ui():
+    return send_from_directory('.', 'index.html')
+
+
+# ---------------- CONNECT ----------------
+@app.route('/connect', methods=['POST'])
+def connect():
+    global ser, last_update_time, last_values
+
+    data = request.json
+
+    try:
+        port = data.get("com_port")
+        baud = int(data.get("baud_rate"))
+
+        if ser and ser.is_open:
+            ser.close()
+            time.sleep(1)
+
+        ser = serial.Serial(port, baud, timeout=1)
+        time.sleep(2)
+        ser.reset_input_buffer()
+
+        last_values = [0.0] * 5
+        last_update_time = time.time()
+
+        return jsonify({"status": "connected"})
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
+
+# ---------------- SERIAL READ ----------------
+def read_serial():
+    global ser, last_values, last_update_time, data_log
+
+    if ser is None or not ser.is_open:
+        return
+
+    try:
+        line = ser.readline().decode('utf-8', errors='ignore').strip()
+
+        if not line:
+            return
+
+        parts = line.replace(',', ' ').split()
+
+        if len(parts) < 5:
+            return
+
+        values = [float(x) for x in parts[:5]]
+
+        if not all(0 <= v <= 5 for v in values):
+            return
+
+        last_values = [round(v, 3) for v in values]
+        last_update_time = time.time()
+
+        # ✅ LOG DATA WITH TIMESTAMP
+        timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+
+        data_log.append({
+            "timestamp": timestamp,
+            "values": last_values.copy()
+        })
+
+        # optional: limit size (prevents memory overflow)
+        if len(data_log) > 10000:
+            data_log.pop(0)
+
+        print("UPDATED:", last_values)
+
+    except Exception as e:
+        print("Serial error:", e)
+
+
+# ---------------- THREAD ----------------
+def serial_loop():
+    while True:
+        if ser and ser.is_open:
+            read_serial()
+        time.sleep(0.05)
+
+
+threading.Thread(target=serial_loop, daemon=True).start()
+
+
+# ---------------- DATA API ----------------
+@app.route('/data')
+def get_data():
+    global last_values, last_update_time
+
+    if ser is None or not ser.is_open:
+        return jsonify({"status": "disconnected"})
+
+    age = time.time() - last_update_time
+
+    if age > 2:
+        return jsonify({
+            "status": "no_data",
+            "pressure": "NO SIGNAL",
+            **{f"p{i}_volt": "" for i in range(1, 6)}
+        })
+
+    return jsonify({
+        "status": "live",
+        "pressure": "LIVE",
+        **{f"p{i+1}_volt": f"{last_values[i]:.3f}" for i in range(5)}
+    })
+
+
+# ---------------- CSV DOWNLOAD ----------------
+@app.route('/download_csv')
+def download_csv():
+    output = io.StringIO()
+    writer = csv.writer(output)
+
+    writer.writerow(["Timestamp", "P1", "P2", "P3", "P4", "P5"])
+
+    for entry in data_log:
+        writer.writerow([entry["timestamp"]] + entry["values"])
+
+    output.seek(0)
+
+    return Response(
+        output,
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment;filename=sensor_data.csv"}
+    )
+
+
+# ---------------- RUN ----------------
+if __name__ == "__main__":
+    webbrowser.open("http://127.0.0.1:5000")
+    app.run(debug=False)
