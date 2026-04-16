@@ -76,47 +76,24 @@ def read_serial():
 
         print("RAW:", line)
 
-        # ---- safer parsing ----
-        parts = re.split(r'[,\s]+', line.strip())
+        parts = line.replace(',', ' ').split()
 
         if len(parts) < 5:
-            print("Bad frame (not enough values):", line)
+            print("Bad frame:", line)
             return
 
-        parts = parts[:5]
+        values = [float(x) for x in parts[:5]]
 
-        try:
-            values = [float(x) for x in parts]
-        except:
-            print("Conversion failed:", line)
+        if not all(0 <= v <= 5 for v in values):
+            print("Out of range:", values)
             return
 
-        # ---- range validation (adjust if needed) ----
-        if not all(-10 <= v <= 10 for v in values):
-            print("Out of range ignored:", values)
-            return
-
-        # ---- freeze detection ----
-        if values == last_values:
-            freeze_counter += 1
-        else:
-            freeze_counter = 0
-
-        # if frozen too long, force accept anyway (DO NOT STALL SYSTEM)
-        if freeze_counter > 20:
-            print("WARNING: frozen stream detected, forcing update")
-            freeze_counter = 0
-
-        # ---- update values (ALWAYS UPDATE SAFE DATA) ----
-        alpha = 0.6
-
-        for i in range(5):
-            smoothed = alpha * last_values[i] + (1 - alpha) * values[i]
-            last_values[i] = round(smoothed, 3)
+        # SIMPLE & BEST (no smoothing)
+        last_values = [round(v, 3) for v in values]
 
         last_update_time = time.time()
 
-        print("UPDATED:", [round(v, 3) for v in last_values])
+        print("UPDATED:", last_values)
 
     except Exception as e:
         print("Serial read error:", e)
