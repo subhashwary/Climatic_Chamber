@@ -91,7 +91,7 @@ def read_serial():
         if len(data_log) > 10000:
             data_log.pop(0)
 
-        print("UPDATED:", last_values)
+        print("UPDATED:", " | ".join(f"{v:.3f}" for v in last_values))
 
     except Exception as e:
         print("Serial error:", e)
@@ -141,7 +141,9 @@ def download_csv():
     writer.writerow(["Timestamp", "P1", "P2", "P3", "P4", "P5"])
 
     for entry in data_log:
-        writer.writerow([entry["timestamp"]] + entry["values"])
+        writer.writerow(
+    [entry["timestamp"]] + [f"{v:.3f}" for v in entry["values"]]
+)
 
     output.seek(0)
 
