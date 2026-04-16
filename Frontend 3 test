@@ -583,10 +583,13 @@ function updatePressure(sensor) {
         return;
     }
 
-    // ensure it's clean voltage (not already scaled)
-    volt = volt / 1;  
+    // Ensure clean numeric value
+    volt = Number(volt);
 
+    // Correct formula
     let psi = (4 * volt) + 5;
+
+    // Display result
     document.getElementById(`p${sensor}_psi`).innerText = psi.toFixed(2);
 }
 
