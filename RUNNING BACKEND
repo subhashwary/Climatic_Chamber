@@ -93,7 +93,8 @@ def read_serial():
 
         last_update_time = time.time()
 
-        print("UPDATED:", last_values)
+        formatted = [f"{v:.3f}" for v in last_values]
+        print("UPDATED:", " | ".join(formatted))
 
     except Exception as e:
         print("Serial read error:", e)
@@ -141,8 +142,8 @@ def get_data():
             **{f"p{i}_psi": "" for i in range(1, 6)},
         })
 
-    volt_values = [round(v, 3) for v in last_values]
-    psi_values = [round(v * 100, 3) for v in last_values]
+    volt_values = [f"{v:.3f}" for v in last_values]
+    psi_values = [f"{v * 100:.3f}" for v in last_values]
 
     return jsonify({
         "status": "live",
