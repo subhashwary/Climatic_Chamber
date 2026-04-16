@@ -583,7 +583,7 @@ function updatePressure(sensor) {
         return;
     }
 
-    let psi = volt * 100;
+    let psi = (4 * volt) + 5;
     document.getElementById(`p${sensor}_psi`).innerText = psi.toFixed(2);
 }
 
