@@ -576,10 +576,15 @@ document.getElementById(`t${i}_volt`).value =
 
 // ---------------- UPDATE PRESSURE ----------------
 function updatePressure(sensor) {
-    let psi = document.getElementById(`p${sensor}_psi`).dataset.value;
+    let volt = parseFloat(document.getElementById(`p${sensor}_volt`).value);
 
-    document.getElementById(`p${sensor}_psi`).innerText =
-        psi ? Number(psi).toFixed(2) : "";
+    if (isNaN(volt)) {
+        document.getElementById(`p${sensor}_psi`).innerText = "";
+        return;
+    }
+
+    let psi = (4 * volt) + 5;
+    document.getElementById(`p${sensor}_psi`).innerText = psi.toFixed(2);
 }
 
 // ---------------- UPDATE TEMPERATURE ----------------
