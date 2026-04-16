@@ -312,7 +312,8 @@ input.btn-box {
 
 #pressure, #temperature {
     margin-bottom: 18px; /* space below sensor reading */
-    font-size: 18px;
+    font-size: 22px;
+    font-weight: bold;
 }
 
 .panel-buttons div.btn-box {
@@ -326,7 +327,7 @@ input.btn-box {
     text-align: center;
 
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 700;
 
     background-color: #f4f7fb;
 
