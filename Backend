@@ -1,23 +1,24 @@
 import webbrowser
-from flask import Flask, jsonify, request, send_from_directory, Response
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 import serial
 import time
+import re
 import threading
-import csv
-import io
 
 app = Flask(__name__)
 CORS(app)
 
 ser = None
 
+# holds latest GOOD values
 last_values = [0.0] * 5
+
+# timestamp of last valid update
 last_update_time = 0
 
-# ---- CSV LOGGING ----
-data_log = []
-last_log_time = 0
+# for frozen detection
+freeze_counter = 0
 
 
 # ---------------- SERVE FRONTEND ----------------
@@ -37,6 +38,9 @@ def connect():
         port = data.get("com_port")
         baud = int(data.get("baud_rate"))
 
+        if not port or not baud:
+            return jsonify({"status": "error", "message": "Missing COM port or baud rate"})
+
         if ser and ser.is_open:
             ser.close()
             time.sleep(1)
@@ -53,107 +57,127 @@ def connect():
         return jsonify({"status": "connected"})
 
     except Exception as e:
+        print("SERIAL ERROR:", e)
         return jsonify({"status": "error", "message": str(e)})
 
 
-# ---------------- SERIAL READ ----------------
+# ---------------- SAFE SERIAL READ ----------------
 def read_serial():
-    global ser, last_values, last_update_time, data_log, last_log_time
+    global ser, last_values, last_update_time, freeze_counter
 
     if ser is None or not ser.is_open:
         return
 
     try:
         line = ser.readline().decode('utf-8', errors='ignore').strip()
+
         if not line:
             return
 
         print("RAW:", line)
 
         parts = line.replace(',', ' ').split()
+
         if len(parts) < 5:
+            print("Bad frame:", line)
             return
 
         values = [float(x) for x in parts[:5]]
 
         if not all(0 <= v <= 5 for v in values):
+            print("Out of range:", values)
             return
 
-        last_values = values
+        # SIMPLE & BEST (no smoothing)
+        last_values = [round(v, 3) for v in values]
+
         last_update_time = time.time()
 
-        # ---- TERMINAL DISPLAY ----
-        print("UPDATED:", " | ".join(f"{v:.3f}" for v in last_values))
-
-        # ---- LOG EVERY 1 SEC ----
-        if time.time() - last_log_time > 1:
-            timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-
-            data_log.append({
-                "timestamp": timestamp,
-                "values": last_values.copy()
-            })
-
-            last_log_time = time.time()
+        formatted = [f"{v:.3f}" for v in last_values]
+        print("UPDATED:", " | ".join(formatted))
 
     except Exception as e:
-        print("Serial error:", e)
+        print("Serial read error:", e)
 
 
-# ---------------- THREAD ----------------
+# ---------------- BACKGROUND THREAD ----------------
 def serial_loop():
+    global ser
+
     while True:
         if ser and ser.is_open:
             read_serial()
+
+            # periodic buffer cleanup (prevents lag buildup)
+            # only clear occasionally
+            if int(time.time()) % 5 == 0:
+                try:
+                    ser.reset_input_buffer()
+                except:
+                    pass
+
         time.sleep(0.05)
 
 
 threading.Thread(target=serial_loop, daemon=True).start()
 
 
-# ---------------- DATA API ----------------
+# ---------------- DATA ENDPOINT ----------------
 @app.route('/data')
 def get_data():
     global last_values, last_update_time
 
+    now = time.time()
+    age = now - last_update_time
+
+    # ---- STALE DATA DETECTION ----
     if ser is None or not ser.is_open:
         return jsonify({"status": "disconnected"})
 
-    if time.time() - last_update_time > 2:
-        return jsonify({"status": "no_data"})
+    if age > 2.0:
+        return jsonify({
+            "status": "no_data",
+            "pressure": "NO SIGNAL",
+            **{f"p{i}_volt": "" for i in range(1, 6)},
+            **{f"p{i}_psi": "" for i in range(1, 6)},
+        })
 
     volt_values = [f"{v:.3f}" for v in last_values]
-    psi_values = [f"{v*100:.3f}" for v in last_values]
+    psi_values = [f"{v * 100:.3f}" for v in last_values]
 
     return jsonify({
         "status": "live",
+        "timestamp": now,
+        "age_sec": round(age, 2),
         "pressure": "LIVE",
         **{f"p{i+1}_volt": volt_values[i] for i in range(5)},
         **{f"p{i+1}_psi": psi_values[i] for i in range(5)},
     })
 
 
-# ---------------- CSV DOWNLOAD ----------------
-@app.route('/download_csv')
-def download_csv():
-    output = io.StringIO()
-    writer = csv.writer(output)
+# ---------------- CONTROL ----------------
+@app.route('/start', methods=['POST'])
+def start():
+    print("START pressed")
+    return jsonify({"status": "started"})
 
-    writer.writerow(["Timestamp", "P1", "P2", "P3", "P4", "P5"])
 
-    for entry in data_log:
-        writer.writerow([entry["timestamp"]] + entry["values"])
+@app.route('/stop', methods=['POST'])
+def stop():
+    print("STOP pressed")
+    return jsonify({"status": "stopped"})
 
-    output.seek(0)
 
-    return Response(
-        output,
-        mimetype="text/csv",
-        headers={"Content-Disposition": "attachment;filename=sensor_data.csv"}
-    )
+@app.route('/reset', methods=['POST'])
+def reset():
+    global last_values, last_update_time
+    last_values = [0.0] * 5
+    last_update_time = time.time()
+    print("RESET pressed")
+    return jsonify({"status": "reset"})
 
 
 # ---------------- RUN ----------------
 if __name__ == "__main__":
     webbrowser.open("http://127.0.0.1:5000")
-    app.run(debug=False)
+    app.run(host="127.0.0.1", port=5000, debug=False, use_reloader=False)
