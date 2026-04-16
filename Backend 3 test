@@ -53,6 +53,23 @@ def connect():
         return jsonify({"status": "error", "message": str(e)})
 
 
+# ---------------- CONTROL ----------------
+@app.route('/start', methods=['POST'])
+def start():
+    return jsonify({"status": "started"})
+
+@app.route('/stop', methods=['POST'])
+def stop():
+    return jsonify({"status": "stopped"})
+
+@app.route('/reset', methods=['POST'])
+def reset():
+    global data_log, last_values
+    data_log = []
+    last_values = [0]*5
+    return jsonify({"status": "reset"})
+
+
 # ---------------- SERIAL READ ----------------
 def read_serial():
     global ser, last_values, last_update_time, data_log
