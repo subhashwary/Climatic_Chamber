@@ -34,6 +34,8 @@
     color: #1f2d3a;   /* dark text for contrast */
 }
 
+<button onclick="downloadCSV()">DOWNLOAD CSV</button>
+
 .btn-header {
     font-weight: bold;
     text-align: center;
@@ -643,6 +645,11 @@ async function connectDevice() {
 
 // ---------------- AUTO START FETCH ----------------
 window.dataInterval = setInterval(fetchData, 2000);
+
+function downloadCSV() {
+    window.open(`${BASE_URL}/download_csv`, "_blank");
+}
+
 </script>
 
 <footer class="footer">
