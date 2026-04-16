@@ -20,8 +20,26 @@
     border-radius: 6px;
 }
 
+.panel-buttons {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: 0.45fr 1fr 1fr;
+    column-gap: 10px;
+    row-gap: 4px;   /* 🔥 reduce from 10px → 4px */
+    align-items: center;
+    width: 100%;
+}
+
 .title, .subtitle {
     color: #1f2d3a;   /* dark text for contrast */
+}
+
+.btn-header {
+    font-weight: bold;
+    text-align: center;
+    padding: 0;        /* 🔥 remove vertical padding */
+    margin: 0;         /* 🔥 remove extra gap */
+    line-height: 1;    /* 🔥 tighter text */
 }
 
 .header img {
@@ -64,8 +82,8 @@
 }
 
 .panel-buttons {
-    display: grid;
-    grid-template-columns: 120px 1fr 1fr; /* FIXED first column */
+    grid-template-columns: 120px 140px 140px;
+    justify-content: center;
 }
 
 .sensor-box {
@@ -79,6 +97,46 @@
     border-radius: 4px;
     box-shadow: none;
     
+}
+
+.btn-box {
+    width: 140px;
+    height: 42px;
+
+    display: flex;              /* 🔥 KEY FIX */
+    align-items: center;        /* vertical center */
+    justify-content: center;    /* horizontal center */
+
+    text-align: center;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    background-color: #f4f7fb;
+
+    border: 2px solid #2c3e50;
+    border-radius: 3px;
+
+    box-sizing: border-box;
+}
+
+input.btn-box {
+    display: flex;              /* match div */
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;                 /* remove default padding */
+    text-align: center;
+
+    line-height: normal;
+}
+
+.panel-buttons {
+    align-items: center;   /* 🔥 ensures row alignment */
+}
+
+.panel-buttons > * {
+    height: 34px;
 }
 
 .sensor-title {
@@ -102,7 +160,7 @@
     display: grid;
     grid-template-columns: 0.45fr 1fr 1fr;
     column-gap: 10px;
-    row-gap: 10px;
+    row-gap: 4px;
     align-items: center;
     width: 100%;
 }
@@ -131,7 +189,7 @@
 
 .sensor-label {
     justify-self: end;      /* push label toward Volt */
-    padding-right: 10px;
+    padding-right: 6px;
     font-weight: bold;
 }
 
@@ -287,20 +345,27 @@ input.btn-box {
 .connection-box {
     position: absolute;
 
-    top: 240px;     /* ⬅️ move it DOWN (adjust between 160–220 if needed) */
-    right: 20px;    
+    top: 175px;
+    right: 20px;
 
     display: flex;
-    align-items: center;
-    gap: 8px;
+    flex-direction: column;   /* 🔥 stack vertically */
+    align-items: flex-start;
+    gap: 6px;
 
     background: #ffffff;
-    padding: 8px 10px;
+    padding: 10px;
 
-    border: 2px solid #2c3e50;   /* match sensor panel border */
+    border: 2px solid #2c3e50;
     border-radius: 6px;
 
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.connection-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .connection-box input {
@@ -332,20 +397,25 @@ input.btn-box {
             <div class="subtitle">Bangalore, 560012</div>
         </div>
 
-        <img src="images/iisc-logo.jpg">
+        <img src="images/IISc_Master.png">
     </div>
 
 <!-- CONNECTION SETTINGS (TOP RIGHT) -->
 <div class="connection-box">
-    <label>COM Port:</label>
-    <input type="text" id="comPort" placeholder="COM3">
 
-    <label>Baud:</label>
-    <input type="number" id="baudRate" placeholder="9600">
+    <div class="connection-row">
+        <label>COM Port:</label>
+        <input type="text" id="comPort" placeholder="COM6">
+    </div>
+
+    <div class="connection-row">
+        <label>Baud:</label>
+        <input type="number" id="baudRate" placeholder="9600">
+    </div>
 
     <button onclick="connectDevice()">CONNECT</button>
-</div>
 
+</div>
 
     <!-- MAIN CONTENT -->
     <div class="container">
@@ -447,35 +517,90 @@ input.btn-box {
             <button onclick="stopDevice()" class="stop-btn">STOP</button>
             <button onclick="resetDevice()">RESET</button>
         </div>
-
     </div>
 
     <script>
+const BASE_URL = "http://127.0.0.1:5000";
 
-        let isRunning = false;
+let isRunning = false;
 
-        async function fetchData() {
-            const res = await fetch("http://127.0.0.1:5000/data");
-            const data = await res.json();
+// ---------------- FETCH DATA ----------------
+async function fetchData() {
+    try {
+        const res = await fetch(`${BASE_URL}/data`);
+        const data = await res.json();
 
-            document.getElementById("pressure").innerText = data.pressure;
-            document.getElementById("temperature").innerText = data.temperature;
+        document.getElementById("pressure").innerText = data.pressure;
+        document.getElementById("temperature").innerText = data.temperature;
+
+        for (let i = 1; i <= 5; i++) {
+            let pVolt = data[`p${i}_volt`];
+let tVolt = data[`t${i}_volt`];
+
+document.getElementById(`p${i}_volt`).value =
+    (pVolt !== "" && pVolt != null) ? Number(pVolt).toFixed(3) : "";
+
+document.getElementById(`t${i}_volt`).value =
+    (tVolt !== "" && tVolt != null) ? Number(tVolt).toFixed(3) : "";
+
+            updatePressure(i);
+            updateTemperature(i);
         }
+    } catch (err) {
+        console.log("Fetch error:", err);
+    }
+}
+
+// ---------------- UPDATE PRESSURE ----------------
+function updatePressure(sensor) {
+    let volt = parseFloat(document.getElementById(`p${sensor}_volt`).value);
+
+    if (isNaN(volt)) {
+        document.getElementById(`p${sensor}_psi`).innerText = "";
+        return;
+    }
+
+    let psi = volt * 100;
+    document.getElementById(`p${sensor}_psi`).innerText = psi.toFixed(2);
+}
+
+// ---------------- UPDATE TEMPERATURE ----------------
+function updateTemperature(sensor) {
+    let volt = parseFloat(document.getElementById(`t${sensor}_volt`).value);
+
+    if (isNaN(volt)) {
+        document.getElementById(`t${sensor}_temp`).innerText = "";
+        return;
+    }
+
+    let temp = volt * 100;
+    document.getElementById(`t${sensor}_temp`).innerText = temp.toFixed(2);
+}
+
+// ---------------- CONTROL ----------------
+async function startDevice() {
+    isRunning = true;
+    await fetch(`${BASE_URL}/start`, { method: "POST" });
+
+    clearInterval(window.dataInterval);
+    window.dataInterval = setInterval(fetchData, 500);
+}
+
+async function stopDevice() {
+    clearInterval(window.dataInterval);
+    await fetch(`${BASE_URL}/stop`, { method: "POST" });
+    isRunning = false;
+}
 
 async function resetDevice() {
     clearInterval(window.dataInterval);
-    isRunning = false;   // 🔥 reset state
+    isRunning = false;
 
-    try {
-        await fetch("http://127.0.0.1:5000/reset", { method: "POST" });
-    } catch (error) {
-        console.log("Backend not responding");
-    }
+    await fetch(`${BASE_URL}/reset`, { method: "POST" });
 
     for (let i = 1; i <= 5; i++) {
         document.getElementById(`p${i}_volt`).value = "";
         document.getElementById(`p${i}_psi`).innerText = "";
-
         document.getElementById(`t${i}_volt`).value = "";
         document.getElementById(`t${i}_temp`).innerText = "";
     }
@@ -486,87 +611,39 @@ async function resetDevice() {
     window.dataInterval = setInterval(fetchData, 2000);
 }
 
-function startDevice() {
-    fetch("http://127.0.0.1:5000/start", { method: "POST" });
+// ---------------- CONNECT ----------------
+async function connectDevice() {
+    try {
+        const port = document.getElementById("comPort").value;
+        const baud = document.getElementById("baudRate").value;
 
-    isRunning = true;
+        const res = await fetch(`${BASE_URL}/connect`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                com_port: port,
+                baud_rate: baud
+            })
+        });
 
-    // 🔥 Recalculate all existing values
-    for (let i = 1; i <= 5; i++) {
-        updatePressure(i);
-        updateTemperature(i);
-    }
+        const data = await res.json();
 
-    clearInterval(window.dataInterval);
-    window.dataInterval = setInterval(fetchData, 2000);
-}
+        if (data.status === "connected") {
+            alert("Device Connected ✅");
+            clearInterval(window.dataInterval);
+            window.dataInterval = setInterval(fetchData, 500);
+        } else {
+            alert("❌ " + data.message);
+        }
 
-async function stopDevice() {
-    clearInterval(window.dataInterval);
-
-    await fetch("http://127.0.0.1:5000/stop", { method: "POST" });
-
-    isRunning = false;  // 🔥 block calculations
-
-    console.log("Stopped");
-}
-
-        window.dataInterval = setInterval(fetchData, 2000);
-
-   async function connectDevice() {
-    const port = document.getElementById("comPort").value;
-    const baud = document.getElementById("baudRate").value;
-
-    await fetch("http://127.0.0.1:5000/connect", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            com_port: port,
-            baud_rate: baud
-        })
-    });
-
-    alert("Connection request sent");
-}
-
-function updatePressure(sensor) {
-    let volt = document.getElementById(`p${sensor}_volt`).value;
-
-    // 🚫 Block if not started
-    if (!isRunning) {
-        document.getElementById(`p${sensor}_psi`).innerText = "";
-        return;
-    }
-
-    let psi = volt * 100;
-
-    if (volt === "") {
-        document.getElementById(`p${sensor}_psi`).innerText = "";
-    } else {
-        document.getElementById(`p${sensor}_psi`).innerText = psi.toFixed(2);
+    } catch (error) {
+        alert("Backend not reachable ❌");
     }
 }
 
-function updateTemperature(sensor) {
-    let volt = document.getElementById(`t${sensor}_volt`).value;
-
-    if (!isRunning) {
-        document.getElementById(`t${sensor}_temp`).innerText = "";
-        return;
-    }
-
-    let temp = volt * 100;
-
-    if (volt === "") {
-        document.getElementById(`t${sensor}_temp`).innerText = "";
-    } else {
-        document.getElementById(`t${sensor}_temp`).innerText = temp.toFixed(2);
-    }
-}
-
-    </script>
+// ---------------- AUTO START FETCH ----------------
+window.dataInterval = setInterval(fetchData, 2000);
+</script>
 
 <footer class="footer">
     <div class="footer-center">
