@@ -111,8 +111,8 @@ def read_serial():
         alpha = 0.6
 
         for i in range(5):
-    smoothed = alpha * last_values[i] + (1 - alpha) * values[i]
-    last_values[i] = round(smoothed, 3)
+            smoothed = alpha * last_values[i] + (1 - alpha) * values[i]
+            last_values[i] = round(smoothed, 3)
 
         last_update_time = time.time()
 
@@ -131,10 +131,12 @@ def serial_loop():
             read_serial()
 
             # periodic buffer cleanup (prevents lag buildup)
-            try:
-                ser.reset_input_buffer()
-            except:
-                pass
+            # only clear occasionally
+            if int(time.time()) % 5 == 0:
+                try:
+                    ser.reset_input_buffer()
+                except:
+                    pass
 
         time.sleep(0.05)
 
