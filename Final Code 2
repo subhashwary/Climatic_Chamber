@@ -1,636 +1,171 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sensor Dashboard</title>
+<title>Sensor Dashboard</title>
 
-    <style>
-    body {
+<style>
+body {
     font-family: Arial;
     margin: 20px;
-    background-color: #f4f7fb; /* light technical grey-blue */
+    background-color: #f4f7fb;
 }
 
 .header {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-
-    background-color: #d9e6f2;  /* light academic blue */
+    background-color: #d9e6f2;
     padding: 10px;
-    border-radius: 6px;
 }
-
-.panel-buttons {
-    margin-top: 10px;
-    display: grid;
-    grid-template-columns: 0.45fr 1fr 1fr;
-    column-gap: 10px;
-    row-gap: 4px;   /* 🔥 reduce from 10px → 4px */
-    align-items: center;
-    width: 100%;
-}
-
-.title, .subtitle {
-    color: #1f2d3a;   /* dark text for contrast */
-}
-
-.btn-header {
-    font-weight: bold;
-    text-align: center;
-    padding: 0;        /* 🔥 remove vertical padding */
-    margin: 0;         /* 🔥 remove extra gap */
-    line-height: 1;    /* 🔥 tighter text */
-}
-
-.header img {
-            height: 60px;
-        }
 
 .title-container {
-            flex-grow: 1;
-            text-align: center;
-        }
+    text-align: center;
+}
 
-.title {
-            font-size: 44px;
-            font-weight: bold;
-        }
+.title { font-size: 28px; font-weight: bold; }
+.subtitle { font-size: 18px; }
 
-.subtitle {
-            font-size: 32px;   /* same size as title */
-            font-weight: bold; /* make it bold */
-            margin-top: 4px;
-        }
-
-.container {
-            margin-top: 20px;
-        }
-
-        /* SENSOR SECTION */
 .sensor-container {
     display: flex;
-    justify-content: center;
-    gap: 40px;              /* space between panels */
-    margin-top: 25px;
-    align-items: flex-start;
-}
-
-.unit {
-    text-align: center;
-    font-size: 13px;
-    margin-top: -6px; /* pulls closer to header */
-}
-
-.panel-buttons {
-    grid-template-columns: 120px 140px 140px;
+    gap: 40px;
+    margin-top: 30px;
     justify-content: center;
 }
 
 .sensor-box {
-    width: 40%;   /* control panel size */
-    
-    padding: 12px 14px;
-    text-align: center;
-    background-color: #ffffff;
-
     border: 2px solid #2c3e50;
-    border-radius: 4px;
-    box-shadow: none;
-    
-}
-
-.btn-box {
-    width: 140px;
-    height: 42px;
-
-    display: flex;              /* 🔥 KEY FIX */
-    align-items: center;        /* vertical center */
-    justify-content: center;    /* horizontal center */
-
-    text-align: center;
-
-    font-size: 12px;
-    font-weight: 600;
-
-    background-color: #f4f7fb;
-
-    border: 2px solid #2c3e50;
-    border-radius: 3px;
-
-    box-sizing: border-box;
-}
-
-input.btn-box {
-    display: flex;              /* match div */
-    align-items: center;
-    justify-content: center;
-
-    padding: 0;                 /* remove default padding */
-    text-align: center;
-
-    line-height: normal;
-}
-
-.panel-buttons {
-    align-items: center;   /* 🔥 ensures row alignment */
-}
-
-.panel-buttons > * {
-    height: 34px;
+    padding: 15px;
+    width: 40%;
+    background: white;
 }
 
 .sensor-title {
-    display: inline-block;
-
-    font-size: 22px;
-    font-weight: 700;
-
-    padding: 6px 14px;
-    margin-bottom: 14px;
-
-    border: 2px solid #2c3e50;
-    border-radius: 6px;
-
-    background-color: #f4f7fb;
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
 }
 
-        /* BUTTONS INSIDE EACH PANEL */
-.panel-buttons {
-    margin-top: 10px;
+.grid {
     display: grid;
-    grid-template-columns: 0.45fr 1fr 1fr;
-    column-gap: 10px;
-    row-gap: 4px;
+    grid-template-columns: 100px 120px 120px;
+    gap: 6px;
     align-items: center;
-    width: 100%;
 }
 
-/* Psi / Temp column → slight center */
-.panel-buttons .btn-box:not(input) {
-    justify-self: center;
-}
-
-.panel-buttons input.btn-box {
-    justify-self: center;   /* center them perfectly */
-    width: 85%;
-}
-
-.panel-buttons div.btn-box {
-    justify-self: center;
-    width: 85%;
-}
-
-.panel-buttons button {
-    width: 110px;
-    height: 32px;
-    font-size: 11px;
-    margin: 0;
-}
-
-.sensor-label {
-    justify-self: end;      /* push label toward Volt */
-    padding-right: 6px;
-    font-weight: bold;
-}
-
-.output-header {
-    grid-column: 2 / 4; /* spans Volt + Psi columns */
+.grid input, .grid div {
+    border: 1px solid #333;
+    padding: 5px;
     text-align: center;
-    font-weight: bold;
-    font-size: 14px;
 }
 
-.btn-header {
-    font-weight: bold;
-    text-align: center;
-    padding: 2px 0;
-
-    width: 100%;
-}
-
-        /* TOP CONTROL BUTTONS */
 .top-buttons {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        button {
-    width: 50px;
-    height: 35px;
-    font-size: 11px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-}
-
-.top-buttons button {
-    width: 90px;      /* bigger width */
-    height: 45px;     /* taller button */
-    font-size: 14px;  /* bigger text */
-    margin: 5px;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-.start-btn {
-    background-color: #28a745;
-}
-
-.stop-btn {
-    background-color: #dc3545;
-}
-
-.footer {
-    position: relative;
-    display: flex;
-    align-items: center;
-
-    margin-top: 40px;
-    padding: 14px;
-
-    font-size: 16px;
-    font-weight: 500;
-
-    color: #1f2d3a;
-    background: #dfe9f3;
-}
-
-/* Center text */
-.footer-center {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
     text-align: center;
+    margin-top: 20px;
 }
 
-/* Right side horizontal */
-.footer-right {
-    margin-left: auto;
-    display: flex;
-    gap: 20px; /* space between contact & website */
-    font-size: 14px;
-}
-
-.footer-left {
-    text-align: left;
-}
-
-.footer-icon {
-    width: 22px;
-    height: 22px;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-}
-
-.footer-icon:hover {
-    transform: scale(1.2);
-}
-
-.main-title {
-    text-align: center;
-    font-size: 30px;
-    font-weight: bold;
-    margin-top: 45px;   /* increased from 10px */
-}
-
-.sub-main {
-    text-align: center;
-    font-size: 25px;
-    margin-top: 4px;
-    color: #444;
-    font-weight: 500;
-}
-
-        h1 {
-    text-align: center;
-}
-
-.sensor-title {
-    font-size: 32px;
-    font-weight: 700;
-    margin-bottom: 12px; /* increased gap */
-}
-
-#pressure, #temperature {
-    margin-bottom: 18px; /* space below sensor reading */
-    font-size: 22px;
-    font-weight: bold;
-}
-
-.panel-buttons div.btn-box {
-    justify-self: center;
-}
-
-.btn-box {
-    width: 75%;
-    height: 42px;
-
-    text-align: center;
-
-    font-size: 16px;
-    font-weight: 700;
-
-    background-color: #f4f7fb;
-
-    border: 2px solid #2c3e50;
-    border-radius: 3px;
-
-    box-sizing: border-box;
-}
-
-input.btn-box {
-    font-size: 16px;
-}
-
-/* Make input behave exactly like div */
-input.btn-box {
-    padding: 0;
-    margin: 0;
-}
-
-.connection-box {
-    position: absolute;
-
-    top: 175px;
-    right: 20px;
-
-    display: flex;
-    flex-direction: column;   /* 🔥 stack vertically */
-    align-items: flex-start;
-    gap: 6px;
-
-    background: #ffffff;
+button {
     padding: 10px;
-
-    border: 2px solid #2c3e50;
-    border-radius: 6px;
-
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.connection-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.connection-box input {
-    width: 80px;
-    height: 28px;
-    font-size: 12px;
-    padding: 2px 5px;
-}
-
-.connection-box button {
-    height: 30px;
-    width: 90px;
-    font-size: 12px;
+    margin: 5px;
     cursor: pointer;
 }
-
-    </style>
+</style>
 </head>
 
 <body>
 
-    <!-- HEADER -->
-    <div class="header">
-        <img src="images/cense-logoo.png">
-
-        <div class="title-container">
-            <div class="title">Centre for Nano Science and Engineering</div>
-            <div class="subtitle">Indian Institute of Science</div>
-            <div class="subtitle">Bangalore, 560012</div>
-        </div>
-
-        <img src="images/IISc_Master_Seal_Black.jpg">
+<div class="header">
+    <div>CeNSE</div>
+    <div class="title-container">
+        <div class="title">Sensor Dashboard</div>
+        <div class="subtitle">Realtime Monitoring</div>
     </div>
+    <div>IISc</div>
+</div>
 
-<!-- CONNECTION SETTINGS (TOP RIGHT) -->
-<div class="connection-box">
-
-    <div class="connection-row">
-        <label>COM Port:</label>
-        <input type="text" id="comPort" placeholder="COM6">
-    </div>
-
-    <div class="connection-row">
-        <label>Baud:</label>
-        <input type="number" id="baudRate" placeholder="9600">
-    </div>
-
+<div style="margin-top:20px;">
+    COM: <input id="comPort" placeholder="COM6">
+    Baud: <input id="baudRate" placeholder="9600">
     <button onclick="connectDevice()">CONNECT</button>
+</div>
+
+<div class="sensor-container">
+
+<!-- PRESSURE -->
+<div class="sensor-box">
+<div class="sensor-title">Pressure</div>
+
+<div class="grid">
+<div></div><b>Volt</b><b>PSI</b>
+
+<div>Sensor1</div><input id="p1_volt"><div id="p1_psi"></div>
+<div>Sensor2</div><input id="p2_volt"><div id="p2_psi"></div>
+<div>Sensor3</div><input id="p3_volt"><div id="p3_psi"></div>
+<div>Sensor4</div><input id="p4_volt"><div id="p4_psi"></div>
+<div>Sensor5</div><input id="p5_volt"><div id="p5_psi"></div>
+</div>
+</div>
+
+<!-- TEMPERATURE -->
+<div class="sensor-box">
+<div class="sensor-title">Temperature</div>
+
+<div class="grid">
+<div></div><b>Volt</b><b>°C</b>
+
+<div>Sensor1</div><input id="t1_volt"><div id="t1_temp"></div>
+<div>Sensor2</div><input id="t2_volt"><div id="t2_temp"></div>
+<div>Sensor3</div><input id="t3_volt"><div id="t3_temp"></div>
+<div>Sensor4</div><input id="t4_volt"><div id="t4_temp"></div>
+<div>Sensor5</div><input id="t5_volt"><div id="t5_temp"></div>
+</div>
+</div>
 
 </div>
 
-    <!-- MAIN CONTENT -->
-    <div class="container">
-
-        <div class="main-title">GTRE RAKE Sensor Assembly</div>
-        <div class="sub-main">Realtime Monitoring</div>
-        
-
-        <!-- SENSOR DISPLAY -->
-        <div class="sensor-container">
-
-            <!-- LEFT PANEL -->
-            <div class="sensor-box">
-                <div class="sensor-title">Pressure Sensor</div>
-                <p id="pressure"></p>
-
-                <div class="panel-buttons">
-    <!-- OUTPUT ROW -->
-     
-<div class="btn-header"></div>
-<div class="btn-header">Output Voltage</div>
-<div class="btn-header">Pressure</div>
-
-<div></div>
-<div class="btn-header">(Volt)</div>
-<div class="btn-header">(Psi)</div>
-
-    <!-- SENSOR ROWS -->
-<div class="sensor-label">Sensor 1</div>
-<input type="text" class="btn-box" id="p1_volt" readonly>
-<div class="btn-box" id="p1_psi"></div>
-
-<div class="sensor-label">Sensor 2</div>
-<input type="text" class="btn-box" id="p2_volt" readonly>
-<div class="btn-box" id="p2_psi"></div>
-
-<div class="sensor-label">Sensor 3</div>
-<input type="text" class="btn-box" id="p3_volt" readonly>
-<div class="btn-box" id="p3_psi"></div>
-
-<div class="sensor-label">Sensor 4</div>
-<input type="text" class="btn-box" id="p4_volt" readonly>
-<div class="btn-box" id="p4_psi"></div>
-
-<div class="sensor-label">Sensor 5</div>
-<input type="text" class="btn-box" id="p5_volt" readonly>
-<div class="btn-box" id="p5_psi"></div>
-
+<div class="top-buttons">
+<button onclick="startDevice()">START</button>
+<button onclick="stopDevice()">STOP</button>
 </div>
-            </div>
 
-            <!-- RIGHT PANEL -->
-            <div class="sensor-box">
-                <div class="sensor-title">Temperature Sensor</div>
-                <p id="temperature"></p>
-
-                <div class="panel-buttons">
-
-    <!-- HEADER ROW -->
- <div class="btn-header"></div>
-<div class="btn-header">Output Voltage</div>
-<div class="btn-header">Temperature</div>
-
-<div class="btn-header"></div>
-<div class="btn-header">(Volt)</div>
-<div class="btn-header">(°C)</div>
-
-    <!-- SENSOR ROWS -->
-    <div class="sensor-label">Sensor 1</div>
-<input type="text" class="btn-box" id="t1_volt" readonly>
-<div class="btn-box" id="t1_temp"></div>
-
-<div class="sensor-label">Sensor 2</div>
-<input type="text" class="btn-box" id="t2_volt" readonly>
-<div class="btn-box" id="t2_temp"></div>
-
-<div class="sensor-label">Sensor 3</div>
-<input type="text" class="btn-box" id="t3_volt" readonly>
-<div class="btn-box" id="t3_temp"></div>
-
-<div class="sensor-label">Sensor 4</div>
-<input type="text" class="btn-box" id="t4_volt" readonly>
-<div class="btn-box" id="t4_temp"></div>
-
-<div class="sensor-label">Sensor 5</div>
-<input type="text" class="btn-box" id="t5_volt" readonly>
-<div class="btn-box" id="t5_temp"></div>
-
-</div>
-            </div>
-        </div>
-            </div>
-
-        </div>
-
-        <!-- CONTROL BUTTONS -->
-        <div class="top-buttons">
-            <button onclick="startDevice()" class="start-btn">START</button>
-            <button onclick="stopDevice()" class="stop-btn">STOP</button>
-            <button onclick="resetDevice()">RESET</button>
-        </div>
-    </div>
-
-    <script>
+<script>
 const BASE_URL = "http://127.0.0.1:5000";
 
-// ✅ FULL CSV HEADER
-let csvContent = "timestamp,rake_no," +
-"p1_v,p1_psi,p2_v,p2_psi,p3_v,p3_psi,p4_v,p4_psi,p5_v,p5_psi," +
-"t1_v,t1_temp,t2_v,t2_temp,t3_v,t3_temp,t4_v,t4_temp,t5_v,t5_temp\n";
+async function connectDevice(){
+    const port = document.getElementById("comPort").value;
+    const baud = document.getElementById("baudRate").value;
 
-// timestamp
-function getTimestamp(){
-    return new Date().toISOString();
+    const res = await fetch(`${BASE_URL}/connect`,{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({com_port:port, baud_rate:baud})
+    });
+
+    const data = await res.json();
+    alert(data.status);
 }
 
-// CSV append
-function appendCSV(row){
-    csvContent += row + "\n";
-}
-
-// FETCH DATA
 async function fetchData(){
-    try{
-        const res = await fetch(`${BASE_URL}/data`);
-        const data = await res.json();
+    const res = await fetch(`${BASE_URL}/data`);
+    const data = await res.json();
 
-        const ts = getTimestamp();
-        document.getElementById("timestamp").innerText = ts;
+    if(data.status !== "live") return;
 
-        const rake = document.getElementById("rakeNo").value || "NA";
+    for(let i=1;i<=5;i++){
+        document.getElementById(`p${i}_volt`).value = data[`p${i}_volt`] ?? "";
+        document.getElementById(`p${i}_psi`).innerText = data[`p${i}_psi`] ?? "";
 
-        let row = [ts, rake];
-
-        for(let i=1;i<=5;i++){
-
-            // PRESSURE
-            let v = parseFloat(data[`p${i}_volt`]);
-            let p = parseFloat(data[`p${i}_psi`]);
-
-            v = !isNaN(v) ? v.toFixed(3) : "";
-            p = !isNaN(p) ? p.toFixed(3) : "";
-
-            document.getElementById(`p${i}_volt`).value = v;
-            document.getElementById(`p${i}_psi`).innerText = p;
-
-            row.push(v, p);
-
-            // TEMPERATURE
-            let tv = parseFloat(data[`t${i}_volt`]);
-            let tt = parseFloat(data[`t${i}_temp`]);
-
-            tv = !isNaN(tv) ? tv.toFixed(3) : "";
-            tt = !isNaN(tt) ? tt.toFixed(3) : "";
-
-            document.getElementById(`t${i}_volt`).value = tv;
-            document.getElementById(`t${i}_temp`).innerText = tt;
-
-            row.push(tv, tt);
-        }
-
-        appendCSV(row.join(","));
-
-    }catch(e){
-        console.log("Fetch error:", e);
+        document.getElementById(`t${i}_volt`).value = data[`t${i}_volt`] ?? "";
+        document.getElementById(`t${i}_temp`).innerText = data[`t${i}_temp`] ?? "";
     }
 }
 
-// CONTROL
 function startDevice(){
     window.loop = setInterval(fetchData,500);
 }
 
 function stopDevice(){
     clearInterval(window.loop);
-
-    // ✅ PROPER CSV DOWNLOAD
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "sensor_data.csv";
-    a.click();
-
-    URL.revokeObjectURL(url);
-}
-
-// CONNECT
-async function connectDevice(){
-    const port = document.getElementById("comPort").value;
-    const baud = document.getElementById("baudRate").value;
-
-    try {
-        const res = await fetch(`${BASE_URL}/connect`,{
-            method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({com_port:port, baud_rate:baud})
-        });
-
-        const data = await res.json();
-
-        if(data.status === "connected"){
-            alert("Device Connected ✅");
-        } else {
-            alert("❌ " + data.message);
-        }
-
-    } catch(err){
-        alert("Backend not reachable ❌");
-    }
 }
 </script>
+
+</body>
+</html>
