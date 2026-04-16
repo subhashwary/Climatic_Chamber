@@ -76,14 +76,16 @@ def read_serial():
         if not all(0 <= v <= 5 for v in values):
             return
 
-        last_values = values  # keep raw
+        last_values = [round(v, 3) for v in values]
+        last_update_time = time.time()
 
-formatted_values = [f"{v:.3f}" for v in values]
+        # ✅ LOG DATA WITH TIMESTAMP
+        timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
 
-data_log.append({
-    "timestamp": timestamp,
-    "values": formatted_values
-})
+        data_log.append({
+            "timestamp": timestamp,
+            "values": last_values.copy()
+        })
 
         # optional: limit size (prevents memory overflow)
         if len(data_log) > 10000:
