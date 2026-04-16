@@ -4,15 +4,24 @@ from flask_cors import CORS
 import serial
 import time
 import re
+import threading
 
 app = Flask(__name__)
 CORS(app)
 
 ser = None
+
+# holds latest GOOD values
 last_values = [0.0] * 5
 
+# timestamp of last valid update
+last_update_time = 0
 
-# ✅ SERVE FRONTEND
+# for frozen detection
+freeze_counter = 0
+
+
+# ---------------- SERVE FRONTEND ----------------
 @app.route('/')
 def serve_ui():
     return send_from_directory('.', 'index.html')
@@ -21,7 +30,7 @@ def serve_ui():
 # ---------------- CONNECT ----------------
 @app.route('/connect', methods=['POST'])
 def connect():
-    global ser
+    global ser, last_update_time, last_values
 
     data = request.json
 
@@ -37,89 +46,152 @@ def connect():
             time.sleep(1)
 
         ser = serial.Serial(port, baud, timeout=1)
+        time.sleep(2)
+        ser.reset_input_buffer()
 
-        time.sleep(2)  # Arduino reset
-        ser.reset_input_buffer()  # ✅ VERY IMPORTANT
+        last_values = [0.0] * 5
+        last_update_time = time.time()
 
         print(f"Connected to {port} at {baud}")
+
         return jsonify({"status": "connected"})
 
     except Exception as e:
         print("SERIAL ERROR:", e)
         return jsonify({"status": "error", "message": str(e)})
 
-@app.route('/data')
-def get_data():
-    global ser, last_values
+
+# ---------------- SAFE SERIAL READ ----------------
+def read_serial():
+    global ser, last_values, last_update_time, freeze_counter
 
     if ser is None or not ser.is_open:
+        return
+
+    try:
+        line = ser.readline().decode('utf-8', errors='ignore').strip()
+
+        if not line:
+            return
+
+        print("RAW:", line)
+
+        # ---- safer parsing ----
+        parts = re.split(r'[,\s]+', line.strip())
+
+        if len(parts) < 5:
+            print("Bad frame (not enough values):", line)
+            return
+
+        parts = parts[:5]
+
+        try:
+            values = [float(x) for x in parts]
+        except:
+            print("Conversion failed:", line)
+            return
+
+        # ---- range validation (adjust if needed) ----
+        if not all(-10 <= v <= 10 for v in values):
+            print("Out of range ignored:", values)
+            return
+
+        # ---- freeze detection ----
+        if values == last_values:
+            freeze_counter += 1
+        else:
+            freeze_counter = 0
+
+        # if frozen too long, force accept anyway (DO NOT STALL SYSTEM)
+        if freeze_counter > 20:
+            print("WARNING: frozen stream detected, forcing update")
+            freeze_counter = 0
+
+        # ---- update values (ALWAYS UPDATE SAFE DATA) ----
+        alpha = 0.6
+
+        for i in range(5):
+            last_values[i] = alpha * last_values[i] + (1 - alpha) * values[i]
+
+        last_update_time = time.time()
+
+        print("UPDATED:", last_values)
+
+    except Exception as e:
+        print("Serial read error:", e)
+
+
+# ---------------- BACKGROUND THREAD ----------------
+def serial_loop():
+    global ser
+
+    while True:
+        if ser and ser.is_open:
+            read_serial()
+
+            # periodic buffer cleanup (prevents lag buildup)
+            try:
+                ser.reset_input_buffer()
+            except:
+                pass
+
+        time.sleep(0.05)
+
+
+threading.Thread(target=serial_loop, daemon=True).start()
+
+
+# ---------------- DATA ENDPOINT ----------------
+@app.route('/data')
+def get_data():
+    global last_values, last_update_time
+
+    now = time.time()
+    age = now - last_update_time
+
+    # ---- STALE DATA DETECTION ----
+    if ser is None or not ser.is_open:
+        return jsonify({"status": "disconnected"})
+
+    if age > 2.0:
         return jsonify({
-            "pressure": "Not Connected",
+            "status": "no_data",
+            "pressure": "NO SIGNAL",
             **{f"p{i}_volt": "" for i in range(1, 6)},
             **{f"p{i}_psi": "" for i in range(1, 6)},
         })
 
-    try:
-        line = ser.readline().decode('utf-8', errors='ignore').strip()
-        print("RAW:", line)
-
-        if line:
-            parts = re.split(r'[,\s]+', line)[:5]
-
-            if len(parts) == 5:
-                try:
-                    values = list(map(float, parts))
-
-                    # validate range (DO NOT DROP STREAM)
-                    if all(0 <= v <= 5 for v in values):
-
-                        # FIRST VALID DATA
-                        if last_values == [0.0]*5:
-                            last_values = values.copy()
-                        else:
-                            alpha = 0.7
-                            for i in range(5):
-                                last_values[i] = (
-                                    alpha * last_values[i] +
-                                    (1 - alpha) * values[i]
-                                )
-
-                        print("UPDATED:", last_values)
-
-                except Exception as e:
-                    print("Conversion error:", e)
-
-    except Exception as e:
-        print("Serial error:", e)
-
-    # ALWAYS RETURN LAST KNOWN GOOD DATA (NO STABLE STATE)
-    psi_values = [round(v * 100, 3) for v in last_values]
     volt_values = [round(v, 3) for v in last_values]
+    psi_values = [round(v * 100, 3) for v in last_values]
 
     return jsonify({
-        "pressure": "Live",
+        "status": "live",
+        "timestamp": now,
+        "age_sec": round(age, 2),
+        "pressure": "LIVE",
         **{f"p{i+1}_volt": volt_values[i] for i in range(5)},
         **{f"p{i+1}_psi": psi_values[i] for i in range(5)},
     })
-# ---------------- START ----------------
+
+
+# ---------------- CONTROL ----------------
 @app.route('/start', methods=['POST'])
 def start():
     print("START pressed")
     return jsonify({"status": "started"})
 
 
-# ---------------- STOP ----------------
 @app.route('/stop', methods=['POST'])
 def stop():
     print("STOP pressed")
     return jsonify({"status": "stopped"})
 
 
-# ---------------- RESET ----------------
 @app.route('/reset', methods=['POST'])
 def reset():
-    global last_values
+    global last_values, last_update_time
     last_values = [0.0] * 5
+    last_update_time = time.time()
     print("RESET pressed")
     return jsonify({"status": "reset"})
 
