@@ -563,7 +563,7 @@ sensorChart = new Chart(ctx, {
             x: {
                 title: {
                     display: true,
-                    text: "Time"
+                    text: "Time (HH:MM:SS)"
                 }
             },
             y: {
