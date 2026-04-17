@@ -3,6 +3,8 @@
 <head>
     <title>Sensor Dashboard</title>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
     body {
     font-family: Arial;
@@ -517,10 +519,49 @@ input.btn-box {
             <button onclick="stopDevice()" class="stop-btn">STOP</button>
             <button onclick="resetDevice()">RESET</button>
         </div>
-    </div>
+
+<div style="width:90%; margin: 30px auto;">
+    <canvas id="sensorChart"></canvas>
+</div>
+
+<button onclick="exportCSV()" style="display:block; margin: 10px auto;">
+    Export Data
+</button>
 
     <script>
 const BASE_URL = "http://127.0.0.1:5000";
+
+let sensorChart;
+
+// 🔴 FREEZE DETECTION VARIABLES
+let lastValues = [null, null, null, null, null];
+let freezeCount = [0, 0, 0, 0, 0];
+
+const FREEZE_LIMIT = 5;
+
+// ---------------- CHART SETUP ----------------
+
+window.onload = function () {
+    const ctx = document.getElementById('sensorChart').getContext('2d');
+
+    sensorChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [
+                { label: 'Sensor 1', borderColor: 'red', data: [], fill: false },
+                { label: 'Sensor 2', borderColor: 'blue', data: [], fill: false },
+                { label: 'Sensor 3', borderColor: 'green', data: [], fill: false },
+                { label: 'Sensor 4', borderColor: 'orange', data: [], fill: false },
+                { label: 'Sensor 5', borderColor: 'purple', data: [], fill: false }
+            ]
+        },
+        options: {
+            responsive: true,
+            animation: false
+        }
+    });
+};
 
 let isRunning = false;
 
@@ -535,17 +576,57 @@ async function fetchData() {
 
         for (let i = 1; i <= 5; i++) {
             let pVolt = data[`p${i}_volt`];
-let tVolt = data[`t${i}_volt`];
+            let tVolt = data[`t${i}_volt`];
 
-document.getElementById(`p${i}_volt`).value =
-    (pVolt !== "" && pVolt != null) ? Number(pVolt).toFixed(3) : "";
+            document.getElementById(`p${i}_volt`).value =
+                (pVolt !== "" && pVolt != null) ? Number(pVolt).toFixed(3) : "";
 
-document.getElementById(`t${i}_volt`).value =
-    (tVolt !== "" && tVolt != null) ? Number(tVolt).toFixed(3) : "";
+            document.getElementById(`t${i}_volt`).value =
+                (tVolt !== "" && tVolt != null) ? Number(tVolt).toFixed(3) : "";
 
             updatePressure(i);
             updateTemperature(i);
         }
+
+        // ✅ GRAPH UPDATE (MOVED HERE)
+        if (sensorChart) {
+            let label = (Date.now() / 1000).toFixed(1); // seconds
+
+            sensorChart.data.labels.push(label);
+
+   for (let i = 1; i <= 5; i++) {
+    let volt = parseFloat(data[`p${i}_volt`]);
+    let psi = isNaN(volt) ? null : volt * 100;
+
+    // ---- FREEZE DETECTION ----
+    if (psi !== null) {
+        if (psi === lastValues[i - 1]) {
+            freezeCount[i - 1]++;
+        } else {
+            freezeCount[i - 1] = 0;
+        }
+
+        lastValues[i - 1] = psi;
+
+        if (freezeCount[i - 1] > FREEZE_LIMIT) {
+            console.warn(`Sensor ${i} FREEZE detected`);
+            sensorChart.data.datasets[i - 1].borderDash = [5, 5];
+        } else {
+            sensorChart.data.datasets[i - 1].borderDash = [];
+        }
+    }
+
+    sensorChart.data.datasets[i - 1].data.push(psi);
+}
+
+            if (sensorChart.data.labels.length > 20) {
+                sensorChart.data.labels.shift();
+                sensorChart.data.datasets.forEach(ds => ds.data.shift());
+            }
+
+            sensorChart.update();
+        }
+
     } catch (err) {
         console.log("Fetch error:", err);
     }
@@ -609,6 +690,40 @@ async function resetDevice() {
     document.getElementById("temperature").innerText = "";
 
     window.dataInterval = setInterval(fetchData, 2000);
+
+    // clear graph
+if (sensorChart) {
+    sensorChart.data.labels = [];
+    sensorChart.data.datasets.forEach(ds => ds.data = []);
+    sensorChart.update();
+}
+}
+
+function exportCSV() {
+    let csv = "Time,Sensor1,Sensor2,Sensor3,Sensor4,Sensor5\n";
+
+    let labels = sensorChart.data.labels;
+    let datasets = sensorChart.data.datasets;
+
+    for (let i = 0; i < labels.length; i++) {
+        let row = [labels[i]];
+
+        datasets.forEach(ds => {
+            row.push(ds.data[i] ?? "");
+        });
+
+        csv += row.join(",") + "\n";
+    }
+
+    let blob = new Blob([csv], { type: "text/csv" });
+    let url = URL.createObjectURL(blob);
+
+    let a = document.createElement("a");
+    a.href = url;
+    a.download = "sensor_data.csv";
+    a.click();
+
+    URL.revokeObjectURL(url);
 }
 
 // ---------------- CONNECT ----------------
