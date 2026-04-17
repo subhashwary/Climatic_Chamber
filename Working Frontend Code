@@ -534,8 +534,14 @@ async function fetchData() {
         document.getElementById("temperature").innerText = data.temperature;
 
         for (let i = 1; i <= 5; i++) {
-            document.getElementById(`p${i}_volt`).value = data[`p${i}_volt`] ?? "";
-            document.getElementById(`t${i}_volt`).value = data[`t${i}_volt`] ?? "";
+            let pVolt = data[`p${i}_volt`];
+let tVolt = data[`t${i}_volt`];
+
+document.getElementById(`p${i}_volt`).value =
+    (pVolt !== "" && pVolt != null) ? Number(pVolt).toFixed(3) : "";
+
+document.getElementById(`t${i}_volt`).value =
+    (tVolt !== "" && tVolt != null) ? Number(tVolt).toFixed(3) : "";
 
             updatePressure(i);
             updateTemperature(i);
