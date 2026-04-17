@@ -544,23 +544,37 @@ const FREEZE_LIMIT = 5;
 window.onload = function () {
     const ctx = document.getElementById('sensorChart').getContext('2d');
 
-    sensorChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [
-                { label: 'Sensor 1', borderColor: 'red', data: [], fill: false },
-                { label: 'Sensor 2', borderColor: 'blue', data: [], fill: false },
-                { label: 'Sensor 3', borderColor: 'green', data: [], fill: false },
-                { label: 'Sensor 4', borderColor: 'orange', data: [], fill: false },
-                { label: 'Sensor 5', borderColor: 'purple', data: [], fill: false }
-            ]
-        },
-        options: {
-            responsive: true,
-            animation: false
+sensorChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [
+            { label: 'Sensor 1', borderColor: 'red', data: [], fill: false },
+            { label: 'Sensor 2', borderColor: 'blue', data: [], fill: false },
+            { label: 'Sensor 3', borderColor: 'green', data: [], fill: false },
+            { label: 'Sensor 4', borderColor: 'orange', data: [], fill: false },
+            { label: 'Sensor 5', borderColor: 'purple', data: [], fill: false }
+        ]
+    },
+    options: {
+        responsive: true,
+        animation: false,
+        scales: {
+            x: {
+                title: {
+                    display: true,
+                    text: "Time"
+                }
+            },
+            y: {
+                title: {
+                    display: true,
+                    text: "Pressure (Psi)"
+                }
+            }
         }
-    });
+    }
+});
 };
 
 let isRunning = false;
@@ -576,7 +590,7 @@ async function fetchData() {
 
         for (let i = 1; i <= 5; i++) {
             let pVolt = data[`p${i}_volt`];
-            let tVolt = data[`t${i}_volt`];
+            let tVolt = data[`t${i}_volt`] ?? "";
 
             document.getElementById(`p${i}_volt`).value =
                 (pVolt !== "" && pVolt != null) ? Number(pVolt).toFixed(3) : "";
@@ -590,12 +604,21 @@ async function fetchData() {
 
         // ✅ GRAPH UPDATE (MOVED HERE)
         if (sensorChart) {
-            let label = (Date.now() / 1000).toFixed(1); // seconds
+            if (!window.startTime) {
+    window.startTime = Date.now();
+}
+
+// let elapsed = ((Date.now() - window.startTime) / 1000).toFixed(1);
+// let label = elapsed + " s";
+
+let now = new Date();
+let label = now.toLocaleTimeString();
 
             sensorChart.data.labels.push(label);
 
    for (let i = 1; i <= 5; i++) {
     let psi = parseFloat(data[`p${i}_psi`]);
+    if (isNaN(psi)) psi = null;
 
     // ---- FREEZE DETECTION ----
     if (psi !== null) {
@@ -618,7 +641,7 @@ async function fetchData() {
     sensorChart.data.datasets[i - 1].data.push(psi);
 }
 
-            if (sensorChart.data.labels.length > 500) {
+            if (sensorChart.data.labels.length > 100) {
                 sensorChart.data.labels.shift();
                 sensorChart.data.datasets.forEach(ds => ds.data.shift());
             }
