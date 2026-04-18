@@ -3,6 +3,8 @@
 <head>
     <title>Sensor Dashboard</title>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
     body {
     font-family: Arial;
@@ -382,19 +384,6 @@ input.btn-box {
     cursor: pointer;
 }
 
-.rake-tabs {
-    text-align: center;
-    margin-top: 15px;
-}
-
-.rake-tabs button {
-    width: 100px;
-    height: 35px;
-    margin: 5px;
-    font-size: 13px;
-    cursor: pointer;
-}
-
     </style>
 </head>
 
@@ -435,16 +424,6 @@ input.btn-box {
 
         <div class="main-title">GTRE RAKE Sensor Assembly</div>
         <div class="sub-main">Realtime Monitoring</div>
-
-<div class="rake-tabs">
-    <button onclick="selectRake(1)">Rake 1</button>
-    <button onclick="selectRake(2)">Rake 2</button>
-    <button onclick="selectRake(3)">Rake 3</button>
-
-    <button onclick="downloadCSV()" style="margin-left:20px;">
-        ⬇ Download CSV
-    </button>
-</div>
         
 
         <!-- SENSOR DISPLAY -->
@@ -538,12 +517,64 @@ input.btn-box {
         <div class="top-buttons">
             <button onclick="startDevice()" class="start-btn">START</button>
             <button onclick="stopDevice()" class="stop-btn">STOP</button>
-            <button onclick="resetDevice()">RESET</button>
         </div>
-    </div>
+
+<div style="width:90%; margin: 30px auto;">
+    <canvas id="sensorChart"></canvas>
+</div>
+
+<button onclick="exportCSV()" style="display:block; margin: 10px auto;">
+    Export Data
+</button>
 
     <script>
 const BASE_URL = "http://127.0.0.1:5000";
+
+let sensorChart;
+
+// 🔴 FREEZE DETECTION VARIABLES
+let lastValues = [null, null, null, null, null];
+let freezeCount = [0, 0, 0, 0, 0];
+
+const FREEZE_LIMIT = 5;
+
+// ---------------- CHART SETUP ----------------
+
+window.onload = function () {
+    const ctx = document.getElementById('sensorChart').getContext('2d');
+
+sensorChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [
+            { label: 'Sensor 1', borderColor: 'red', data: [], fill: false },
+            { label: 'Sensor 2', borderColor: 'blue', data: [], fill: false },
+            { label: 'Sensor 3', borderColor: 'green', data: [], fill: false },
+            { label: 'Sensor 4', borderColor: 'orange', data: [], fill: false },
+            { label: 'Sensor 5', borderColor: 'purple', data: [], fill: false }
+        ]
+    },
+    options: {
+        responsive: true,
+        animation: false,
+        scales: {
+            x: {
+                title: {
+                    display: true,
+                    text: "Time (HH:MM:SS)"
+                }
+            },
+            y: {
+                title: {
+                    display: true,
+                    text: "Pressure (Psi)"
+                }
+            }
+        }
+    }
+});
+};
 
 let isRunning = false;
 
@@ -558,17 +589,65 @@ async function fetchData() {
 
         for (let i = 1; i <= 5; i++) {
             let pVolt = data[`p${i}_volt`];
-let tVolt = data[`t${i}_volt`];
+            let tVolt = data[`t${i}_volt`] ?? "";
 
-document.getElementById(`p${i}_volt`).value =
-    (pVolt !== "" && pVolt != null) ? Number(pVolt).toFixed(3) : "";
+            document.getElementById(`p${i}_volt`).value =
+                (pVolt !== "" && pVolt != null) ? Number(pVolt).toFixed(3) : "";
 
-document.getElementById(`t${i}_volt`).value =
-    (tVolt !== "" && tVolt != null) ? Number(tVolt).toFixed(3) : "";
+            document.getElementById(`t${i}_volt`).value =
+                (tVolt !== "" && tVolt != null) ? Number(tVolt).toFixed(3) : "";
 
             updatePressure(i);
             updateTemperature(i);
         }
+
+        // ✅ GRAPH UPDATE (MOVED HERE)
+        if (sensorChart) {
+            if (!window.startTime) {
+    window.startTime = Date.now();
+}
+
+// let elapsed = ((Date.now() - window.startTime) / 1000).toFixed(1);
+// let label = elapsed + " s";
+
+let now = new Date();
+let label = now.toLocaleTimeString();
+
+            sensorChart.data.labels.push(label);
+
+   for (let i = 1; i <= 5; i++) {
+    let psi = parseFloat(data[`p${i}_psi`]);
+    if (isNaN(psi)) psi = null;
+
+    // ---- FREEZE DETECTION ----
+    if (psi !== null) {
+        if (psi === lastValues[i - 1]) {
+            freezeCount[i - 1]++;
+        } else {
+            freezeCount[i - 1] = 0;
+        }
+
+        lastValues[i - 1] = psi;
+
+        if (freezeCount[i - 1] > FREEZE_LIMIT) {
+            console.warn(`Sensor ${i} FREEZE detected`);
+            sensorChart.data.datasets[i - 1].borderDash = [5, 5];
+        } else {
+            sensorChart.data.datasets[i - 1].borderDash = [];
+        }
+    }
+
+    sensorChart.data.datasets[i - 1].data.push(psi);
+}
+
+            if (sensorChart.data.labels.length > 100) {
+                sensorChart.data.labels.shift();
+                sensorChart.data.datasets.forEach(ds => ds.data.shift());
+            }
+
+            sensorChart.update();
+        }
+
     } catch (err) {
         console.log("Fetch error:", err);
     }
@@ -605,6 +684,8 @@ async function startDevice() {
     isRunning = true;
     await fetch(`${BASE_URL}/start`, { method: "POST" });
 
+    document.getElementById("pressure").innerText = "STARTED";
+
     clearInterval(window.dataInterval);
     window.dataInterval = setInterval(fetchData, 500);
 }
@@ -612,26 +693,37 @@ async function startDevice() {
 async function stopDevice() {
     clearInterval(window.dataInterval);
     await fetch(`${BASE_URL}/stop`, { method: "POST" });
+
+    document.getElementById("pressure").innerText = "STOPPED";
+
     isRunning = false;
 }
 
-async function resetDevice() {
-    clearInterval(window.dataInterval);
-    isRunning = false;
+function exportCSV() {
+    let csv = "Time,Sensor1,Sensor2,Sensor3,Sensor4,Sensor5\n";
 
-    await fetch(`${BASE_URL}/reset`, { method: "POST" });
+    let labels = sensorChart.data.labels;
+    let datasets = sensorChart.data.datasets;
 
-    for (let i = 1; i <= 5; i++) {
-        document.getElementById(`p${i}_volt`).value = "";
-        document.getElementById(`p${i}_psi`).innerText = "";
-        document.getElementById(`t${i}_volt`).value = "";
-        document.getElementById(`t${i}_temp`).innerText = "";
+    for (let i = 0; i < labels.length; i++) {
+        let row = [labels[i]];
+
+        datasets.forEach(ds => {
+            row.push(ds.data[i] ?? "");
+        });
+
+        csv += row.join(",") + "\n";
     }
 
-    document.getElementById("pressure").innerText = "";
-    document.getElementById("temperature").innerText = "";
+    let blob = new Blob([csv], { type: "text/csv" });
+    let url = URL.createObjectURL(blob);
 
-    window.dataInterval = setInterval(fetchData, 2000);
+    let a = document.createElement("a");
+    a.href = url;
+    a.download = "sensor_data.csv";
+    a.click();
+
+    URL.revokeObjectURL(url);
 }
 
 // ---------------- CONNECT ----------------
@@ -666,18 +758,6 @@ async function connectDevice() {
 
 // ---------------- AUTO START FETCH ----------------
 window.dataInterval = setInterval(fetchData, 2000);
-
-let currentRake = 1;
-
-function selectRake(rake) {
-    currentRake = rake;
-    alert("Switched to Rake " + rake);
-}
-
-function downloadCSV() {
-    window.open(`${BASE_URL}/download_csv`, "_blank");
-}
-
 </script>
 
 <footer class="footer">
