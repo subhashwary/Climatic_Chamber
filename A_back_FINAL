@@ -15,6 +15,8 @@ ser = None
 last_values = [0.0] * 5
 last_update_time = 0
 
+is_running = False
+
 # ✅ DATA LOG STORAGE
 data_log = []
 
@@ -56,18 +58,15 @@ def connect():
 # ---------------- CONTROL ----------------
 @app.route('/start', methods=['POST'])
 def start():
+    global is_running
+    is_running = True
     return jsonify({"status": "started"})
 
 @app.route('/stop', methods=['POST'])
 def stop():
+    global is_running
+    is_running = False
     return jsonify({"status": "stopped"})
-
-@app.route('/reset', methods=['POST'])
-def reset():
-    global data_log, last_values
-    data_log = []
-    last_values = [0]*5
-    return jsonify({"status": "reset"})
 
 
 # ---------------- SERIAL READ ----------------
@@ -117,7 +116,7 @@ def read_serial():
 # ---------------- THREAD ----------------
 def serial_loop():
     while True:
-        if ser and ser.is_open:
+        if ser and ser.is_open and is_running:
             read_serial()
         time.sleep(0.05)
 
