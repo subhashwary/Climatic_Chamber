@@ -3,6 +3,8 @@
 <head>
     <title>Sensor Dashboard</title>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
     body {
     font-family: Arial;
@@ -515,17 +517,104 @@ input.btn-box {
         <div class="top-buttons">
             <button onclick="startDevice()" class="start-btn">START</button>
             <button onclick="stopDevice()" class="stop-btn">STOP</button>
-            <button onclick="resetDevice()">RESET</button>
         </div>
-    </div>
+
+<div style="width:90%; margin: 30px auto;">
+    <div style="width:90%; margin: 30px auto;">
+    <h3 style="text-align:center;">Pressure Graph</h3>
+    <canvas id="pressureChart"></canvas>
+</div>
+
+<div style="width:90%; margin: 30px auto;">
+    <h3 style="text-align:center;">Temperature Graph</h3>
+    <canvas id="temperatureChart"></canvas>
+</div>
+</div>
+
+<button onclick="exportCSV()" style="display:block; margin: 10px auto;">
+    Export Data
+</button>
 
     <script>
 const BASE_URL = "http://127.0.0.1:5000";
 
+let pressureChart;
+let temperatureChart;
+
 let isRunning = false;
 
-// ---------------- FETCH DATA ----------------
+// 🔴 FREEZE DETECTION VARIABLES
+let lastValues = [null, null, null, null, null];
+let freezeCount = [0, 0, 0, 0, 0];
+
+const FREEZE_LIMIT = 5;
+
+// ---------------- CHART SETUP ----------------
+
+window.onload = function () {
+
+    // -------- PRESSURE CHART --------
+    const pctx = document.getElementById('pressureChart').getContext('2d');
+
+    pressureChart = new Chart(pctx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [
+                { label: 'P1', borderColor: 'red', data: [] },
+                { label: 'P2', borderColor: 'blue', data: [] },
+                { label: 'P3', borderColor: 'green', data: [] },
+                { label: 'P4', borderColor: 'orange', data: [] },
+                { label: 'P5', borderColor: 'purple', data: [] }
+            ]
+        },
+        options: {
+            responsive: true,
+            animation: false,
+            scales: {
+                x: {
+                    title: { display: true, text: "Time (HH:MM:SS)" }
+                },
+                y: {
+                    title: { display: true, text: "Pressure (Psi)" }
+                }
+            }
+        }
+    });
+
+    // -------- TEMPERATURE CHART --------
+    const tctx = document.getElementById('temperatureChart').getContext('2d');
+
+    temperatureChart = new Chart(tctx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [
+                { label: 'T1', borderColor: 'red', data: [] },
+                { label: 'T2', borderColor: 'blue', data: [] },
+                { label: 'T3', borderColor: 'green', data: [] },
+                { label: 'T4', borderColor: 'orange', data: [] },
+                { label: 'T5', borderColor: 'purple', data: [] }
+            ]
+        },
+        options: {
+            responsive: true,
+            animation: false,
+            scales: {
+                x: {
+                    title: { display: true, text: "Time (HH:MM:SS)" }
+                },
+                y: {
+                    title: { display: true, text: "Temperature (°C)" }
+                }
+            }
+        }
+    });
+};
+
 async function fetchData() {
+    if (!isRunning) return;
+
     try {
         const res = await fetch(`${BASE_URL}/data`);
         const data = await res.json();
@@ -533,22 +622,93 @@ async function fetchData() {
         document.getElementById("pressure").innerText = data.pressure;
         document.getElementById("temperature").innerText = data.temperature;
 
+        // -------- UPDATE UI --------
         for (let i = 1; i <= 5; i++) {
             let pVolt = data[`p${i}_volt`];
-let tVolt = data[`t${i}_volt`];
+            let tVolt = data[`t${i}_volt`] ?? "";
 
-document.getElementById(`p${i}_volt`).value =
-    (pVolt !== "" && pVolt != null) ? Number(pVolt).toFixed(3) : "";
+            document.getElementById(`p${i}_volt`).value =
+                (pVolt !== "" && pVolt != null) ? Number(pVolt).toFixed(3) : "";
 
-document.getElementById(`t${i}_volt`).value =
-    (tVolt !== "" && tVolt != null) ? Number(tVolt).toFixed(3) : "";
+            document.getElementById(`t${i}_volt`).value =
+                (tVolt !== "" && tVolt != null) ? Number(tVolt).toFixed(3) : "";
 
             updatePressure(i);
             updateTemperature(i);
         }
-    } catch (err) {
-        console.log("Fetch error:", err);
+
+        // -------- GRAPH UPDATE (ONLY ONCE) --------
+        let now = new Date();
+        let label = now.toLocaleTimeString();
+
+        pressureChart.data.labels.push(label);
+        temperatureChart.data.labels.push(label);
+
+        for (let i = 1; i <= 5; i++) {
+            let psi = parseFloat(data[`p${i}_psi`]);
+            let temp = parseFloat(data[`t${i}_temp`]);
+
+            pressureChart.data.datasets[i - 1].data.push(isNaN(psi) ? null : psi);
+            temperatureChart.data.datasets[i - 1].data.push(isNaN(temp) ? null : temp);
+        }
+
+        // LIMIT SIZE
+        if (pressureChart.data.labels.length > 100) {
+            pressureChart.data.labels.shift();
+            pressureChart.data.datasets.forEach(ds => ds.data.shift());
+        }
+
+        if (temperatureChart.data.labels.length > 100) {
+            temperatureChart.data.labels.shift();
+            temperatureChart.data.datasets.forEach(ds => ds.data.shift());
+        }
+
+        pressureChart.update();
+        temperatureChart.update();
+
+   } catch (err) {
+    console.log("Fetch error:", err);
+
+    document.getElementById("pressure").innerText = "DISCONNECTED";
+    document.getElementById("temperature").innerText = "DISCONNECTED";
+
+    isRunning = false;
+    clearInterval(window.dataInterval);
+}
+}
+
+function exportCSV() {
+    let csv = "Time";
+
+    for (let i = 1; i <= 5; i++) csv += `,P${i}`;
+    for (let i = 1; i <= 5; i++) csv += `,T${i}`;
+    csv += "\n";
+
+    let labels = pressureChart.data.labels;
+
+    for (let i = 0; i < labels.length; i++) {
+        let row = [labels[i]];
+
+        pressureChart.data.datasets.forEach(ds => {
+            row.push(ds.data[i] ?? "");
+        });
+
+        temperatureChart.data.datasets.forEach(ds => {
+            row.push(ds.data[i] ?? "");
+        });
+
+        csv += row.join(",") + "\n";
     }
+
+    let blob = new Blob([csv], { type: "text/csv" });
+    let url = URL.createObjectURL(blob);
+
+    let a = document.createElement("a");
+    a.href = url;
+    a.download = "sensor_data.csv";
+    a.click();
+
+    URL.revokeObjectURL(url);
 }
 
 // ---------------- UPDATE PRESSURE ----------------
@@ -560,27 +720,18 @@ function updatePressure(sensor) {
         return;
     }
 
-    let psi = volt * 100;
+    let psi = (4 * volt) + 5;
     document.getElementById(`p${sensor}_psi`).innerText = psi.toFixed(2);
 }
 
 // ---------------- UPDATE TEMPERATURE ----------------
-function updateTemperature(sensor) {
-    let volt = parseFloat(document.getElementById(`t${sensor}_volt`).value);
-
-    if (isNaN(volt)) {
-        document.getElementById(`t${sensor}_temp`).innerText = "";
-        return;
-    }
-
-    let temp = volt * 100;
-    document.getElementById(`t${sensor}_temp`).innerText = temp.toFixed(2);
-}
 
 // ---------------- CONTROL ----------------
 async function startDevice() {
     isRunning = true;
     await fetch(`${BASE_URL}/start`, { method: "POST" });
+
+    document.getElementById("pressure").innerText = "STARTED";
 
     clearInterval(window.dataInterval);
     window.dataInterval = setInterval(fetchData, 500);
@@ -589,26 +740,11 @@ async function startDevice() {
 async function stopDevice() {
     clearInterval(window.dataInterval);
     await fetch(`${BASE_URL}/stop`, { method: "POST" });
-    isRunning = false;
-}
 
-async function resetDevice() {
-    clearInterval(window.dataInterval);
+    document.getElementById("pressure").innerText = "STOPPED";
+
     isRunning = false;
 
-    await fetch(`${BASE_URL}/reset`, { method: "POST" });
-
-    for (let i = 1; i <= 5; i++) {
-        document.getElementById(`p${i}_volt`).value = "";
-        document.getElementById(`p${i}_psi`).innerText = "";
-        document.getElementById(`t${i}_volt`).value = "";
-        document.getElementById(`t${i}_temp`).innerText = "";
-    }
-
-    document.getElementById("pressure").innerText = "";
-    document.getElementById("temperature").innerText = "";
-
-    window.dataInterval = setInterval(fetchData, 2000);
 }
 
 // ---------------- CONNECT ----------------
@@ -642,7 +778,7 @@ async function connectDevice() {
 }
 
 // ---------------- AUTO START FETCH ----------------
-window.dataInterval = setInterval(fetchData, 2000);
+window.dataInterval = null;
 </script>
 
 <footer class="footer">
