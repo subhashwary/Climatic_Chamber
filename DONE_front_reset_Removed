@@ -517,7 +517,6 @@ input.btn-box {
         <div class="top-buttons">
             <button onclick="startDevice()" class="start-btn">START</button>
             <button onclick="stopDevice()" class="stop-btn">STOP</button>
-            <button onclick="resetDevice()">RESET</button>
         </div>
 
 <div style="width:90%; margin: 30px auto;">
@@ -685,6 +684,8 @@ async function startDevice() {
     isRunning = true;
     await fetch(`${BASE_URL}/start`, { method: "POST" });
 
+    document.getElementById("pressure").innerText = "STARTED";
+
     clearInterval(window.dataInterval);
     window.dataInterval = setInterval(fetchData, 500);
 }
@@ -692,33 +693,10 @@ async function startDevice() {
 async function stopDevice() {
     clearInterval(window.dataInterval);
     await fetch(`${BASE_URL}/stop`, { method: "POST" });
+
+    document.getElementById("pressure").innerText = "STOPPED";
+
     isRunning = false;
-}
-
-async function resetDevice() {
-    clearInterval(window.dataInterval);
-    isRunning = false;
-
-    await fetch(`${BASE_URL}/reset`, { method: "POST" });
-
-    for (let i = 1; i <= 5; i++) {
-        document.getElementById(`p${i}_volt`).value = "";
-        document.getElementById(`p${i}_psi`).innerText = "";
-        document.getElementById(`t${i}_volt`).value = "";
-        document.getElementById(`t${i}_temp`).innerText = "";
-    }
-
-    document.getElementById("pressure").innerText = "";
-    document.getElementById("temperature").innerText = "";
-
-    window.dataInterval = setInterval(fetchData, 2000);
-
-    // clear graph
-if (sensorChart) {
-    sensorChart.data.labels = [];
-    sensorChart.data.datasets.forEach(ds => ds.data = []);
-    sensorChart.update();
-}
 }
 
 function exportCSV() {
