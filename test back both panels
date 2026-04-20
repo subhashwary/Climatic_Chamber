@@ -1,0 +1,211 @@
+import webbrowser
+from flask import Flask, jsonify, request, send_from_directory, Response
+from flask_cors import CORS
+import serial
+import time
+import threading
+import csv
+import io
+
+app = Flask(__name__)
+CORS(app)
+
+ser = None
+
+last_values = {
+    "pressure": [0.0] * 5,
+    "temperature": [0.0] * 5
+}
+
+last_update_time = 0
+data_log = []
+is_running = False
+
+
+# ---------------- SERVE FRONTEND ----------------
+@app.route('/')
+def serve_ui():
+    return send_from_directory('.', 'index.html')
+
+
+# ---------------- CONNECT ----------------
+@app.route('/connect', methods=['POST'])
+def connect():
+    global ser, last_values, last_update_time
+
+    data = request.json
+
+    try:
+        port = data.get("com_port")
+        baud = int(data.get("baud_rate"))
+
+        if ser and ser.is_open:
+            ser.close()
+            time.sleep(1)
+
+        ser = serial.Serial(port, baud, timeout=1)
+        time.sleep(2)
+        ser.reset_input_buffer()
+
+        last_values = {
+            "pressure": [0.0] * 5,
+            "temperature": [0.0] * 5
+        }
+
+        last_update_time = time.time()
+
+        return jsonify({"status": "connected"})
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
+
+# ---------------- CONTROL ----------------
+@app.route('/start', methods=['POST'])
+def start():
+    global is_running, data_log
+    is_running = True
+    data_log.clear()
+    return jsonify({"status": "started"})
+
+
+@app.route('/stop', methods=['POST'])
+def stop():
+    global is_running
+    is_running = False
+    return jsonify({"status": "stopped"})
+
+
+# ---------------- CALIBRATION ----------------
+def calculate_psi(v):
+    psi = (v - 0.5) * 25
+    return max(0, psi)  # 0.5–4.5V → 0–100 PSI
+
+
+def calculate_temp(v):
+    return v * 100          # LM35
+
+
+# ---------------- SERIAL READ ----------------
+def read_serial():
+    global last_values, last_update_time, data_log
+
+    try:
+        if ser is None or not ser.is_open:
+            return
+
+        line = ser.readline().decode('utf-8', errors='ignore').strip()
+        if not line:
+            return
+
+        parts = line.replace(',', ' ').split()
+        if len(parts) < 10:
+            return
+
+        values = [float(x) for x in parts[:10]]
+
+        p_values = values[:5]
+        t_values = values[5:]
+
+        if not all(0 <= v <= 5 for v in p_values + t_values):
+            return
+
+        # smoothing
+        alpha = 0.2
+        for i in range(5):
+            last_values["pressure"][i] = round(
+                alpha * p_values[i] + (1 - alpha) * last_values["pressure"][i], 3
+            )
+            last_values["temperature"][i] = round(
+                alpha * t_values[i] + (1 - alpha) * last_values["temperature"][i], 3
+            )
+
+        last_update_time = time.time()
+
+        if is_running:
+            data_log.append({
+                "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+                "pressure": [calculate_psi(v) for v in last_values["pressure"]],
+                "temperature": [calculate_temp(v) for v in last_values["temperature"]]
+            })
+
+            if len(data_log) > 10000:
+                data_log.pop(0)
+
+        print("UPDATED:", last_values)
+
+    except Exception as e:
+        print("Serial error:", e)
+
+
+# ---------------- THREAD ----------------
+def serial_loop():
+    global ser
+    while True:
+        try:
+            if ser is not None and ser.is_open:
+                read_serial()
+        except Exception as e:
+            print("THREAD ERROR:", e)
+        time.sleep(0.05)
+
+
+threading.Thread(target=serial_loop, daemon=True).start()
+
+
+# ---------------- DATA API ----------------
+@app.route('/data')
+def get_data():
+    if ser is None or not ser.is_open:
+        return jsonify({"status": "disconnected"})
+
+    if time.time() - last_update_time > 2:
+        return jsonify({"status": "no_data"})
+
+    response = {
+        "status": "live",
+        "pressure": "LIVE",
+        "temperature": "LIVE"
+    }
+
+    for i in range(5):
+        p = last_values["pressure"][i]
+        t = last_values["temperature"][i]
+
+        response[f"p{i+1}_volt"] = p
+        response[f"p{i+1}_psi"] = round(calculate_psi(p), 2)
+
+        response[f"t{i+1}_volt"] = t
+        response[f"t{i+1}_temp"] = round(calculate_temp(t), 2)
+
+    return jsonify(response)
+
+
+# ---------------- CSV ----------------
+@app.route('/download_csv')
+def download_csv():
+    output = io.StringIO()
+    writer = csv.writer(output)
+
+    writer.writerow(["Timestamp","P1","P2","P3","P4","P5","T1","T2","T3","T4","T5"])
+
+    for entry in data_log:
+        writer.writerow(
+            [entry["timestamp"]] +
+            entry["pressure"] +
+            entry["temperature"]
+        )
+
+    output.seek(0)
+
+    return Response(
+        output,
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment;filename=sensor_data.csv"}
+    )
+
+
+# ---------------- RUN ----------------
+if __name__ == "__main__":
+    webbrowser.open("http://127.0.0.1:5000")
+    app.run(debug=False)
