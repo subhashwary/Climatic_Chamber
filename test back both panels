@@ -12,14 +12,11 @@ CORS(app)
 
 ser = None
 
-last_values = {
-    "pressure": [0.0] * 5,
-    "temperature": [0.0] * 5
-}
-
+last_values = [0.0] * 5
 last_update_time = 0
+
+# ✅ DATA LOG STORAGE
 data_log = []
-is_running = False
 
 
 # ---------------- SERVE FRONTEND ----------------
@@ -31,7 +28,7 @@ def serve_ui():
 # ---------------- CONNECT ----------------
 @app.route('/connect', methods=['POST'])
 def connect():
-    global ser, last_values, last_update_time
+    global ser, last_update_time, last_values
 
     data = request.json
 
@@ -47,11 +44,7 @@ def connect():
         time.sleep(2)
         ser.reset_input_buffer()
 
-        last_values = {
-            "pressure": [0.0] * 5,
-            "temperature": [0.0] * 5
-        }
-
+        last_values = [0.0] * 5
         last_update_time = time.time()
 
         return jsonify({"status": "connected"})
@@ -63,76 +56,59 @@ def connect():
 # ---------------- CONTROL ----------------
 @app.route('/start', methods=['POST'])
 def start():
-    global is_running, data_log
-    is_running = True
-    data_log.clear()
     return jsonify({"status": "started"})
-
 
 @app.route('/stop', methods=['POST'])
 def stop():
-    global is_running
-    is_running = False
     return jsonify({"status": "stopped"})
 
-
-# ---------------- CALIBRATION ----------------
-def calculate_psi(v):
-    psi = (v - 0.5) * 25
-    return max(0, psi)  # 0.5–4.5V → 0–100 PSI
-
-
-def calculate_temp(v):
-    return v * 100          # LM35
+@app.route('/reset', methods=['POST'])
+def reset():
+    global data_log, last_values
+    data_log = []
+    last_values = [0]*5
+    return jsonify({"status": "reset"})
 
 
 # ---------------- SERIAL READ ----------------
 def read_serial():
-    global last_values, last_update_time, data_log
+    global ser, last_values, last_update_time, data_log
+
+    if ser is None or not ser.is_open:
+        return
 
     try:
-        if ser is None or not ser.is_open:
-            return
-
         line = ser.readline().decode('utf-8', errors='ignore').strip()
+
         if not line:
             return
 
         parts = line.replace(',', ' ').split()
-        if len(parts) < 10:
+
+        if len(parts) < 5:
             return
 
-        values = [float(x) for x in parts[:10]]
+        values = [float(x) for x in parts[:5]]
 
-        p_values = values[:5]
-        t_values = values[5:]
-
-        if not all(0 <= v <= 5 for v in p_values + t_values):
+        if not all(0 <= v <= 5 for v in values):
             return
 
-        # smoothing
-        alpha = 0.2
-        for i in range(5):
-            last_values["pressure"][i] = round(
-                alpha * p_values[i] + (1 - alpha) * last_values["pressure"][i], 3
-            )
-            last_values["temperature"][i] = round(
-                alpha * t_values[i] + (1 - alpha) * last_values["temperature"][i], 3
-            )
-
+        last_values = [round(v, 3) for v in values]
         last_update_time = time.time()
 
-        if is_running:
-            data_log.append({
-                "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
-                "pressure": [calculate_psi(v) for v in last_values["pressure"]],
-                "temperature": [calculate_temp(v) for v in last_values["temperature"]]
-            })
+        # ✅ LOG DATA WITH TIMESTAMP
+        timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
 
-            if len(data_log) > 10000:
-                data_log.pop(0)
+        data_log.append({
+            "timestamp": timestamp,
+            "values": last_values.copy()
+        })
 
-        print("UPDATED:", last_values)
+        # optional: limit size (prevents memory overflow)
+        if len(data_log) > 10000:
+            data_log.pop(0)
+
+        print("UPDATED:", " | ".join(f"{v:.3f}" for v in last_values))
 
     except Exception as e:
         print("Serial error:", e)
@@ -140,61 +116,64 @@ def read_serial():
 
 # ---------------- THREAD ----------------
 def serial_loop():
-    global ser
     while True:
-        try:
-            if ser is not None and ser.is_open:
-                read_serial()
-        except Exception as e:
-            print("THREAD ERROR:", e)
+        if ser and ser.is_open:
+            read_serial()
         time.sleep(0.05)
 
 
 threading.Thread(target=serial_loop, daemon=True).start()
 
-
 # ---------------- DATA API ----------------
+def calculate_psi(voltage):
+    return (4 * voltage) + 5
+
+
 @app.route('/data')
 def get_data():
+    global last_values, last_update_time
+
     if ser is None or not ser.is_open:
         return jsonify({"status": "disconnected"})
 
-    if time.time() - last_update_time > 2:
-        return jsonify({"status": "no_data"})
+    age = time.time() - last_update_time
+
+    if age > 2:
+        return jsonify({
+            "status": "no_data",
+            "pressure": "NO SIGNAL",
+            **{f"p{i}_volt": "" for i in range(1, 6)},
+            **{f"p{i}_psi": "" for i in range(1, 6)}
+        })
 
     response = {
         "status": "live",
-        "pressure": "LIVE",
-        "temperature": "LIVE"
+        "pressure": "LIVE"
     }
 
+    # add voltage + psi for each sensor
     for i in range(5):
-        p = last_values["pressure"][i]
-        t = last_values["temperature"][i]
+        v = last_values[i]
+        psi = calculate_psi(v)
 
-        response[f"p{i+1}_volt"] = p
-        response[f"p{i+1}_psi"] = round(calculate_psi(p), 2)
-
-        response[f"t{i+1}_volt"] = t
-        response[f"t{i+1}_temp"] = round(calculate_temp(t), 2)
+        response[f"p{i+1}_volt"] = round(v, 3)
+        response[f"p{i+1}_psi"] = round(psi, 2)
 
     return jsonify(response)
 
 
-# ---------------- CSV ----------------
+# ---------------- CSV DOWNLOAD ----------------
 @app.route('/download_csv')
 def download_csv():
     output = io.StringIO()
     writer = csv.writer(output)
 
-    writer.writerow(["Timestamp","P1","P2","P3","P4","P5","T1","T2","T3","T4","T5"])
+    writer.writerow(["Timestamp", "P1", "P2", "P3", "P4", "P5"])
 
     for entry in data_log:
         writer.writerow(
-            [entry["timestamp"]] +
-            entry["pressure"] +
-            entry["temperature"]
-        )
+    [entry["timestamp"]] + [f"{v:.3f}" for v in entry["values"]]
+)
 
     output.seek(0)
 
