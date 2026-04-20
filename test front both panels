@@ -54,14 +54,14 @@
         }
 
 .title {
-            font-size: 44px;
+            font-size: 32px;
             font-weight: bold;
         }
 
 .subtitle {
-            font-size: 32px;   /* same size as title */
-            font-weight: bold; /* make it bold */
-            margin-top: 4px;
+            font-size: 25px;   /* same size as title */
+            font-weight: 500; /* make it bold */
+            margin-top: 3px;
         }
 
 .container {
@@ -289,15 +289,15 @@ input.btn-box {
 
 .main-title {
     text-align: center;
-    font-size: 30px;
-    font-weight: bold;
-    margin-top: 45px;   /* increased from 10px */
+    font-size: 25px;
+    font-weight: 600;
+    margin-top: 35px;   /* increased from 10px */
 }
 
 .sub-main {
     text-align: center;
-    font-size: 25px;
-    margin-top: 4px;
+    font-size: 18px;
+    margin-top: 2px;
     color: #444;
     font-weight: 500;
 }
@@ -307,9 +307,9 @@ input.btn-box {
 }
 
 .sensor-title {
-    font-size: 32px;
-    font-weight: 700;
-    margin-bottom: 12px; /* increased gap */
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 10px; /* increased gap */
 }
 
 #pressure, #temperature {
@@ -347,7 +347,7 @@ input.btn-box {
 .connection-box {
     position: absolute;
 
-    top: 175px;
+    top: 115px;
     right: 20px;
 
     display: flex;
@@ -381,6 +381,27 @@ input.btn-box {
     height: 30px;
     width: 90px;
     font-size: 12px;
+    cursor: pointer;
+}
+
+.export-footer {
+    display: flex;
+    justify-content: center;   /* center horizontally */
+    margin-top: 20px;
+    margin-bottom: 10px;       /* tight gap above PASF */
+}
+
+.export-footer button {
+    width: 140px;
+    height: 40px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    border: 2px solid #2c3e50;
+    border-radius: 5px;
+
+    background-color: #f4f7fb;
     cursor: pointer;
 }
 
@@ -520,63 +541,83 @@ input.btn-box {
         </div>
 
 <div style="width:90%; margin: 30px auto;">
+    <h3 style="text-align:center;">Pressure Graph</h3>
     <canvas id="sensorChart"></canvas>
 </div>
 
-<button onclick="exportCSV()" style="display:block; margin: 10px auto;">
-    Export Data
-</button>
+<div style="width:90%; margin: 30px auto;">
+    <h3 style="text-align:center;">Temperature Graph</h3>
+    <canvas id="temperatureChart"></canvas>
+</div>
+
+<div class="export-footer">
+    <button onclick="exportCSV()">Export Data</button>
+</div>
 
     <script>
 const BASE_URL = "http://127.0.0.1:5000";
 
 let sensorChart;
+let temperatureChart;
 
-// 🔴 FREEZE DETECTION VARIABLES
+let isRunning = false;
+
+// 🔴 FREEZE DETECTION
 let lastValues = [null, null, null, null, null];
 let freezeCount = [0, 0, 0, 0, 0];
-
 const FREEZE_LIMIT = 5;
 
 // ---------------- CHART SETUP ----------------
-
 window.onload = function () {
-    const ctx = document.getElementById('sensorChart').getContext('2d');
 
-sensorChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: [],
-        datasets: [
-            { label: 'Sensor 1', borderColor: 'red', data: [], fill: false },
-            { label: 'Sensor 2', borderColor: 'blue', data: [], fill: false },
-            { label: 'Sensor 3', borderColor: 'green', data: [], fill: false },
-            { label: 'Sensor 4', borderColor: 'orange', data: [], fill: false },
-            { label: 'Sensor 5', borderColor: 'purple', data: [], fill: false }
-        ]
-    },
-    options: {
-        responsive: true,
-        animation: false,
-        scales: {
-            x: {
-                title: {
-                    display: true,
-                    text: "Time (HH:MM:SS)"
-                }
-            },
-            y: {
-                title: {
-                    display: true,
-                    text: "Pressure (Psi)"
-                }
+    // PRESSURE CHART
+    const ctx = document.getElementById('sensorChart').getContext('2d');
+    sensorChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [
+                { label: 'Sensor 1', borderColor: 'red', data: [], fill: false },
+                { label: 'Sensor 2', borderColor: 'blue', data: [], fill: false },
+                { label: 'Sensor 3', borderColor: 'green', data: [], fill: false },
+                { label: 'Sensor 4', borderColor: 'orange', data: [], fill: false },
+                { label: 'Sensor 5', borderColor: 'purple', data: [], fill: false }
+            ]
+        },
+        options: {
+            responsive: true,
+            animation: false,
+            scales: {
+                x: { title: { display: true, text: "Time (HH:MM:SS)" } },
+                y: { title: { display: true, text: "Pressure (Psi)" } }
             }
         }
-    }
-});
-};
+    });
 
-let isRunning = false;
+    // TEMPERATURE CHART
+    const tctx = document.getElementById('temperatureChart').getContext('2d');
+    temperatureChart = new Chart(tctx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [
+                { label: 'Sensor 1', borderColor: 'red', data: [], fill: false },
+                { label: 'Sensor 2', borderColor: 'blue', data: [], fill: false },
+                { label: 'Sensor 3', borderColor: 'green', data: [], fill: false },
+                { label: 'Sensor 4', borderColor: 'orange', data: [], fill: false },
+                { label: 'Sensor 5', borderColor: 'purple', data: [], fill: false }
+            ]
+        },
+        options: {
+            responsive: true,
+            animation: false,
+            scales: {
+                x: { title: { display: true, text: "Time (HH:MM:SS)" } },
+                y: { title: { display: true, text: "Temperature (°C)" } }
+            }
+        }
+    });
+};
 
 // ---------------- FETCH DATA ----------------
 async function fetchData() {
@@ -587,73 +628,74 @@ async function fetchData() {
         document.getElementById("pressure").innerText = data.pressure;
         document.getElementById("temperature").innerText = data.temperature;
 
+        let now = new Date();
+        let label = now.toLocaleTimeString();
+
+        sensorChart.data.labels.push(label);
+        temperatureChart.data.labels.push(label);
+
         for (let i = 1; i <= 5; i++) {
+
+            // -------- UI UPDATE --------
             let pVolt = data[`p${i}_volt`];
-            let tVolt = data[`t${i}_volt`] ?? "";
+            let tVolt = data[`t${i}_volt`];
 
             document.getElementById(`p${i}_volt`).value =
-                (pVolt !== "" && pVolt != null) ? Number(pVolt).toFixed(3) : "";
+                (pVolt != null) ? Number(pVolt).toFixed(3) : "";
 
             document.getElementById(`t${i}_volt`).value =
-                (tVolt !== "" && tVolt != null) ? Number(tVolt).toFixed(3) : "";
+                (tVolt != null) ? Number(tVolt).toFixed(3) : "";
 
             updatePressure(i);
             updateTemperature(i);
-        }
 
-        // ✅ GRAPH UPDATE (MOVED HERE)
-        if (sensorChart) {
-            if (!window.startTime) {
-    window.startTime = Date.now();
-}
+            // -------- CALCULATIONS --------
+            let psi = parseFloat(data[`p${i}_psi`]);
+            if (isNaN(psi)) psi = null;
 
-// let elapsed = ((Date.now() - window.startTime) / 1000).toFixed(1);
-// let label = elapsed + " s";
+            let temp = parseFloat(tVolt);
+            temp = isNaN(temp) ? null : temp * 100;
 
-let now = new Date();
-let label = now.toLocaleTimeString();
+            // -------- GRAPH UPDATE --------
+            sensorChart.data.datasets[i - 1].data.push(psi);
+            temperatureChart.data.datasets[i - 1].data.push(temp);
 
-            sensorChart.data.labels.push(label);
+            // -------- FREEZE DETECTION --------
+            if (psi !== null) {
+                if (psi === lastValues[i - 1]) {
+                    freezeCount[i - 1]++;
+                } else {
+                    freezeCount[i - 1] = 0;
+                }
 
-   for (let i = 1; i <= 5; i++) {
-    let psi = parseFloat(data[`p${i}_psi`]);
-    if (isNaN(psi)) psi = null;
+                lastValues[i - 1] = psi;
 
-    // ---- FREEZE DETECTION ----
-    if (psi !== null) {
-        if (psi === lastValues[i - 1]) {
-            freezeCount[i - 1]++;
-        } else {
-            freezeCount[i - 1] = 0;
-        }
-
-        lastValues[i - 1] = psi;
-
-        if (freezeCount[i - 1] > FREEZE_LIMIT) {
-            console.warn(`Sensor ${i} FREEZE detected`);
-            sensorChart.data.datasets[i - 1].borderDash = [5, 5];
-        } else {
-            sensorChart.data.datasets[i - 1].borderDash = [];
-        }
-    }
-
-    sensorChart.data.datasets[i - 1].data.push(psi);
-}
-
-            if (sensorChart.data.labels.length > 100) {
-                sensorChart.data.labels.shift();
-                sensorChart.data.datasets.forEach(ds => ds.data.shift());
+                if (freezeCount[i - 1] > FREEZE_LIMIT) {
+                    sensorChart.data.datasets[i - 1].borderDash = [5, 5];
+                } else {
+                    sensorChart.data.datasets[i - 1].borderDash = [];
+                }
             }
-
-            sensorChart.update();
         }
+
+        // -------- LIMIT DATA --------
+        if (sensorChart.data.labels.length > 100) {
+            sensorChart.data.labels.shift();
+            temperatureChart.data.labels.shift();
+
+            sensorChart.data.datasets.forEach(ds => ds.data.shift());
+            temperatureChart.data.datasets.forEach(ds => ds.data.shift());
+        }
+
+        sensorChart.update();
+        temperatureChart.update();
 
     } catch (err) {
         console.log("Fetch error:", err);
     }
 }
 
-// ---------------- UPDATE PRESSURE ----------------
+// ---------------- UPDATE FUNCTIONS ----------------
 function updatePressure(sensor) {
     let volt = parseFloat(document.getElementById(`p${sensor}_volt`).value);
 
@@ -666,7 +708,6 @@ function updatePressure(sensor) {
     document.getElementById(`p${sensor}_psi`).innerText = psi.toFixed(2);
 }
 
-// ---------------- UPDATE TEMPERATURE ----------------
 function updateTemperature(sensor) {
     let volt = parseFloat(document.getElementById(`t${sensor}_volt`).value);
 
@@ -675,7 +716,7 @@ function updateTemperature(sensor) {
         return;
     }
 
-    let temp = volt * 100;
+    let temp = (8 * volt) + 10;
     document.getElementById(`t${sensor}_temp`).innerText = temp.toFixed(2);
 }
 
@@ -699,6 +740,7 @@ async function stopDevice() {
     isRunning = false;
 }
 
+// ---------------- EXPORT ----------------
 function exportCSV() {
     let csv = "Time,Sensor1,Sensor2,Sensor3,Sensor4,Sensor5\n";
 
@@ -707,11 +749,7 @@ function exportCSV() {
 
     for (let i = 0; i < labels.length; i++) {
         let row = [labels[i]];
-
-        datasets.forEach(ds => {
-            row.push(ds.data[i] ?? "");
-        });
-
+        datasets.forEach(ds => row.push(ds.data[i] ?? ""));
         csv += row.join(",") + "\n";
     }
 
@@ -751,12 +789,12 @@ async function connectDevice() {
             alert("❌ " + data.message);
         }
 
-    } catch (error) {
+    } catch {
         alert("Backend not reachable ❌");
     }
 }
 
-// ---------------- AUTO START FETCH ----------------
+// ---------------- AUTO FETCH ----------------
 window.dataInterval = setInterval(fetchData, 2000);
 </script>
 
