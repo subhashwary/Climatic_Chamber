@@ -694,7 +694,7 @@ function updateTemperature(sensor) {
         return;
     }
 
-    let temp = volt * 100;
+    let temp = (8 * volt) + 10;
     document.getElementById(`t${sensor}_temp`).innerText = temp.toFixed(2);
 }
 
