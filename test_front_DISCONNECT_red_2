@@ -672,6 +672,16 @@ async function fetchData() {
         const res = await fetch(`${BASE_URL}/data`);
         const data = await res.json();
 
+        // 🟢 AUTO RECONNECT DETECTION (USB plugged back)
+        if (data && Object.keys(data).length > 0 && isRunning) {
+
+            document.getElementById("pressure").innerText = "CONNECTED";
+            document.getElementById("temperature").innerText = "CONNECTED";
+
+            document.getElementById("pressure").style.color = "green";
+            document.getElementById("temperature").style.color = "green";
+        }
+
         // 🔴 HANDLE DISCONNECTED / NO SIGNAL
         if (data.status === "disconnected" || data.status === "no_data") {
 
