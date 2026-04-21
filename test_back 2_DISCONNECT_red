@@ -133,7 +133,17 @@ def read_serial():
               "T:", last_values["temperature"])
         
     except Exception as e:
-            print("Serial error:", e)
+        print("Serial error:", e)
+
+        # 🔴 ADD THIS BLOCK (USB unplug detection)
+        try:
+            if ser and ser.is_open:
+                ser.close()
+        except:
+            pass
+
+        # force backend to report disconnect
+        last_update_time = 0
 
 def serial_loop():
     while True:
