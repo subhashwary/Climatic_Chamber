@@ -902,6 +902,13 @@ async function connectDevice() {
 
         if (data.status === "connected") {
             alert("Device Connected ✅");
+
+            document.getElementById("pressure").innerText = "CONNECTED";
+            document.getElementById("temperature").innerText = "CONNECTED";
+
+            document.getElementById("pressure").style.color = "green";
+            document.getElementById("temperature").style.color = "green";
+
             clearInterval(window.dataInterval);
             window.dataInterval = setInterval(fetchData, 500);
         } else {
