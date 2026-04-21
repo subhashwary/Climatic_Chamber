@@ -54,14 +54,14 @@
         }
 
 .title {
-            font-size: 44px;
+            font-size: 32px;
             font-weight: bold;
         }
 
 .subtitle {
-            font-size: 32px;   /* same size as title */
-            font-weight: bold; /* make it bold */
-            margin-top: 4px;
+            font-size: 25px;   /* same size as title */
+            font-weight: 500; /* make it bold */
+            margin-top: 3px;
         }
 
 .container {
@@ -212,11 +212,14 @@ input.btn-box {
 
         /* TOP CONTROL BUTTONS */
 .top-buttons {
-            margin-top: 20px;
-            text-align: center;
-        }
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
 
-        button {
+button {
     width: 50px;
     height: 35px;
     font-size: 11px;
@@ -266,7 +269,6 @@ input.btn-box {
 
 /* Right side horizontal */
 .footer-right {
-    margin-left: auto;
     display: flex;
     gap: 20px; /* space between contact & website */
     font-size: 14px;
@@ -289,15 +291,15 @@ input.btn-box {
 
 .main-title {
     text-align: center;
-    font-size: 30px;
-    font-weight: bold;
-    margin-top: 45px;   /* increased from 10px */
+    font-size: 25px;
+    font-weight: 600;
+    margin-top: 35px;   /* increased from 10px */
 }
 
 .sub-main {
     text-align: center;
-    font-size: 25px;
-    margin-top: 4px;
+    font-size: 18px;
+    margin-top: 2px;
     color: #444;
     font-weight: 500;
 }
@@ -307,9 +309,9 @@ input.btn-box {
 }
 
 .sensor-title {
-    font-size: 32px;
-    font-weight: 700;
-    margin-bottom: 12px; /* increased gap */
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 10px; /* increased gap */
 }
 
 #pressure, #temperature {
@@ -347,13 +349,13 @@ input.btn-box {
 .connection-box {
     position: absolute;
 
-    top: 175px;
+    top: 160px;
     right: 20px;
 
     display: flex;
     flex-direction: column;   /* 🔥 stack vertically */
     align-items: flex-start;
-    gap: 6px;
+    gap: 10px;
 
     background: #ffffff;
     padding: 10px;
@@ -362,6 +364,14 @@ input.btn-box {
     border-radius: 6px;
 
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.connection-row label {
+    font-size: 15px;   /* increase label text */
+}
+
+.connection-box select {
+    font-size: 14px;   /* increase dropdown text */
 }
 
 .connection-row {
@@ -382,6 +392,58 @@ input.btn-box {
     width: 90px;
     font-size: 12px;
     cursor: pointer;
+}
+
+.export-footer {
+    display: flex;
+    justify-content: center;   /* center horizontally */
+    margin-top: 20px;
+    margin-bottom: 10px;       /* tight gap above PASF */
+}
+
+.export-footer button {
+    width: 140px;
+    height: 40px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    border: 2px solid #2c3e50;
+    border-radius: 5px;
+
+    background-color: #f4f7fb;
+    cursor: pointer;
+}
+
+/* Increase font size for unit labels (Volt, Psi, °C) */
+.panel-buttons .btn-header:nth-child(5),
+.panel-buttons .btn-header:nth-child(6) {
+    font-size: 15px;   /* adjust if you want bigger */
+}
+
+/* Increase font size for panel values (Volt, Psi, °C outputs) */
+.panel-buttons .btn-box {
+    font-size: 14px;
+}
+
+button.active-btn {
+    border: 3px solid #000;
+    box-shadow: 0 0 6px rgba(0,0,0,0.4);
+    transform: scale(1.05);
+}
+
+/* Make ONLY sensor checkboxes bigger */
+input[type="checkbox"] {
+    transform: scale(1.9);
+    margin-right: 14px;
+}
+
+.connection-box button {
+    background-color: #90ee90; /* light green */
+    border: 2px solid #2c3e50;
+    color: #1f2d3a;
+    font-weight: 600;
+    align-self: center;
 }
 
     </style>
@@ -405,17 +467,37 @@ input.btn-box {
 <!-- CONNECTION SETTINGS (TOP RIGHT) -->
 <div class="connection-box">
 
-    <div class="connection-row">
-        <label>COM Port:</label>
-        <input type="text" id="comPort" placeholder="COM6">
-    </div>
+    <div style="display: flex; gap: 10px; align-items: flex-start;">
 
-    <div class="connection-row">
-        <label>Baud:</label>
-        <input type="number" id="baudRate" placeholder="9600">
-    </div>
+        <!-- LEFT: CONNECT BUTTON -->
+        <button class="connect-btn" onclick="connectDevice()">
+    CONNECT
+</button>
 
-    <button onclick="connectDevice()">CONNECT</button>
+        <!-- RIGHT: INPUTS (STACKED) -->
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+
+            <div class="connection-row">
+                <label>COM Port:</label>
+                <select id="comPort">
+                    <option value="COM3">COM3</option>
+                    <option value="COM4">COM4</option>
+                    <option value="COM5">COM5</option>
+                    <option value="COM6" selected>COM6</option>
+                </select>
+            </div>
+
+            <div class="connection-row">
+                <label>Baud:</label>
+                <select id="baudRate">
+                    <option value="9600">9600</option>
+                    <option value="115200">115200</option>
+                </select>
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 
@@ -515,188 +597,365 @@ input.btn-box {
 
         <!-- CONTROL BUTTONS -->
         <div class="top-buttons">
-            <button onclick="startDevice()" class="start-btn">START</button>
-            <button onclick="stopDevice()" class="stop-btn">STOP</button>
-        </div>
+
+    <button id="startBtn" onclick="startDevice()" class="start-btn">START</button>
+    <button id="stopBtn" onclick="stopDevice()" class="stop-btn">STOP</button>
+    <button id="resetBtn" onclick="resetDevice()" style="background-color:#6c757d;">RESET</button>
+
+</div>
+
+<!-- SAMPLING RATE (ABOVE PRESSURE GRAPH) -->
+<div style="width:90%; margin: 20px auto; display:flex; justify-content:space-between; align-items:center;">
+
+    <!-- LEFT: SENSOR FILTER CHECKBOXES -->
+    <div style="display:flex; gap:12px; align-items:center;">
+        <label style="font-weight:600;">Sensors:</label>
+
+        <label><input type="checkbox" checked onchange="toggleSensor(0)"> S1</label>
+        <label><input type="checkbox" checked onchange="toggleSensor(1)"> S2</label>
+        <label><input type="checkbox" checked onchange="toggleSensor(2)"> S3</label>
+        <label><input type="checkbox" checked onchange="toggleSensor(3)"> S4</label>
+        <label><input type="checkbox" checked onchange="toggleSensor(4)"> S5</label>
+    </div>
+
+    <!-- RIGHT: SAMPLING RATE (UNCHANGED FUNCTIONALITY) -->
+    <div style="display:flex; gap:10px; align-items:center;">
+        <label style="font-weight:600;">Sampling Rate:</label>
+
+        <select id="samplingRate" onchange="changeSamplingRate()" 
+            style="width: 120px; height: 40px; font-size: 14px; border-radius: 6px;">
+            <option value="1">1 sec</option>
+            <option value="5">5 sec</option>
+            <option value="10">10 sec</option>
+            <option value="30">30 sec</option>
+            <option value="60">60 sec</option>
+            <option value="120">120 sec</option>
+        </select>
+    </div>
+
+</div>
 
 <div style="width:90%; margin: 30px auto;">
-    <div style="width:90%; margin: 30px auto;">
     <h3 style="text-align:center;">Pressure Graph</h3>
-    <canvas id="pressureChart"></canvas>
+    <canvas id="sensorChart"></canvas>
 </div>
 
 <div style="width:90%; margin: 30px auto;">
     <h3 style="text-align:center;">Temperature Graph</h3>
     <canvas id="temperatureChart"></canvas>
 </div>
-</div>
 
-<button onclick="exportCSV()" style="display:block; margin: 10px auto;">
-    Export Data
-</button>
+<div class="export-footer">
+    <button onclick="exportCSV()">Export Data</button>
+</div>
 
     <script>
 const BASE_URL = "http://127.0.0.1:5000";
 
-let pressureChart;
+let sensorChart;
 let temperatureChart;
 
 let isRunning = false;
 
-// 🔴 FREEZE DETECTION VARIABLES
+let samplingRateSec = 1;
+let dataInterval = null;
+
+// 🔴 FREEZE DETECTION
 let lastValues = [null, null, null, null, null];
 let freezeCount = [0, 0, 0, 0, 0];
-
 const FREEZE_LIMIT = 5;
 
 // ---------------- CHART SETUP ----------------
-
 window.onload = function () {
 
-    // -------- PRESSURE CHART --------
-    const pctx = document.getElementById('pressureChart').getContext('2d');
-
-    pressureChart = new Chart(pctx, {
+    // PRESSURE CHART
+    const ctx = document.getElementById('sensorChart').getContext('2d');
+    sensorChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: [],
             datasets: [
-                { label: 'P1', borderColor: 'red', data: [] },
-                { label: 'P2', borderColor: 'blue', data: [] },
-                { label: 'P3', borderColor: 'green', data: [] },
-                { label: 'P4', borderColor: 'orange', data: [] },
-                { label: 'P5', borderColor: 'purple', data: [] }
+                { label: 'Sensor 1', borderColor: 'red', data: [], fill: false },
+                { label: 'Sensor 2', borderColor: 'blue', data: [], fill: false },
+                { label: 'Sensor 3', borderColor: 'green', data: [], fill: false },
+                { label: 'Sensor 4', borderColor: 'orange', data: [], fill: false },
+                { label: 'Sensor 5', borderColor: 'purple', data: [], fill: false }
             ]
         },
         options: {
             responsive: true,
             animation: false,
             scales: {
-                x: {
-                    title: { display: true, text: "Time (HH:MM:SS)" }
-                },
-                y: {
-                    title: { display: true, text: "Pressure (Psi)" }
-                }
+                x: { title: { display: true, text: "Time (HH:MM:SS)" } },
+                y: { title: { display: true, text: "Pressure (Psi)" } }
             }
         }
     });
 
-    // -------- TEMPERATURE CHART --------
+    // TEMPERATURE CHART
     const tctx = document.getElementById('temperatureChart').getContext('2d');
-
     temperatureChart = new Chart(tctx, {
         type: 'line',
         data: {
             labels: [],
             datasets: [
-                { label: 'T1', borderColor: 'red', data: [] },
-                { label: 'T2', borderColor: 'blue', data: [] },
-                { label: 'T3', borderColor: 'green', data: [] },
-                { label: 'T4', borderColor: 'orange', data: [] },
-                { label: 'T5', borderColor: 'purple', data: [] }
+                { label: 'Sensor 1', borderColor: 'red', data: [], fill: false },
+                { label: 'Sensor 2', borderColor: 'blue', data: [], fill: false },
+                { label: 'Sensor 3', borderColor: 'green', data: [], fill: false },
+                { label: 'Sensor 4', borderColor: 'orange', data: [], fill: false },
+                { label: 'Sensor 5', borderColor: 'purple', data: [], fill: false }
             ]
         },
         options: {
             responsive: true,
             animation: false,
             scales: {
-                x: {
-                    title: { display: true, text: "Time (HH:MM:SS)" }
-                },
-                y: {
-                    title: { display: true, text: "Temperature (°C)" }
-                }
+                x: { title: { display: true, text: "Time (HH:MM:SS)" } },
+                y: { title: { display: true, text: "Temperature (°C)" } }
             }
         }
     });
+    
+    applySamplingRate();
 };
 
+// ---------------- FETCH DATA ----------------
 async function fetchData() {
-    if (!isRunning) return;
-
     try {
         const res = await fetch(`${BASE_URL}/data`);
         const data = await res.json();
 
-        document.getElementById("pressure").innerText = data.pressure;
-        document.getElementById("temperature").innerText = data.temperature;
+        // 🟢 AUTO RECONNECT DETECTION (USB plugged back)
+        // 🟢 AUTO CONNECT (USB plugged back properly)
+        if (data.status === "live" && isRunning) {
+            document.getElementById("pressure").innerText = "CONNECTED";
+            document.getElementById("temperature").innerText = "CONNECTED";
 
-        // -------- UPDATE UI --------
-        for (let i = 1; i <= 5; i++) {
-            let pVolt = data[`p${i}_volt`];
-            let tVolt = data[`t${i}_volt`] ?? "";
-
-            document.getElementById(`p${i}_volt`).value =
-                (pVolt !== "" && pVolt != null) ? Number(pVolt).toFixed(3) : "";
-
-            document.getElementById(`t${i}_volt`).value =
-                (tVolt !== "" && tVolt != null) ? Number(tVolt).toFixed(3) : "";
-
-            updatePressure(i);
-            updateTemperature(i);
+            document.getElementById("pressure").style.color = "green";
+            document.getElementById("temperature").style.color = "green";
         }
 
-        // -------- GRAPH UPDATE (ONLY ONCE) --------
+        // 🔴 HANDLE DISCONNECTED / NO SIGNAL
+        if (data.status === "disconnected" || data.status === "no_data") {
+
+            let msg = (data.status === "disconnected") ? "DISCONNECTED" : "NO SIGNAL";
+
+            document.getElementById("pressure").innerText = msg;
+            document.getElementById("temperature").innerText = msg;
+
+            document.getElementById("pressure").style.color = "red";
+            document.getElementById("temperature").style.color = "red";
+
+            return;
+        }
+
+        // 🟢 AUTO CONNECT DETECTION (when data resumes after unplug)
+        if (data.status === "live" && !isRunning) {
+            document.getElementById("pressure").innerText = data.pressure;
+            document.getElementById("temperature").innerText = data.temperature;
+
+            document.getElementById("pressure").style.color = "green";
+            document.getElementById("temperature").style.color = "green";
+        } else {
+            document.getElementById("pressure").innerText = data.pressure;
+            document.getElementById("temperature").innerText = data.temperature;
+
+            document.getElementById("pressure").style.color = "#1f2d3a";
+            document.getElementById("temperature").style.color = "#1f2d3a";
+        }
+
         let now = new Date();
         let label = now.toLocaleTimeString();
 
-        pressureChart.data.labels.push(label);
+        sensorChart.data.labels.push(label);
         temperatureChart.data.labels.push(label);
 
         for (let i = 1; i <= 5; i++) {
+
+            // -------- UI UPDATE --------
+            let pVolt = data[`p${i}_volt`];
+            let tVolt = data[`t${i}_volt`];
+
+            document.getElementById(`p${i}_volt`).value =
+                (pVolt != null) ? Number(pVolt).toFixed(3) : "";
+
+            document.getElementById(`t${i}_volt`).value =
+                (tVolt != null) ? Number(tVolt).toFixed(3) : "";
+
+            updatePressure(i);
+            updateTemperature(i);
+
+            // -------- CALCULATIONS --------
             let psi = parseFloat(data[`p${i}_psi`]);
-            let temp = parseFloat(data[`t${i}_temp`]);
+            if (isNaN(psi)) psi = null;
 
-            pressureChart.data.datasets[i - 1].data.push(isNaN(psi) ? null : psi);
-            temperatureChart.data.datasets[i - 1].data.push(isNaN(temp) ? null : temp);
+            let temp = parseFloat(tVolt);
+            temp = isNaN(temp) ? null : (8 * temp) + 10;
+
+            // -------- GRAPH UPDATE --------
+            sensorChart.data.datasets[i - 1].data.push(psi);
+            temperatureChart.data.datasets[i - 1].data.push(temp);
+
+            // -------- FREEZE DETECTION --------
+            if (psi !== null) {
+                if (psi === lastValues[i - 1]) {
+                    freezeCount[i - 1]++;
+                } else {
+                    freezeCount[i - 1] = 0;
+                }
+
+                lastValues[i - 1] = psi;
+
+                if (freezeCount[i - 1] > FREEZE_LIMIT) {
+                    sensorChart.data.datasets[i - 1].borderDash = [5, 5];
+                } else {
+                    sensorChart.data.datasets[i - 1].borderDash = [];
+                }
+            }
         }
 
-        // LIMIT SIZE
-        if (pressureChart.data.labels.length > 100) {
-            pressureChart.data.labels.shift();
-            pressureChart.data.datasets.forEach(ds => ds.data.shift());
+        // -------- LIMIT DATA --------
+        if (sensorChart.data.labels.length > 100) {
+
+            // remove 2nd element instead of 1st → keeps origin (index 0)
+            sensorChart.data.labels.splice(1, 1);
+            temperatureChart.data.labels.splice(1, 1);
+
+            sensorChart.data.datasets.forEach(ds => ds.data.splice(1, 1));
+            temperatureChart.data.datasets.forEach(ds => ds.data.splice(1, 1));
         }
 
-        if (temperatureChart.data.labels.length > 100) {
-            temperatureChart.data.labels.shift();
-            temperatureChart.data.datasets.forEach(ds => ds.data.shift());
-        }
-
-        pressureChart.update();
+        sensorChart.update();
         temperatureChart.update();
 
-   } catch (err) {
+    } catch (err) {
     console.log("Fetch error:", err);
 
+    // 🔴 USB unplug / backend unreachable → mark as DISCONNECTED
     document.getElementById("pressure").innerText = "DISCONNECTED";
     document.getElementById("temperature").innerText = "DISCONNECTED";
 
+    document.getElementById("pressure").style.color = "red";
+    document.getElementById("temperature").style.color = "red";
+}
+}
+
+function toggleSensor(index) {
+    const checked = event.target.checked;
+
+    // Pressure chart
+    sensorChart.data.datasets[index].hidden = !checked;
+
+    // Temperature chart
+    temperatureChart.data.datasets[index].hidden = !checked;
+
+    sensorChart.update();
+    temperatureChart.update();
+}
+
+// ---------------- UPDATE FUNCTIONS ----------------
+function updatePressure(sensor) {
+    let volt = parseFloat(document.getElementById(`p${sensor}_volt`).value);
+
+    if (isNaN(volt)) {
+        document.getElementById(`p${sensor}_psi`).innerText = "";
+        return;
+    }
+
+    let psi = (4 * volt) + 5;
+    document.getElementById(`p${sensor}_psi`).innerText = psi.toFixed(2);
+}
+
+function updateTemperature(sensor) {
+    let volt = parseFloat(document.getElementById(`t${sensor}_volt`).value);
+
+    if (isNaN(volt)) {
+        document.getElementById(`t${sensor}_temp`).innerText = "";
+        return;
+    }
+
+    let temp = (8 * volt) + 10;
+    document.getElementById(`t${sensor}_temp`).innerText = temp.toFixed(2);
+}
+
+// ---------------- CONTROL ----------------
+async function startDevice() {
+    isRunning = true;
+    await fetch(`${BASE_URL}/start`, { method: "POST" });
+
+    document.getElementById("pressure").innerText = "STARTED";
+    document.getElementById("temperature").innerText = "STARTED";
+
+    applySamplingRate();
+    setActiveButton("startBtn");
+}
+
+async function stopDevice() {
+    if (dataInterval) {
+    clearInterval(dataInterval);
+    dataInterval = null;
+}
+    await fetch(`${BASE_URL}/stop`, { method: "POST" });
+
+    document.getElementById("pressure").innerText = "STOPPED";
+    document.getElementById("temperature").innerText = "STOPPED";
+
+    document.getElementById("pressure").style.color = "red";
+    document.getElementById("temperature").style.color = "red";
+
     isRunning = false;
-    clearInterval(window.dataInterval);
-}
+    setActiveButton("stopBtn");
 }
 
+function resetDevice() {
+
+    // stop fetching
+    if (dataInterval) {
+    clearInterval(dataInterval);
+    dataInterval = null;
+}
+    isRunning = false;
+
+    // reset UI text
+    document.getElementById("pressure").innerText = "RESET";
+    document.getElementById("temperature").innerText = "RESET";
+
+    // clear charts completely
+    sensorChart.data.labels = [];
+    temperatureChart.data.labels = [];
+
+    sensorChart.data.datasets.forEach(ds => ds.data = []);
+    temperatureChart.data.datasets.forEach(ds => ds.data = []);
+
+    sensorChart.update();
+    temperatureChart.update();
+
+    // reset freeze detection
+    lastValues = [null, null, null, null, null];
+    freezeCount = [0, 0, 0, 0, 0];
+
+    // clear input + output boxes
+    for (let i = 1; i <= 5; i++) {
+        document.getElementById(`p${i}_volt`).value = "";
+        document.getElementById(`p${i}_psi`).innerText = "";
+
+        document.getElementById(`t${i}_volt`).value = "";
+        document.getElementById(`t${i}_temp`).innerText = "";
+    }
+    // ✅ set active AFTER loop
+    setActiveButton("resetBtn");
+}
+
+// ---------------- EXPORT ----------------
 function exportCSV() {
-    let csv = "Time";
+    let csv = "Time,Sensor1,Sensor2,Sensor3,Sensor4,Sensor5\n";
 
-    for (let i = 1; i <= 5; i++) csv += `,P${i}`;
-    for (let i = 1; i <= 5; i++) csv += `,T${i}`;
-    csv += "\n";
-
-    let labels = pressureChart.data.labels;
+    let labels = sensorChart.data.labels;
+    let datasets = sensorChart.data.datasets;
 
     for (let i = 0; i < labels.length; i++) {
         let row = [labels[i]];
-
-        pressureChart.data.datasets.forEach(ds => {
-            row.push(ds.data[i] ?? "");
-        });
-
-        temperatureChart.data.datasets.forEach(ds => {
-            row.push(ds.data[i] ?? "");
-        });
-
+        datasets.forEach(ds => row.push(ds.data[i] ?? ""));
         csv += row.join(",") + "\n";
     }
 
@@ -711,40 +970,34 @@ function exportCSV() {
     URL.revokeObjectURL(url);
 }
 
-// ---------------- UPDATE PRESSURE ----------------
-function updatePressure(sensor) {
-    let volt = parseFloat(document.getElementById(`p${sensor}_volt`).value);
+// ---------------- SAMPLING CONTROL ----------------
+function applySamplingRate() {
 
-    if (isNaN(volt)) {
-        document.getElementById(`p${sensor}_psi`).innerText = "";
-        return;
+    // stop existing loop
+    if (dataInterval) {
+        clearInterval(dataInterval);
     }
 
-    let psi = (4 * volt) + 5;
-    document.getElementById(`p${sensor}_psi`).innerText = psi.toFixed(2);
+    // restart only if system is running
+    if (isRunning) {
+        dataInterval = setInterval(fetchData, samplingRateSec * 1000);
+    }
 }
 
-// ---------------- UPDATE TEMPERATURE ----------------
+// ---------------- HELPER FUNCTIONS ----------------
+function setActiveButton(activeId) {
+    const buttons = ["startBtn", "stopBtn", "resetBtn"];
 
-// ---------------- CONTROL ----------------
-async function startDevice() {
-    isRunning = true;
-    await fetch(`${BASE_URL}/start`, { method: "POST" });
+    buttons.forEach(id => {
+        document.getElementById(id).classList.remove("active-btn");
+    });
 
-    document.getElementById("pressure").innerText = "STARTED";
-
-    clearInterval(window.dataInterval);
-    window.dataInterval = setInterval(fetchData, 500);
+    document.getElementById(activeId).classList.add("active-btn");
 }
 
-async function stopDevice() {
-    clearInterval(window.dataInterval);
-    await fetch(`${BASE_URL}/stop`, { method: "POST" });
-
-    document.getElementById("pressure").innerText = "STOPPED";
-
-    isRunning = false;
-
+function changeSamplingRate() {
+    samplingRateSec = parseInt(document.getElementById("samplingRate").value);
+    applySamplingRate();
 }
 
 // ---------------- CONNECT ----------------
@@ -766,19 +1019,26 @@ async function connectDevice() {
 
         if (data.status === "connected") {
             alert("Device Connected ✅");
-            clearInterval(window.dataInterval);
-            window.dataInterval = setInterval(fetchData, 500);
+
+            document.getElementById("pressure").innerText = "CONNECTED";
+            document.getElementById("temperature").innerText = "CONNECTED";
+
+            document.getElementById("pressure").style.color = "green";
+            document.getElementById("temperature").style.color = "green";
+
+            isRunning = true;
+            applySamplingRate();
         } else {
             alert("❌ " + data.message);
         }
 
-    } catch (error) {
+    } catch {
         alert("Backend not reachable ❌");
     }
 }
 
-// ---------------- AUTO START FETCH ----------------
-window.dataInterval = null;
+// ---------------- AUTO FETCH ----------------
+
 </script>
 
 <footer class="footer">
