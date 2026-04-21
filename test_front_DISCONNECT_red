@@ -413,6 +413,12 @@ input.btn-box {
     cursor: pointer;
 }
 
+/* Increase font size for unit labels (Volt, Psi, °C) */
+.panel-buttons .btn-header:nth-child(5),
+.panel-buttons .btn-header:nth-child(6) {
+    font-size: 15px;   /* adjust if you want bigger */
+}
+
 button.active-btn {
     border: 3px solid #000;
     box-shadow: 0 0 6px rgba(0,0,0,0.4);
