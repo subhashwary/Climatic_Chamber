@@ -131,12 +131,10 @@ def read_serial():
         print("UPDATED:",
               "P:", last_values["pressure"],
               "T:", last_values["temperature"])
-
+        
     except Exception as e:
-        print("Serial error:", e)
+            print("Serial error:", e)
 
-
-# ---------------- THREAD ----------------
 def serial_loop():
     while True:
         if ser and ser.is_open and is_running:
