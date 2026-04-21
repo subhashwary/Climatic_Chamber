@@ -54,14 +54,14 @@
         }
 
 .title {
-            font-size: 44px;
+            font-size: 32px;
             font-weight: bold;
         }
 
 .subtitle {
-            font-size: 32px;   /* same size as title */
-            font-weight: bold; /* make it bold */
-            margin-top: 4px;
+            font-size: 25px;   /* same size as title */
+            font-weight: 500; /* make it bold */
+            margin-top: 3px;
         }
 
 .container {
@@ -289,15 +289,15 @@ input.btn-box {
 
 .main-title {
     text-align: center;
-    font-size: 30px;
-    font-weight: bold;
-    margin-top: 45px;   /* increased from 10px */
+    font-size: 25px;
+    font-weight: 600;
+    margin-top: 35px;   /* increased from 10px */
 }
 
 .sub-main {
     text-align: center;
-    font-size: 25px;
-    margin-top: 4px;
+    font-size: 18px;
+    margin-top: 2px;
     color: #444;
     font-weight: 500;
 }
@@ -307,9 +307,9 @@ input.btn-box {
 }
 
 .sensor-title {
-    font-size: 32px;
-    font-weight: 700;
-    margin-bottom: 12px; /* increased gap */
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 10px; /* increased gap */
 }
 
 #pressure, #temperature {
@@ -347,13 +347,13 @@ input.btn-box {
 .connection-box {
     position: absolute;
 
-    top: 175px;
+    top: 115px;
     right: 20px;
 
     display: flex;
     flex-direction: column;   /* 🔥 stack vertically */
     align-items: flex-start;
-    gap: 6px;
+    gap: 10px;
 
     background: #ffffff;
     padding: 10px;
@@ -362,6 +362,14 @@ input.btn-box {
     border-radius: 6px;
 
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.connection-row label {
+    font-size: 15px;   /* increase label text */
+}
+
+.connection-box select {
+    font-size: 14px;   /* increase dropdown text */
 }
 
 .connection-row {
@@ -381,6 +389,27 @@ input.btn-box {
     height: 30px;
     width: 90px;
     font-size: 12px;
+    cursor: pointer;
+}
+
+.export-footer {
+    display: flex;
+    justify-content: center;   /* center horizontally */
+    margin-top: 20px;
+    margin-bottom: 10px;       /* tight gap above PASF */
+}
+
+.export-footer button {
+    width: 140px;
+    height: 40px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    border: 2px solid #2c3e50;
+    border-radius: 5px;
+
+    background-color: #f4f7fb;
     cursor: pointer;
 }
 
@@ -405,17 +434,38 @@ input.btn-box {
 <!-- CONNECTION SETTINGS (TOP RIGHT) -->
 <div class="connection-box">
 
-    <div class="connection-row">
-        <label>COM Port:</label>
-        <input type="text" id="comPort" placeholder="COM6">
-    </div>
+    <div style="display: flex; gap: 10px; align-items: flex-start;">
 
-    <div class="connection-row">
-        <label>Baud:</label>
-        <input type="number" id="baudRate" placeholder="9600">
-    </div>
+        <!-- LEFT: CONNECT BUTTON -->
+        <button onclick="connectDevice()" 
+        style="margin-top: 22px; font-size: 14px; height: 36px; width: 100px;">
+    CONNECT
+</button>
 
-    <button onclick="connectDevice()">CONNECT</button>
+        <!-- RIGHT: INPUTS (STACKED) -->
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+
+            <div class="connection-row">
+                <label>COM Port:</label>
+                <select id="comPort">
+                    <option value="COM3">COM3</option>
+                    <option value="COM4">COM4</option>
+                    <option value="COM5">COM5</option>
+                    <option value="COM6" selected>COM6</option>
+                </select>
+            </div>
+
+            <div class="connection-row">
+                <label>Baud:</label>
+                <select id="baudRate">
+                    <option value="9600">9600</option>
+                    <option value="115200">115200</option>
+                </select>
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 
@@ -520,6 +570,7 @@ input.btn-box {
         </div>
 
 <div style="width:90%; margin: 30px auto;">
+    <h3 style="text-align:center;">Pressure Graph</h3>
     <canvas id="sensorChart"></canvas>
 </div>
 
@@ -528,9 +579,9 @@ input.btn-box {
     <canvas id="temperatureChart"></canvas>
 </div>
 
-<button onclick="exportCSV()" style="display:block; margin: 10px auto;">
-    Export Data
-</button>
+<div class="export-footer">
+    <button onclick="exportCSV()">Export Data</button>
+</div>
 
     <script>
 const BASE_URL = "http://127.0.0.1:5000";
@@ -603,8 +654,27 @@ async function fetchData() {
         const res = await fetch(`${BASE_URL}/data`);
         const data = await res.json();
 
+        // 🔴 HANDLE DISCONNECTED STATE
+        // 🔴 HANDLE DISCONNECTED / NO SIGNAL
+        if (data.status === "disconnected" || data.status === "no_data") {
+
+            let msg = (data.status === "disconnected") ? "DISCONNECTED" : "NO SIGNAL";
+
+            document.getElementById("pressure").innerText = msg;
+            document.getElementById("temperature").innerText = msg;
+
+            document.getElementById("pressure").style.color = "red";
+            document.getElementById("temperature").style.color = "red";
+
+            return;
+        }
+
         document.getElementById("pressure").innerText = data.pressure;
         document.getElementById("temperature").innerText = data.temperature;
+
+        // 🟢 NORMAL STATE COLOR RESET
+        document.getElementById("pressure").style.color = "#1f2d3a";
+        document.getElementById("temperature").style.color = "#1f2d3a";
 
         let now = new Date();
         let label = now.toLocaleTimeString();
@@ -632,7 +702,7 @@ async function fetchData() {
             if (isNaN(psi)) psi = null;
 
             let temp = parseFloat(tVolt);
-            temp = isNaN(temp) ? null : temp * 100;
+            temp = isNaN(temp) ? null : (8 * temp) + 10;
 
             // -------- GRAPH UPDATE --------
             sensorChart.data.datasets[i - 1].data.push(psi);
@@ -658,11 +728,13 @@ async function fetchData() {
 
         // -------- LIMIT DATA --------
         if (sensorChart.data.labels.length > 100) {
-            sensorChart.data.labels.shift();
-            temperatureChart.data.labels.shift();
 
-            sensorChart.data.datasets.forEach(ds => ds.data.shift());
-            temperatureChart.data.datasets.forEach(ds => ds.data.shift());
+            // remove 2nd element instead of 1st → keeps origin (index 0)
+            sensorChart.data.labels.splice(1, 1);
+            temperatureChart.data.labels.splice(1, 1);
+
+            sensorChart.data.datasets.forEach(ds => ds.data.splice(1, 1));
+            temperatureChart.data.datasets.forEach(ds => ds.data.splice(1, 1));
         }
 
         sensorChart.update();
@@ -704,6 +776,7 @@ async function startDevice() {
     await fetch(`${BASE_URL}/start`, { method: "POST" });
 
     document.getElementById("pressure").innerText = "STARTED";
+    document.getElementById("temperature").innerText = "STARTED";
 
     clearInterval(window.dataInterval);
     window.dataInterval = setInterval(fetchData, 500);
@@ -714,6 +787,7 @@ async function stopDevice() {
     await fetch(`${BASE_URL}/stop`, { method: "POST" });
 
     document.getElementById("pressure").innerText = "STOPPED";
+    document.getElementById("temperature").innerText = "STOPPED";
 
     isRunning = false;
 }
