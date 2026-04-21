@@ -673,8 +673,8 @@ async function fetchData() {
         const data = await res.json();
 
         // 🟢 AUTO RECONNECT DETECTION (USB plugged back)
-        if (data && Object.keys(data).length > 0 && isRunning) {
-
+        // 🟢 AUTO CONNECT (USB plugged back properly)
+        if (data.status === "live" && isRunning) {
             document.getElementById("pressure").innerText = "CONNECTED";
             document.getElementById("temperature").innerText = "CONNECTED";
 
@@ -697,7 +697,7 @@ async function fetchData() {
         }
 
         // 🟢 AUTO CONNECT DETECTION (when data resumes after unplug)
-        if (data.status === "live") {
+        if (data.status === "live" && !isRunning) {
             document.getElementById("pressure").innerText = data.pressure;
             document.getElementById("temperature").innerText = data.temperature;
 
