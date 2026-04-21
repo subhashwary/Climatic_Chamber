@@ -766,8 +766,15 @@ async function fetchData() {
         temperatureChart.update();
 
     } catch (err) {
-        console.log("Fetch error:", err);
-    }
+    console.log("Fetch error:", err);
+
+    // 🔴 USB unplug / backend unreachable → mark as DISCONNECTED
+    document.getElementById("pressure").innerText = "DISCONNECTED";
+    document.getElementById("temperature").innerText = "DISCONNECTED";
+
+    document.getElementById("pressure").style.color = "red";
+    document.getElementById("temperature").style.color = "red";
+}
 }
 
 // ---------------- UPDATE FUNCTIONS ----------------
