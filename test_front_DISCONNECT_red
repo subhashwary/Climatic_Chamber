@@ -347,7 +347,7 @@ input.btn-box {
 .connection-box {
     position: absolute;
 
-    top: 115px;
+    top: 160px;
     right: 20px;
 
     display: flex;
@@ -411,6 +411,12 @@ input.btn-box {
 
     background-color: #f4f7fb;
     cursor: pointer;
+}
+
+button.active-btn {
+    border: 3px solid #000;
+    box-shadow: 0 0 6px rgba(0,0,0,0.4);
+    transform: scale(1.05);
 }
 
     </style>
@@ -565,8 +571,9 @@ input.btn-box {
 
         <!-- CONTROL BUTTONS -->
         <div class="top-buttons">
-            <button onclick="startDevice()" class="start-btn">START</button>
-            <button onclick="stopDevice()" class="stop-btn">STOP</button>
+            <button id="startBtn" onclick="startDevice()" class="start-btn">START</button>
+            <button id="stopBtn" onclick="stopDevice()" class="stop-btn">STOP</button>
+            <button id="resetBtn" onclick="resetDevice()" style="background-color:#6c757d;">RESET</button>
         </div>
 
 <div style="width:90%; margin: 30px auto;">
@@ -780,6 +787,7 @@ async function startDevice() {
 
     clearInterval(window.dataInterval);
     window.dataInterval = setInterval(fetchData, 500);
+    setActiveButton("startBtn");
 }
 
 async function stopDevice() {
@@ -790,6 +798,43 @@ async function stopDevice() {
     document.getElementById("temperature").innerText = "STOPPED";
 
     isRunning = false;
+    setActiveButton("stopBtn");
+}
+
+function resetDevice() {
+
+    // stop fetching
+    clearInterval(window.dataInterval);
+    isRunning = false;
+
+    // reset UI text
+    document.getElementById("pressure").innerText = "RESET";
+    document.getElementById("temperature").innerText = "RESET";
+
+    // clear charts completely
+    sensorChart.data.labels = [];
+    temperatureChart.data.labels = [];
+
+    sensorChart.data.datasets.forEach(ds => ds.data = []);
+    temperatureChart.data.datasets.forEach(ds => ds.data = []);
+
+    sensorChart.update();
+    temperatureChart.update();
+
+    // reset freeze detection
+    lastValues = [null, null, null, null, null];
+    freezeCount = [0, 0, 0, 0, 0];
+
+    // clear input + output boxes
+    for (let i = 1; i <= 5; i++) {
+        document.getElementById(`p${i}_volt`).value = "";
+        document.getElementById(`p${i}_psi`).innerText = "";
+
+        document.getElementById(`t${i}_volt`).value = "";
+        document.getElementById(`t${i}_temp`).innerText = "";
+    }
+    // ✅ set active AFTER loop
+    setActiveButton("resetBtn");
 }
 
 // ---------------- EXPORT ----------------
@@ -814,6 +859,17 @@ function exportCSV() {
     a.click();
 
     URL.revokeObjectURL(url);
+}
+
+// ---------------- HELPER FUNCTIONS ----------------
+function setActiveButton(activeId) {
+    const buttons = ["startBtn", "stopBtn", "resetBtn"];
+
+    buttons.forEach(id => {
+        document.getElementById(id).classList.remove("active-btn");
+    });
+
+    document.getElementById(activeId).classList.add("active-btn");
 }
 
 // ---------------- CONNECT ----------------
