@@ -419,6 +419,11 @@ input.btn-box {
     font-size: 15px;   /* adjust if you want bigger */
 }
 
+/* Increase font size for panel values (Volt, Psi, °C outputs) */
+.panel-buttons .btn-box {
+    font-size: 14px;
+}
+
 button.active-btn {
     border: 3px solid #000;
     box-shadow: 0 0 6px rgba(0,0,0,0.4);
