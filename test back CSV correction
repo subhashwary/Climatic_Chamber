@@ -6,24 +6,20 @@ import time
 import threading
 import csv
 import io
-import serial.tools.list_ports
-
-log_file_handle = None
-csv_writer = None
 
 app = Flask(__name__)
-LOG_FILE = "sensor_log.csv"
 CORS(app)
 
 ser = None
-last_port = None
-last_baud = None
 
 last_values = {
     "pressure": [0.0] * 5,
     "temperature": [0.0] * 5
 }
 last_update_time = 0
+
+# ✅ DATA LOG STORAGE
+data_log = []
 
 is_running = False
 
@@ -44,10 +40,6 @@ def connect():
     try:
         port = data.get("com_port")
         baud = int(data.get("baud_rate"))
-
-        global last_port, last_baud
-        last_port = port
-        last_baud = baud
 
         if ser and ser.is_open:
             ser.close()
@@ -73,38 +65,25 @@ def connect():
 # ---------------- CONTROL ----------------
 @app.route('/start', methods=['POST'])
 def start():
-    global is_running, log_file_handle, csv_writer
+    global is_running, data_log
 
     is_running = True
 
-    log_file_handle = open(LOG_FILE, "w", newline="")
-    csv_writer = csv.writer(log_file_handle)
-
-    csv_writer.writerow([
-            "Timestamp",
-            "P1","P2","P3","P4","P5",
-            "T1","T2","T3","T4","T5"
-        ])
+    # 🔥 session control (NO RESET NEEDED)
+    data_log.clear()
 
     return jsonify({"status": "started"})
 
 @app.route('/stop', methods=['POST'])
 def stop():
-    global is_running, log_file_handle, csv_writer
-
+    global is_running
     is_running = False
-
-    if log_file_handle is not None:
-        log_file_handle.close()
-        log_file_handle = None
-        csv_writer = None
-
     return jsonify({"status": "stopped"})
 
 
 # ---------------- SERIAL READ ----------------
 def read_serial():
-    global last_values, last_update_time
+    global ser, last_values, last_update_time, data_log
 
     if ser is None or not ser.is_open:
         return
@@ -140,11 +119,14 @@ def read_serial():
         if is_running:
             timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
 
-            row = [timestamp] + last_values["pressure"] + last_values["temperature"]
+            data_log.append({
+                "timestamp": timestamp,
+                "pressure": last_values["pressure"].copy(),
+                "temperature": last_values["temperature"].copy()
+            })
 
-            if csv_writer:
-                csv_writer.writerow(row)
-                log_file_handle.flush()
+            if len(data_log) > 10000:
+                data_log.pop(0)
 
         print("UPDATED:",
               "P:", last_values["pressure"],
@@ -169,21 +151,16 @@ def serial_loop():
             read_serial()
         time.sleep(0.05)
 
-def port_available(port):
-    ports = [p.device for p in serial.tools.list_ports.comports()]
-    return port in ports
-
 def auto_reconnect():
     global ser
 
     while True:
         try:
             if ser is None or not ser.is_open:
-                if port_available(last_port):
-                    ser = serial.Serial(last_port, last_baud, timeout=1)
-                    time.sleep(2)
-                    ser.reset_input_buffer()
-                    print("🔁 Auto reconnected to device")
+                ser = serial.Serial("COM6", 115200, timeout=1)
+                time.sleep(2)
+                ser.reset_input_buffer()
+                print("🔁 Auto reconnected to device")
         except:
             pass
 
@@ -244,10 +221,30 @@ def get_data():
 # ---------------- CSV DOWNLOAD ----------------
 @app.route('/download_csv')
 def download_csv():
-    try:
-        return send_from_directory('.', LOG_FILE, as_attachment=True)
-    except Exception as e:
-        return jsonify({"error": str(e)})
+    output = io.StringIO()
+    writer = csv.writer(output)
+
+    writer.writerow([
+    "Timestamp",
+    "P1","P2","P3","P4","P5",
+    "T1","T2","T3","T4","T5"
+])
+
+    for entry in data_log:
+        writer.writerow(
+    [entry["timestamp"]] +
+    [f"{v:.3f}" for v in entry["pressure"]] +
+    [f"{v:.3f}" for v in entry["temperature"]]
+)
+
+    output.seek(0)
+
+    return Response(
+        output,
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment;filename=sensor_data.csv"}
+    )
+
 
 # ---------------- RUN ----------------
 if __name__ == "__main__":
