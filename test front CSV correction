@@ -467,14 +467,6 @@ input[type="checkbox"] {
 <!-- CONNECTION SETTINGS (TOP RIGHT) -->
 <div class="connection-box">
 
-<div id="statusIndicator" style="
-    width:12px;
-    height:12px;
-    border-radius:50%;
-    background:red;
-    margin-top:5px;">
-</div>
-
     <div style="display: flex; gap: 10px; align-items: flex-start;">
 
         <!-- LEFT: CONNECT BUTTON -->
@@ -679,20 +671,6 @@ let lastValues = [null, null, null, null, null];
 let freezeCount = [0, 0, 0, 0, 0];
 const FREEZE_LIMIT = 5;
 
-function updateStatusLED(status) {
-    const led = document.getElementById("statusIndicator");
-
-    if (status === "connected" || status === "live") {
-    led.style.background = "green";
-} 
-else if (status === "no_signal" || status === "no_data") {
-    led.style.background = "orange";
-} 
-else {
-    led.style.background = "red";
-}
-}
-
 // ---------------- CHART SETUP ----------------
 window.onload = function () {
 
@@ -776,8 +754,6 @@ async function fetchData() {
 
             return;
         }
-
-        updateStatusLED(data.status);
 
         // 🟢 AUTO CONNECT DETECTION (when data resumes after unplug)
         if (data.status === "live" && !isRunning) {
