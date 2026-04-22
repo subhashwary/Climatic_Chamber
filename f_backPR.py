@@ -1,0 +1,260 @@
+import webbrowser
+from flask import Flask, jsonify, request, send_from_directory, Response
+from flask_cors import CORS
+import serial
+import time
+import threading
+import csv
+import io
+
+app = Flask(__name__)
+CORS(app)
+
+ser = None
+
+last_values = {
+    "pressure": [0.0] * 5,
+    "temperature": [0.0] * 5
+}
+last_update_time = 0
+
+# ✅ DATA LOG STORAGE
+data_log = []
+
+is_running = False
+
+
+# ---------------- SERVE FRONTEND ----------------
+@app.route('/')
+def serve_ui():
+    return send_from_directory('.', 'index.html')
+
+
+# ---------------- CONNECT ----------------
+@app.route('/connect', methods=['POST'])
+def connect():
+    global ser, last_update_time, last_values
+
+    data = request.json
+
+    try:
+        port = data.get("com_port")
+        baud = int(data.get("baud_rate"))
+
+        if ser and ser.is_open:
+            ser.close()
+            time.sleep(1)
+
+        ser = serial.Serial(port, baud, timeout=1)
+        time.sleep(2)
+        ser.reset_input_buffer()
+
+        last_values = {
+    "pressure": [0.0] * 5,
+    "temperature": [0.0] * 5
+}
+    
+        last_update_time = time.time()
+
+        return jsonify({"status": "connected"})
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
+
+# ---------------- CONTROL ----------------
+@app.route('/start', methods=['POST'])
+def start():
+    global is_running, data_log
+
+    is_running = True
+
+    # 🔥 session control (NO RESET NEEDED)
+    data_log.clear()
+
+    return jsonify({"status": "started"})
+
+@app.route('/stop', methods=['POST'])
+def stop():
+    global is_running
+    is_running = False
+    return jsonify({"status": "stopped"})
+
+
+# ---------------- SERIAL READ ----------------
+def read_serial():
+    global ser, last_values, last_update_time, data_log
+
+    if ser is None or not ser.is_open:
+        return
+
+    try:
+        line = ser.readline().decode('utf-8', errors='ignore').strip()
+
+        if not line:
+            return
+
+        parts = line.replace(',', ' ').split()
+
+        if len(parts) < 10:
+            return
+
+        values = [float(x) for x in parts[:10]]
+
+        # split into pressure + temperature
+        p_values = values[:5]
+        t_values = values[5:]
+
+        if not all(0 <= v <= 5 for v in p_values + t_values):
+            return
+
+        last_values = {
+            "pressure": [round(v, 3) for v in p_values],
+            "temperature": [round(v, 3) for v in t_values]
+        }
+
+        last_update_time = time.time()
+
+        # ✅ ONLY LOG WHEN RUNNING (VERY IMPORTANT)
+        if is_running:
+            timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+
+            data_log.append({
+                "timestamp": timestamp,
+                "pressure": last_values["pressure"].copy(),
+                "temperature": last_values["temperature"].copy()
+            })
+
+            if len(data_log) > 10000:
+                data_log.pop(0)
+
+        print("UPDATED:",
+              "P:", last_values["pressure"],
+              "T:", last_values["temperature"])
+        
+    except Exception as e:
+        print("Serial error:", e)
+
+        # 🔴 ADD THIS BLOCK (USB unplug detection)
+        try:
+            if ser and ser.is_open:
+                ser.close()
+        except:
+            pass
+
+        # force backend to report disconnect
+        last_update_time = 0
+
+def serial_loop():
+    while True:
+        if ser and ser.is_open:
+            read_serial()
+        time.sleep(0.05)
+
+def auto_reconnect():
+    global ser
+
+    while True:
+        try:
+            if ser is None or not ser.is_open:
+                port = ser.port if ser else "COM6"
+                baud = ser.baudrate if ser else 115200
+                ser = serial.Serial(port, baud, timeout=1)
+                time.sleep(2)
+                ser.reset_input_buffer()
+                print("🔁 Auto reconnected to device")
+        except:
+            pass
+
+        time.sleep(2)
+
+threading.Thread(target=serial_loop, daemon=True).start()
+threading.Thread(target=auto_reconnect, daemon=True).start()
+
+# ---------------- DATA API ----------------
+def calculate_psi(voltage):
+    return (4 * voltage) + 5
+
+
+@app.route('/data')
+def get_data():
+    global last_values, last_update_time
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+
+    if ser is None or not ser.is_open:
+        return jsonify({"status": "disconnected"})
+
+    age = time.time() - last_update_time
+
+    if age > 2:
+        return jsonify({
+            "status": "no_data",
+            "pressure": "NO SIGNAL",
+            "temperature": "NO SIGNAL",
+            **{f"p{i}_volt": "" for i in range(1, 6)},
+            **{f"p{i}_psi": "" for i in range(1, 6)},
+            **{f"t{i}_volt": "" for i in range(1, 6)},
+            **{f"t{i}_temp": "" for i in range(1, 6)}
+        })
+
+    response = {
+    "status": "live",
+    "pressure": "LIVE",
+    "temperature": "LIVE",
+    "timestamp": timestamp
+}
+
+    for i in range(5):
+        # PRESSURE
+        p_v = last_values["pressure"][i]
+        psi = calculate_psi(p_v)
+
+        response[f"p{i+1}_volt"] = round(p_v, 3)
+        response[f"p{i+1}_psi"] = round(psi, 2)
+
+        # TEMPERATURE
+        t_v = last_values["temperature"][i]
+        temp = (8 * t_v) + 10   # your chosen mapping
+
+        response[f"t{i+1}_volt"] = round(t_v, 3)
+        response[f"t{i+1}_temp"] = round(temp, 2)
+
+    return jsonify(response)
+
+
+# ---------------- CSV DOWNLOAD ----------------
+@app.route('/download_csv')
+def download_csv():
+    output = io.StringIO()
+    writer = csv.writer(output)
+
+    writer.writerow([
+        "Timestamp",
+        "P1_Volt","P2_Volt","P3_Volt","P4_Volt","P5_Volt",
+        "T1_Volt","T2_Volt","T3_Volt","T4_Volt","T5_Volt",
+        "T1_C","T2_C","T3_C","T4_C","T5_C"
+    ])
+
+    for entry in data_log:
+        temps = entry["temperature"]
+        
+        writer.writerow(
+            [entry["timestamp"]] +
+            [f"{v:.3f}" for v in entry["pressure"]] +
+            [f"{v:.3f}" for v in temps] +
+            [f"{(8*v)+10:.2f}" for v in temps]
+        )
+
+    output.seek(0)
+
+    return Response(
+        output,
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment;filename=sensor_data.csv"}
+    )
+
+
+# ---------------- RUN ----------------
+if __name__ == "__main__":
+    webbrowser.open("http://127.0.0.1:5000")
+    app.run(debug=False, threaded=True, use_reloader=False)
