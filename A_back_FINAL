@@ -12,13 +12,16 @@ CORS(app)
 
 ser = None
 
-last_values = [0.0] * 5
+last_values = {
+    "pressure": [0.0] * 5,
+    "temperature": [0.0] * 5
+}
 last_update_time = 0
-
-is_running = False
 
 # ✅ DATA LOG STORAGE
 data_log = []
+
+is_running = False
 
 
 # ---------------- SERVE FRONTEND ----------------
@@ -46,7 +49,11 @@ def connect():
         time.sleep(2)
         ser.reset_input_buffer()
 
-        last_values = [0.0] * 5
+        last_values = {
+    "pressure": [0.0] * 5,
+    "temperature": [0.0] * 5
+}
+    
         last_update_time = time.time()
 
         return jsonify({"status": "connected"})
@@ -58,8 +65,13 @@ def connect():
 # ---------------- CONTROL ----------------
 @app.route('/start', methods=['POST'])
 def start():
-    global is_running
+    global is_running, data_log
+
     is_running = True
+
+    # 🔥 session control (NO RESET NEEDED)
+    data_log.clear()
+
     return jsonify({"status": "started"})
 
 @app.route('/stop', methods=['POST'])
@@ -84,44 +96,78 @@ def read_serial():
 
         parts = line.replace(',', ' ').split()
 
-        if len(parts) < 5:
+        if len(parts) < 10:
             return
 
-        values = [float(x) for x in parts[:5]]
+        values = [float(x) for x in parts[:10]]
 
-        if not all(0 <= v <= 5 for v in values):
+        # split into pressure + temperature
+        p_values = values[:5]
+        t_values = values[5:]
+
+        if not all(0 <= v <= 5 for v in p_values + t_values):
             return
 
-        last_values = [round(v, 3) for v in values]
+        last_values = {
+            "pressure": [round(v, 3) for v in p_values],
+            "temperature": [round(v, 3) for v in t_values]
+        }
+
         last_update_time = time.time()
 
-        # ✅ LOG DATA WITH TIMESTAMP
-        timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+        # ✅ ONLY LOG WHEN RUNNING (VERY IMPORTANT)
+        if is_running:
+            timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
 
-        data_log.append({
-            "timestamp": timestamp,
-            "values": last_values.copy()
-        })
+            data_log.append({
+                "timestamp": timestamp,
+                "pressure": last_values["pressure"].copy(),
+                "temperature": last_values["temperature"].copy()
+            })
 
-        # optional: limit size (prevents memory overflow)
-        if len(data_log) > 10000:
-            data_log.pop(0)
+            if len(data_log) > 10000:
+                data_log.pop(0)
 
-        print("UPDATED:", " | ".join(f"{v:.3f}" for v in last_values))
-
+        print("UPDATED:",
+              "P:", last_values["pressure"],
+              "T:", last_values["temperature"])
+        
     except Exception as e:
         print("Serial error:", e)
 
+        # 🔴 ADD THIS BLOCK (USB unplug detection)
+        try:
+            if ser and ser.is_open:
+                ser.close()
+        except:
+            pass
 
-# ---------------- THREAD ----------------
+        # force backend to report disconnect
+        last_update_time = 0
+
 def serial_loop():
     while True:
-        if ser and ser.is_open and is_running:
+        if ser and ser.is_open:
             read_serial()
         time.sleep(0.05)
 
+def auto_reconnect():
+    global ser
+
+    while True:
+        try:
+            if ser is None or not ser.is_open:
+                ser = serial.Serial("COM6", 115200, timeout=1)
+                time.sleep(2)
+                ser.reset_input_buffer()
+                print("🔁 Auto reconnected to device")
+        except:
+            pass
+
+        time.sleep(2)
 
 threading.Thread(target=serial_loop, daemon=True).start()
+threading.Thread(target=auto_reconnect, daemon=True).start()
 
 # ---------------- DATA API ----------------
 def calculate_psi(voltage):
@@ -141,22 +187,33 @@ def get_data():
         return jsonify({
             "status": "no_data",
             "pressure": "NO SIGNAL",
+            "temperature": "NO SIGNAL",
             **{f"p{i}_volt": "" for i in range(1, 6)},
-            **{f"p{i}_psi": "" for i in range(1, 6)}
+            **{f"p{i}_psi": "" for i in range(1, 6)},
+            **{f"t{i}_volt": "" for i in range(1, 6)},
+            **{f"t{i}_temp": "" for i in range(1, 6)}
         })
 
     response = {
         "status": "live",
-        "pressure": "LIVE"
+        "pressure": "LIVE",
+        "temperature": "LIVE"
     }
 
-    # add voltage + psi for each sensor
     for i in range(5):
-        v = last_values[i]
-        psi = calculate_psi(v)
+        # PRESSURE
+        p_v = last_values["pressure"][i]
+        psi = calculate_psi(p_v)
 
-        response[f"p{i+1}_volt"] = round(v, 3)
+        response[f"p{i+1}_volt"] = round(p_v, 3)
         response[f"p{i+1}_psi"] = round(psi, 2)
+
+        # TEMPERATURE
+        t_v = last_values["temperature"][i]
+        temp = (8 * t_v) + 10   # your chosen mapping
+
+        response[f"t{i+1}_volt"] = round(t_v, 3)
+        response[f"t{i+1}_temp"] = round(temp, 2)
 
     return jsonify(response)
 
@@ -167,11 +224,17 @@ def download_csv():
     output = io.StringIO()
     writer = csv.writer(output)
 
-    writer.writerow(["Timestamp", "P1", "P2", "P3", "P4", "P5"])
+    writer.writerow([
+    "Timestamp",
+    "P1","P2","P3","P4","P5",
+    "T1","T2","T3","T4","T5"
+])
 
     for entry in data_log:
         writer.writerow(
-    [entry["timestamp"]] + [f"{v:.3f}" for v in entry["values"]]
+    [entry["timestamp"]] +
+    [f"{v:.3f}" for v in entry["pressure"]] +
+    [f"{v:.3f}" for v in entry["temperature"]]
 )
 
     output.seek(0)
