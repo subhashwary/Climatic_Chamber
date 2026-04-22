@@ -229,11 +229,11 @@ def download_csv():
     writer = csv.writer(output)
 
     writer.writerow([
-        "Timestamp",
-        "P1_Volt","P2_Volt","P3_Volt","P4_Volt","P5_Volt",
-        "T1_Volt","T2_Volt","T3_Volt","T4_Volt","T5_Volt",
-        "T1_C","T2_C","T3_C","T4_C","T5_C"
-    ])
+    "Timestamp",
+    "P1_Volt","P2_Volt","P3_Volt","P4_Volt","P5_Volt",
+    "T1_Volt","T2_Volt","T3_Volt","T4_Volt","T5_Volt",
+    "T1_DegreeC","T2_DegreeC","T3_DegreeC","T4_DegreeC","T5_DegreeC"
+])
 
     for entry in data_log:
         temps = entry["temperature"]
@@ -241,8 +241,8 @@ def download_csv():
         writer.writerow(
             [entry["timestamp"]] +
             [f"{v:.3f}" for v in entry["pressure"]] +
-            [f"{v:.3f}" for v in temps] +
-            [f"{(8*v)+10:.2f}" for v in temps]
+            [f"{v:.3f}" for v in entry["temperature"]] +
+            [f"{(8*v)+10:.2f}" for v in entry["temperature"]]
         )
 
     output.seek(0)
