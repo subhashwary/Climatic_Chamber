@@ -1,0 +1,294 @@
+import webbrowser
+from flask import Flask, jsonify, request, send_from_directory, Response
+from flask_cors import CORS
+import serial
+import time
+import threading
+import csv
+import io
+import os
+
+if not os.path.exists("sensor_log.csv"):
+    with open("sensor_log.csv", "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow([
+            "Timestamp",
+            "P1","P2","P3","P4","P5",
+            "T1","T2","T3","T4","T5"
+        ])
+
+selected_port = "COM4"
+selected_baud = 115200
+
+lock = threading.Lock()
+
+last_log_time = 0
+sampling_interval = 1   # default (seconds)
+
+app = Flask(__name__)
+CORS(app)
+
+ser = None
+
+last_values = {
+    "pressure": [0.0] * 5,
+    "temperature": [0.0] * 5
+}
+last_update_time = 0
+
+# ✅ DATA LOG STORAGE
+data_log = []
+
+is_running = False
+
+
+# ---------------- SERVE FRONTEND ----------------
+@app.route('/')
+def serve_ui():
+    return send_from_directory('.', 'index.html')
+
+
+# ---------------- CONNECT ----------------
+@app.route('/connect', methods=['POST'])
+def connect():
+    global ser, last_update_time, last_values
+
+    data = request.json
+
+    try:
+        port = data.get("com_port")
+        baud = int(data.get("baud_rate"))
+
+        with lock:
+            if ser and ser.is_open:
+                ser.close()
+            time.sleep(1)
+
+        ser = serial.Serial(port, baud, timeout=1)
+        time.sleep(2)
+        ser.reset_input_buffer()
+
+        last_values = {
+    "pressure": [0.0] * 5,
+    "temperature": [0.0] * 5
+}
+    
+        last_update_time = time.time()
+
+        return jsonify({"status": "connected"})
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        })
+
+# ---------------- CONTROL ----------------
+@app.route('/start', methods=['POST'])
+def start():
+    global is_running, data_log
+
+    is_running = True
+
+    return jsonify({"status": "started"})
+
+@app.route('/stop', methods=['POST'])
+def stop():
+    global is_running
+    is_running = False
+    return jsonify({"status": "stopped"})
+
+@app.route('/set_sampling', methods=['POST'])
+def set_sampling():
+    global sampling_interval
+
+    data = request.json
+    sampling_interval = int(data.get("rate", 1))
+
+    return jsonify({"status": "ok"})
+
+@app.route('/reset', methods=['POST'])
+def reset():
+    global last_values, last_update_time
+
+    # Reset in-memory values
+    last_values = {
+        "pressure": [0.0] * 5,
+        "temperature": [0.0] * 5
+    }
+    last_update_time = 0
+
+    # 🔥 Clear CSV file
+    with open("sensor_log.csv", "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow([
+            "Timestamp",
+            "P1","P2","P3","P4","P5",
+            "T1","T2","T3","T4","T5"
+        ])
+
+    return jsonify({"status": "reset"})
+
+# ---------------- STATUS (ADD THIS) ----------------
+@app.route('/status')
+def status():
+    return jsonify({
+        "connected": ser is not None and ser.is_open,
+        "running": is_running
+    })
+
+# ---------------- SERIAL READ ----------------
+def read_serial():
+    global ser, last_values, last_update_time, data_log
+
+    if ser is None or not ser.is_open:
+        return
+
+    try:
+        with lock:
+            if ser is None or not ser.is_open:
+                return
+            line = ser.readline().decode('utf-8', errors='ignore').strip()
+
+        if not line:
+            return
+
+        parts = line.replace(',', ' ').split()
+
+        if len(parts) < 10:
+            return
+
+        values = [float(x) for x in parts[:10]]
+
+        # split into pressure + temperature
+        p_values = values[:5]
+        t_values = values[5:]
+
+        if not all(0 <= v <= 5 for v in p_values + t_values):
+            return
+
+        last_values = {
+            "pressure": [round(v, 3) for v in p_values],
+            "temperature": [round(v, 3) for v in t_values]
+        }
+
+        last_update_time = time.time()
+
+        # ✅ ONLY LOG WHEN RUNNING (VERY IMPORTANT)
+        global last_log_time
+
+        if is_running and (time.time() - last_log_time >= sampling_interval):
+
+            timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+
+            with open("sensor_log.csv", "a", newline="") as f:
+
+                writer = csv.writer(f)
+
+                writer.writerow(
+                    [timestamp] +
+                    [f"{v:.3f}" for v in last_values["pressure"]] +
+                    [f"{v:.3f}" for v in last_values["temperature"]]
+                )
+
+            last_log_time = time.time()
+
+        print("UPDATED:",
+              "P:", last_values["pressure"],
+              "T:", last_values["temperature"])
+        
+    except Exception as e:
+        print("Serial error:", e)
+
+        # 🔴 ADD THIS BLOCK (USB unplug detection)
+        try:
+            if ser and ser.is_open:
+                ser.close()
+        except:
+            pass
+
+        # force backend to report disconnect
+        last_update_time = 0
+
+def serial_loop():
+    while True:
+        if ser and ser.is_open:
+            read_serial()
+        time.sleep(0.05)
+
+def auto_reconnect():
+    global ser
+
+    while True:
+        try:
+            with lock:
+                if ser is None or not ser.is_open:
+                    ser = serial.Serial(selected_port, selected_baud, timeout=1)
+                    time.sleep(2)
+                    ser.reset_input_buffer()
+                    print("🔁 Auto reconnected to device")
+        except:
+            pass
+
+        time.sleep(2)
+
+threading.Thread(target=serial_loop, daemon=True).start()
+threading.Thread(target=auto_reconnect, daemon=True).start()
+
+# ---------------- DATA API ----------------
+def calculate_psi(voltage):
+    return (4 * voltage) + 5
+
+
+@app.route('/data')
+def get_data():
+    global last_values, last_update_time
+
+    if ser is None or not ser.is_open:
+        return jsonify({"status": "disconnected"})
+
+    age = time.time() - last_update_time
+
+    if age > 2:
+        return jsonify({
+            "status": "no_data",
+            "pressure": "NO SIGNAL",
+            "temperature": "NO SIGNAL",
+            **{f"p{i}_volt": "" for i in range(1, 6)},
+            **{f"p{i}_psi": "" for i in range(1, 6)},
+            **{f"t{i}_volt": "" for i in range(1, 6)},
+            **{f"t{i}_temp": "" for i in range(1, 6)}
+        })
+
+    response = {
+        "status": "live",
+        "pressure": "LIVE",
+        "temperature": "LIVE"
+    }
+
+    for i in range(5):
+        # PRESSURE
+        p_v = last_values["pressure"][i]
+        psi = calculate_psi(p_v)
+
+        response[f"p{i+1}_volt"] = round(p_v, 3)
+        response[f"p{i+1}_psi"] = round(psi, 2)
+
+        # TEMPERATURE
+        t_v = last_values["temperature"][i]
+        temp = (8 * t_v) + 10   # your chosen mapping
+
+        response[f"t{i+1}_volt"] = round(t_v, 3)
+        response[f"t{i+1}_temp"] = round(temp, 2)
+
+    return jsonify(response)
+
+# ---------------- CSV DOWNLOAD ----------------
+@app.route('/download_csv')
+def download_csv():
+    return send_from_directory('.', 'sensor_log.csv', as_attachment=True)
+
+# ---------------- RUN ----------------
+if __name__ == "__main__":
+    webbrowser.open("http://127.0.0.1:5000")
+    app.run(debug=False)
