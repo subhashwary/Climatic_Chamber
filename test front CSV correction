@@ -656,15 +656,9 @@ let sensorChart;
 let temperatureChart;
 
 let isRunning = false;
-let isConnected = false;
 
 let samplingRateSec = 1;
 let dataInterval = null;
-
-let maxPoints = 300;
-
-let minValues = [Infinity, Infinity, Infinity, Infinity, Infinity];
-let maxValues = [-Infinity, -Infinity, -Infinity, -Infinity, -Infinity];
 
 // 🔴 FREEZE DETECTION
 let lastValues = [null, null, null, null, null];
@@ -691,6 +685,11 @@ window.onload = function () {
         options: {
             responsive: true,
             animation: false,
+            elements: {
+                point: {
+                    radius: 0
+                }
+            },
             scales: {
                 x: { title: { display: true, text: "Time (HH:MM:SS)" } },
                 y: { title: { display: true, text: "Pressure (Psi)" } }
@@ -715,6 +714,11 @@ window.onload = function () {
         options: {
             responsive: true,
             animation: false,
+            elements: {
+                point: {
+                    radius: 0
+                }
+            },
             scales: {
                 x: { title: { display: true, text: "Time (HH:MM:SS)" } },
                 y: { title: { display: true, text: "Temperature (°C)" } }
@@ -733,7 +737,7 @@ async function fetchData() {
 
         // 🟢 AUTO RECONNECT DETECTION (USB plugged back)
         // 🟢 AUTO CONNECT (USB plugged back properly)
-        if (data.status === "live" && isConnected) {
+        if (data.status === "live" && isRunning) {
             document.getElementById("pressure").innerText = "CONNECTED";
             document.getElementById("temperature").innerText = "CONNECTED";
 
@@ -796,11 +800,10 @@ async function fetchData() {
             if (isNaN(psi)) psi = null;
 
             let temp = parseFloat(data[`t${i}_temp`]);
-            if (isNaN(temp)) temp = null;
 
-            if (psi !== null) {
-                minValues[i - 1] = Math.min(minValues[i - 1], psi);
-                maxValues[i - 1] = Math.max(maxValues[i - 1], psi);
+            if (isNaN(temp)) {
+                let tVoltVal = parseFloat(tVolt);
+                temp = isNaN(tVoltVal) ? null : (8 * tVoltVal) + 10;
             }
 
             // -------- GRAPH UPDATE --------
@@ -825,17 +828,18 @@ async function fetchData() {
             }
         }
 
-        // -------- LIMIT DATA --------
-        if (sensorChart.data.labels.length > maxPoints) {
+        // LIMIT DATA
+        const MAX_POINTS = Math.floor(86400 / samplingRateSec);
 
-            // remove 2nd element instead of 1st → keeps origin (index 0)
-            sensorChart.data.labels.splice(1, 1);
-            temperatureChart.data.labels.splice(1, 1);
+        if (sensorChart.data.labels.length > MAX_POINTS) {
+            sensorChart.data.labels.shift();
+            temperatureChart.data.labels.shift();
 
-            sensorChart.data.datasets.forEach(ds => ds.data.splice(1, 1));
-            temperatureChart.data.datasets.forEach(ds => ds.data.splice(1, 1));
+            sensorChart.data.datasets.forEach(ds => ds.data.shift());
+            temperatureChart.data.datasets.forEach(ds => ds.data.shift());
         }
 
+        // UPDATE
         sensorChart.update();
         temperatureChart.update();
 
@@ -854,10 +858,7 @@ async function fetchData() {
 function toggleSensor(event, index) {
     const checked = event.target.checked;
 
-    // Pressure chart
     sensorChart.data.datasets[index].hidden = !checked;
-
-    // Temperature chart
     temperatureChart.data.datasets[index].hidden = !checked;
 
     sensorChart.update();
@@ -891,12 +892,6 @@ function updateTemperature(sensor) {
 
 // ---------------- CONTROL ----------------
 async function startDevice() {
-
-    if (!isConnected) {
-        alert("Connect device first");
-        return;
-    }
-
     isRunning = true;
     await fetch(`${BASE_URL}/start`, { method: "POST" });
 
@@ -925,9 +920,6 @@ async function stopDevice() {
 }
 
 function resetDevice() {
-
-    minValues = [Infinity, Infinity, Infinity, Infinity, Infinity];
-    maxValues = [-Infinity, -Infinity, -Infinity, -Infinity, -Infinity];
 
     // stop fetching
     if (dataInterval) {
@@ -968,7 +960,26 @@ function resetDevice() {
 
 // ---------------- EXPORT ----------------
 function exportCSV() {
-    window.open(`${BASE_URL}/download_csv`, '_blank');
+    let csv = "Time,Sensor1,Sensor2,Sensor3,Sensor4,Sensor5\n";
+
+    let labels = sensorChart.data.labels;
+    let datasets = sensorChart.data.datasets;
+
+    for (let i = 0; i < labels.length; i++) {
+        let row = [labels[i]];
+        datasets.forEach(ds => row.push(ds.data[i] ?? ""));
+        csv += row.join(",") + "\n";
+    }
+
+    let blob = new Blob([csv], { type: "text/csv" });
+    let url = URL.createObjectURL(blob);
+
+    let a = document.createElement("a");
+    a.href = url;
+    a.download = "sensor_data.csv";
+    a.click();
+
+    URL.revokeObjectURL(url);
 }
 
 // ---------------- SAMPLING CONTROL ----------------
@@ -998,9 +1009,6 @@ function setActiveButton(activeId) {
 
 function changeSamplingRate() {
     samplingRateSec = parseInt(document.getElementById("samplingRate").value);
-
-    maxPoints = Math.floor(600 / samplingRateSec); // 10 min window
-
     applySamplingRate();
 }
 
@@ -1030,9 +1038,8 @@ async function connectDevice() {
             document.getElementById("pressure").style.color = "green";
             document.getElementById("temperature").style.color = "green";
 
-            isConnected = true;
-            isRunning = false;   // system connected but not started
-
+            isRunning = true;
+            applySamplingRate();
         } else {
             alert("❌ " + data.message);
         }
