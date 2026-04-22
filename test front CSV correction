@@ -591,7 +591,6 @@ input[type="checkbox"] {
 </div>
             </div>
         </div>
-            </div>
 
         </div>
 
@@ -646,7 +645,7 @@ input[type="checkbox"] {
 </div>
 
 <div class="export-footer">
-    <button onclick="exportCSV()">Export Data</button>
+    <button onclick="window.location.href='/download_csv'">Export Data</button>
 </div>
 
     <script>
@@ -828,16 +827,6 @@ async function fetchData() {
             }
         }
 
-        // LIMIT DATA
-        const MAX_POINTS = Math.floor(86400 / samplingRateSec);
-
-        if (sensorChart.data.labels.length > MAX_POINTS) {
-            sensorChart.data.labels.shift();
-            temperatureChart.data.labels.shift();
-
-            sensorChart.data.datasets.forEach(ds => ds.data.shift());
-            temperatureChart.data.datasets.forEach(ds => ds.data.shift());
-        }
 
         // UPDATE
         sensorChart.update();
@@ -892,22 +881,37 @@ function updateTemperature(sensor) {
 
 // ---------------- CONTROL ----------------
 async function startDevice() {
-    isRunning = true;
     await fetch(`${BASE_URL}/start`, { method: "POST" });
+
+    isRunning = true;
 
     document.getElementById("pressure").innerText = "STARTED";
     document.getElementById("temperature").innerText = "STARTED";
 
-    applySamplingRate();
+    document.getElementById("pressure").style.color = "green";
+    document.getElementById("temperature").style.color = "green";
+
+    // 🔥 ALWAYS reset interval safely
+    if (dataInterval) {
+        clearInterval(dataInterval);
+        dataInterval = null;
+    }
+
+    // 🔥 restart fresh loop
+    dataInterval = setInterval(fetchData, samplingRateSec * 1000);
+
     setActiveButton("startBtn");
 }
 
 async function stopDevice() {
-    if (dataInterval) {
-    clearInterval(dataInterval);
-    dataInterval = null;
-}
     await fetch(`${BASE_URL}/stop`, { method: "POST" });
+
+    isRunning = false;
+
+    if (dataInterval) {
+        clearInterval(dataInterval);
+        dataInterval = null;
+    }
 
     document.getElementById("pressure").innerText = "STOPPED";
     document.getElementById("temperature").innerText = "STOPPED";
@@ -915,24 +919,27 @@ async function stopDevice() {
     document.getElementById("pressure").style.color = "red";
     document.getElementById("temperature").style.color = "red";
 
-    isRunning = false;
     setActiveButton("stopBtn");
 }
 
-function resetDevice() {
+async function resetDevice() {
+
+    // call backend reset
+    await fetch(`${BASE_URL}/reset`, { method: "POST" });
 
     // stop fetching
     if (dataInterval) {
-    clearInterval(dataInterval);
-    dataInterval = null;
-}
+        clearInterval(dataInterval);
+        dataInterval = null;
+    }
+
     isRunning = false;
 
     // reset UI text
     document.getElementById("pressure").innerText = "RESET";
     document.getElementById("temperature").innerText = "RESET";
 
-    // clear charts completely
+    // clear charts
     sensorChart.data.labels = [];
     temperatureChart.data.labels = [];
 
@@ -946,7 +953,7 @@ function resetDevice() {
     lastValues = [null, null, null, null, null];
     freezeCount = [0, 0, 0, 0, 0];
 
-    // clear input + output boxes
+    // clear input boxes
     for (let i = 1; i <= 5; i++) {
         document.getElementById(`p${i}_volt`).value = "";
         document.getElementById(`p${i}_psi`).innerText = "";
@@ -954,7 +961,7 @@ function resetDevice() {
         document.getElementById(`t${i}_volt`).value = "";
         document.getElementById(`t${i}_temp`).innerText = "";
     }
-    // ✅ set active AFTER loop
+
     setActiveButton("resetBtn");
 }
 
@@ -1009,6 +1016,14 @@ function setActiveButton(activeId) {
 
 function changeSamplingRate() {
     samplingRateSec = parseInt(document.getElementById("samplingRate").value);
+
+    // 🔥 SEND TO BACKEND
+    fetch(`${BASE_URL}/set_sampling`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ rate: samplingRateSec })
+    });
+
     applySamplingRate();
 }
 
@@ -1038,8 +1053,7 @@ async function connectDevice() {
             document.getElementById("pressure").style.color = "green";
             document.getElementById("temperature").style.color = "green";
 
-            isRunning = true;
-            applySamplingRate();
+            isRunning = false;
         } else {
             alert("❌ " + data.message);
         }
