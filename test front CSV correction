@@ -682,9 +682,15 @@ const FREEZE_LIMIT = 5;
 function updateStatusLED(status) {
     const led = document.getElementById("statusIndicator");
 
-    if (status === "connected") led.style.background = "green";
-    else if (status === "no_signal") led.style.background = "orange";
-    else led.style.background = "red";
+    if (status === "connected" || status === "live") {
+    led.style.background = "green";
+} 
+else if (status === "no_signal" || status === "no_data") {
+    led.style.background = "orange";
+} 
+else {
+    led.style.background = "red";
+}
 }
 
 // ---------------- CHART SETUP ----------------
@@ -814,6 +820,7 @@ async function fetchData() {
             if (isNaN(psi)) psi = null;
 
             let temp = parseFloat(data[`t${i}_temp`]);
+            if (isNaN(temp)) temp = null;
 
             if (psi !== null) {
                 minValues[i - 1] = Math.min(minValues[i - 1], psi);
@@ -943,6 +950,9 @@ async function stopDevice() {
 
 function resetDevice() {
 
+    minValues = [Infinity, Infinity, Infinity, Infinity, Infinity];
+    maxValues = [-Infinity, -Infinity, -Infinity, -Infinity, -Infinity];
+
     // stop fetching
     if (dataInterval) {
     clearInterval(dataInterval);
@@ -1047,7 +1057,6 @@ async function connectDevice() {
             isConnected = true;
             isRunning = false;   // system connected but not started
 
-            applySamplingRate(); 
         } else {
             alert("❌ " + data.message);
         }
