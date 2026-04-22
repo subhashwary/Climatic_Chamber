@@ -90,7 +90,7 @@ def start():
 
 @app.route('/stop', methods=['POST'])
 def stop():
-    global is_running, log_file_handle
+    global is_running, log_file_handle, csv_writer
 
     is_running = False
 
@@ -104,6 +104,7 @@ def stop():
 
 # ---------------- SERIAL READ ----------------
 def read_serial():
+    global last_values, last_update_time
 
     if ser is None or not ser.is_open:
         return
