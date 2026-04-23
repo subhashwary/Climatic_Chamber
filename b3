@@ -141,24 +141,27 @@ def read_serial():
 
         if is_running:
             if last_log_time == 0:
-                last_log_time = current_time  # first cycle sync
+                last_log_time = current_time  # first sync
 
             if (current_time - last_log_time) >= sampling_rate:
                 last_log_time = current_time
-            last_log_time = current_time
 
-            timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+                timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
 
-            row = (
-                [timestamp] +
-                [round(v, 3) for v in last_values["pressure"]] +
-                [round(v, 3) for v in last_values["temperature"]] +
-                [round((8*v)+10, 2) for v in last_values["temperature"]]
-            )
+                row = (
+                    [timestamp] +
+                    [round(v, 3) for v in last_values["pressure"]] +
+                    [round(v, 3) for v in last_values["temperature"]] +
+                    [round((8*v)+10, 2) for v in last_values["temperature"]]
+                )
 
-            with open("sensor_data_live.csv", "a", newline="") as f:
-                writer = csv.writer(f)
-                writer.writerow(row)
+                data_log.append(row)
+
+                if len(data_log) >= 20:
+                    with open("sensor_data_live.csv", "a", newline="") as f:
+                        writer = csv.writer(f)
+                        writer.writerows(data_log)
+                    data_log.clear()
 
         print("UPDATED:",
               "P:", last_values["pressure"],
