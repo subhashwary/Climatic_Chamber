@@ -79,9 +79,6 @@ def start():
 
     is_running = True
 
-    # 🔥 force fresh timing cycle
-    last_log_time = 0  
-
     # fresh file
     with open("sensor_data_live.csv", "w", newline="") as f:
         writer = csv.writer(f)
@@ -135,17 +132,7 @@ def read_serial():
 
         last_update_time = time.time()
 
-        global last_log_time, sampling_rate
-
-        current_time = time.time()
-
         if is_running:
-            if last_log_time == 0:
-                last_log_time = current_time  # first sync
-
-            if (current_time - last_log_time) >= sampling_rate:
-                last_log_time = current_time
-
                 timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
 
                 row = (
