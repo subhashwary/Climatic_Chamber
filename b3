@@ -253,6 +253,13 @@ def get_data():
 
     return jsonify(response)
 
+@app.route('/disconnect', methods=['POST'])
+def disconnect():
+    global ser
+    if ser and ser.is_open:
+        ser.close()
+    return jsonify({"status": "disconnected"})
+
 
 # ---------------- CSV DOWNLOAD ----------------
 
