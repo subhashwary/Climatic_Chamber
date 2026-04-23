@@ -483,7 +483,7 @@ input[type="checkbox"] {
                     <option value="COM3">COM3</option>
                     <option value="COM4">COM4</option>
                     <option value="COM5">COM5</option>
-                    <option value="COM6" selected>COM6</option>
+                    <option value="COM6" selected>COM4</option>
                 </select>
             </div>
 
@@ -832,9 +832,9 @@ if (data.status === "disconnected" || data.status === "no_data") {
         temperatureChart.data.datasets.forEach(ds => ds.data.shift());
     }
 
-    // update charts
-    sensorChart.update();
-    temperatureChart.update();
+    // update charts (no animation → better for long runs)
+    sensorChart.update('none');
+    temperatureChart.update('none');
 } 
 
     catch (err) {
@@ -1044,7 +1044,9 @@ async function connectDevice() {
             document.getElementById("pressure").style.color = "green";
             document.getElementById("temperature").style.color = "green";
 
-            isRunning = false;
+              // 🔥 ADD THIS
+    fetchData();  // immediate read
+
         } else {
             alert("❌ " + data.message);
         }
