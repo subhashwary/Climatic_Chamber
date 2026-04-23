@@ -6,29 +6,15 @@ import time
 import threading
 import csv
 import io
-import os
-
-csv_file = "sensor_log.csv"
-
-if not os.path.exists(csv_file):
-    with open(csv_file, "w", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerow([
-            "Timestamp",
-            "P1_Volt","P2_Volt","P3_Volt","P4_Volt","P5_Volt",
-            "T1_Volt","T2_Volt","T3_Volt","T4_Volt","T5_Volt",
-            "T1_DegreeC","T2_DegreeC","T3_DegreeC","T4_DegreeC","T5_DegreeC"
-        ])
 
 app = Flask(__name__)
 CORS(app)
 
-sampling_interval = 1   # seconds
-last_logged_time = 0
+
+sampling_rate = 1   # seconds
+last_log_time = 0
 
 ser = None
-last_port = "COM4"
-last_baud = 115200
 
 last_values = {
     "pressure": [0.0] * 5,
@@ -41,6 +27,12 @@ data_log = []
 
 is_running = False
 
+@app.route('/set_sampling', methods=['POST'])
+def set_sampling():
+    global sampling_rate
+    data = request.json
+    sampling_rate = int(data.get("rate", 1))
+    return jsonify({"status": "ok"})
 
 # ---------------- SERVE FRONTEND ----------------
 @app.route('/')
@@ -51,15 +43,13 @@ def serve_ui():
 # ---------------- CONNECT ----------------
 @app.route('/connect', methods=['POST'])
 def connect():
-    global ser, last_update_time, last_values, last_port, last_baud
+    global ser, last_update_time, last_values
 
     data = request.json
 
     try:
         port = data.get("com_port")
         baud = int(data.get("baud_rate"))
-        last_port = port
-        last_baud = baud
 
         if ser and ser.is_open:
             ser.close()
@@ -85,18 +75,13 @@ def connect():
 # ---------------- CONTROL ----------------
 @app.route('/start', methods=['POST'])
 def start():
-    global is_running, data_log, last_logged_time, csv_file
+    global is_running, last_log_time
 
     is_running = True
-    last_logged_time = 0
+    last_log_time = 0
 
-    # 🔥 clear session memory
-    data_log.clear()
-
-    # 🔥 create NEW CSV file for this session
-    csv_file = f"sensor_log_{time.strftime('%Y%m%d_%H%M%S')}.csv"
-
-    with open(csv_file, "w", newline="") as f:
+    # fresh file
+    with open("sensor_data_live.csv", "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow([
             "Timestamp",
@@ -148,32 +133,25 @@ def read_serial():
 
         last_update_time = time.time()
 
-        global last_logged_time
+        global last_log_time, sampling_rate
 
         current_time = time.time()
 
-        if is_running and (current_time - last_logged_time >= sampling_interval):
-            last_logged_time = current_time
+        if is_running and (current_time - last_log_time >= sampling_rate):
+            last_log_time = current_time
+
             timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
 
-            entry = {
-                "timestamp": timestamp,
-                "pressure": last_values["pressure"].copy(),
-                "temperature": last_values["temperature"].copy()
-            }
+            row = (
+                [timestamp] +
+                [round(v, 3) for v in last_values["pressure"]] +
+                [round(v, 3) for v in last_values["temperature"]] +
+                [round((8*v)+10, 2) for v in last_values["temperature"]]
+            )
 
-            data_log.append(entry)
-
-            # 🔥 WRITE TO FILE (24hr safe)
-            with open(csv_file, "a", newline="") as f:
+            with open("sensor_data_live.csv", "a", newline="") as f:
                 writer = csv.writer(f)
-
-                writer.writerow(
-                    [timestamp] +
-                    [f"{v:.3f}" for v in entry["pressure"]] +
-                    [f"{v:.3f}" for v in entry["temperature"]] +
-                    [f"{(8*v)+10:.2f}" for v in entry["temperature"]]
-                )
+                writer.writerow(row)
 
         print("UPDATED:",
               "P:", last_values["pressure"],
@@ -199,18 +177,21 @@ def serial_loop():
         time.sleep(0.05)
 
 def auto_reconnect():
-    global ser, last_port, last_baud
+    global ser
 
     while True:
-        if ser is None or not ser.is_open:
-            try:
-                ser = serial.Serial(last_port, last_baud, timeout=1)
+        try:
+            if ser is None or not ser.is_open:
+                port = ser.port if ser else "COM6"
+                baud = ser.baudrate if ser else 115200
+                ser = serial.Serial(port, baud, timeout=1)
                 time.sleep(2)
                 ser.reset_input_buffer()
-                print(f"🔁 Reconnected to {last_port}")
-            except:
-                pass
-        time.sleep(5)   # 🔥 slower retry
+                print("🔁 Auto reconnected to device")
+        except:
+            pass
+
+        time.sleep(2)
 
 threading.Thread(target=serial_loop, daemon=True).start()
 threading.Thread(target=auto_reconnect, daemon=True).start()
@@ -219,12 +200,6 @@ threading.Thread(target=auto_reconnect, daemon=True).start()
 def calculate_psi(voltage):
     return (4 * voltage) + 5
 
-@app.route('/set_sampling', methods=['POST'])
-def set_sampling():
-    global sampling_interval
-    data = request.json
-    sampling_interval = int(data.get("rate", 1))
-    return jsonify({"status": "ok"})
 
 @app.route('/data')
 def get_data():
@@ -273,36 +248,10 @@ def get_data():
 
 
 # ---------------- CSV DOWNLOAD ----------------
+
 @app.route('/download_csv')
 def download_csv():
-    output = io.StringIO()
-    writer = csv.writer(output)
-
-    writer.writerow([
-    "Timestamp",
-    "P1_Volt","P2_Volt","P3_Volt","P4_Volt","P5_Volt",
-    "T1_Volt","T2_Volt","T3_Volt","T4_Volt","T5_Volt",
-    "T1_DegreeC","T2_DegreeC","T3_DegreeC","T4_DegreeC","T5_DegreeC"
-])
-
-    for entry in data_log:
-        temps = entry["temperature"]
-        
-        writer.writerow(
-            [entry["timestamp"]] +
-            [f"{v:.3f}" for v in entry["pressure"]] +
-            [f"{v:.3f}" for v in entry["temperature"]] +
-            [f"{(8*v)+10:.2f}" for v in entry["temperature"]]
-        )
-
-    output.seek(0)
-
-    return Response(
-        output,
-        mimetype="text/csv",
-        headers={"Content-Disposition": "attachment;filename=sensor_data.csv"}
-    )
-
+    return send_from_directory('.', 'sensor_data_live.csv', as_attachment=True)
 
 # ---------------- RUN ----------------
 if __name__ == "__main__":
