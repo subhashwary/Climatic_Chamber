@@ -669,6 +669,12 @@ const FREEZE_LIMIT = 5;
 // ---------------- CHART SETUP ----------------
 window.onload = function () {
 
+    setupCharts();   // only charts here
+
+    // set default sampling once (NO interval start here)
+    samplingRateSec = parseInt(document.getElementById("samplingRate").value);
+};
+
     // PRESSURE CHART
     const ctx = document.getElementById('sensorChart').getContext('2d');
     sensorChart = new Chart(ctx, {
@@ -716,14 +722,50 @@ window.onload = function () {
             }
         }
     });
-    
-    applySamplingRate();
 
-    changeSamplingRate();
-};
+    function setupCharts() {
+
+    const ctx = document.getElementById('sensorChart').getContext('2d');
+    sensorChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [
+                { label: 'Sensor 1', borderColor: 'red', data: [], fill: false },
+                { label: 'Sensor 2', borderColor: 'blue', data: [], fill: false },
+                { label: 'Sensor 3', borderColor: 'green', data: [], fill: false },
+                { label: 'Sensor 4', borderColor: 'orange', data: [], fill: false },
+                { label: 'Sensor 5', borderColor: 'purple', data: [], fill: false }
+            ]
+        },
+        options: { responsive: true, animation: false }
+    });
+
+    const tctx = document.getElementById('temperatureChart').getContext('2d');
+    temperatureChart = new Chart(tctx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [
+                { label: 'Sensor 1', borderColor: 'red', data: [], fill: false },
+                { label: 'Sensor 2', borderColor: 'blue', data: [], fill: false },
+                { label: 'Sensor 3', borderColor: 'green', data: [], fill: false },
+                { label: 'Sensor 4', borderColor: 'orange', data: [], fill: false },
+                { label: 'Sensor 5', borderColor: 'purple', data: [], fill: false }
+            ]
+        },
+        options: { responsive: true, animation: false }
+    });
+}
 
 // ---------------- FETCH DATA ----------------
 async function fetchData() {
+    if (!isRunning) return;
+
+    if (!document.visibilityState || document.visibilityState === "hidden") {
+        return; // pause updates when tab inactive
+    }
+
     try {
         const res = await fetch(`${BASE_URL}/data`);
         const data = await res.json();
@@ -801,8 +843,8 @@ async function fetchData() {
             temperatureChart.data.datasets.forEach(ds => ds.data.shift());
         }
 
-        sensorChart.update();
-        temperatureChart.update();
+        sensorChart.update("none");
+        temperatureChart.update("none");
 
     } catch (err) {
     console.log("Fetch error:", err);
@@ -856,6 +898,7 @@ function updateTemperature(sensor) {
 
 // ---------------- CONTROL ----------------
 async function startDevice() {
+    if (isRunning) return;
 
     if (!isConnected) {
         alert("Please CONNECT device first");
@@ -866,16 +909,15 @@ async function startDevice() {
 
     await fetch(`${BASE_URL}/start`, { method: "POST" });
 
-    changeSamplingRate();
-
-    // 🔥 ADD THIS LINE (critical fix)
-    fetchData();
-
     document.getElementById("pressure").innerText = "STARTED";
     document.getElementById("temperature").innerText = "STARTED";
 
-    applySamplingRate();
+    document.getElementById("pressure").style.color = "green";
+    document.getElementById("temperature").style.color = "green";
+
     setActiveButton("startBtn");
+
+    startPolling();   // ✅ single controlled loop starts here
 }
 
 async function stopDevice() {
@@ -892,6 +934,7 @@ async function stopDevice() {
     document.getElementById("temperature").style.color = "red";
 
     isRunning = false;
+    stopPolling();
 
     setActiveButton("stopBtn");
 }
@@ -908,6 +951,9 @@ function resetDevice() {
     // reset UI text
     document.getElementById("pressure").innerText = "RESET";
     document.getElementById("temperature").innerText = "RESET";
+
+    stopPolling();
+    pollingActive = false;
 
     // clear charts completely
     sensorChart.data.labels = [];
@@ -952,19 +998,24 @@ function exportCSV() {
 }
 
 // ---------------- SAMPLING CONTROL ----------------
-function applySamplingRate() {
+let pollingActive = false;
 
-    if (dataInterval) {
-        clearInterval(dataInterval);
-        dataInterval = null;
+async function loop() {
+    while (pollingActive && isRunning) {
+
+        // 👇 PUT IT HERE (FIRST LINE INSIDE LOOP)
+        if (document.visibilityState === "hidden") {
+            await new Promise(r => setTimeout(r, 1000));
+            continue;
+        }
+
+        await fetchData();
+        await new Promise(r => setTimeout(r, samplingRateSec * 1000));
     }
+}
 
-    if (isRunning) {
-        dataInterval = setInterval(fetchData, samplingRateSec * 1000);
-
-        // 🔥 ALSO fetch immediately (backup safety)
-        fetchData();
-    }
+function stopPolling() {
+    pollingActive = false;
 }
 
 // ---------------- HELPER FUNCTIONS ----------------
@@ -1021,7 +1072,7 @@ async function connectDevice() {
 
             isConnected = true;
             isRunning = false;
-            applySamplingRate();
+            startPolling();
         } else {
             alert("❌ " + data.message);
         }
