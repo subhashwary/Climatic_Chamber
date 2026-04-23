@@ -730,41 +730,14 @@ async function fetchData() {
 
         // 🟢 AUTO RECONNECT DETECTION (USB plugged back)
         // 🟢 AUTO CONNECT (USB plugged back properly)
-        if (data.status === "live" && isRunning) {
-            document.getElementById("pressure").innerText = "CONNECTED";
-            document.getElementById("temperature").innerText = "CONNECTED";
-
-            document.getElementById("pressure").style.color = "green";
-            document.getElementById("temperature").style.color = "green";
-        }
-
-        // 🔴 HANDLE DISCONNECTED / NO SIGNAL
+        // STATUS HANDLING (clean)
         if (data.status === "disconnected" || data.status === "no_data") {
-
-            let msg = (data.status === "disconnected") ? "DISCONNECTED" : "NO SIGNAL";
-
-            document.getElementById("pressure").innerText = msg;
-            document.getElementById("temperature").innerText = msg;
+            document.getElementById("pressure").innerText = data.status === "disconnected" ? "DISCONNECTED" : "NO SIGNAL";
+            document.getElementById("temperature").innerText = data.status === "disconnected" ? "DISCONNECTED" : "NO SIGNAL";
 
             document.getElementById("pressure").style.color = "red";
             document.getElementById("temperature").style.color = "red";
-
             return;
-        }
-
-        // 🟢 AUTO CONNECT DETECTION (when data resumes after unplug)
-        if (data.status === "live" && !isRunning) {
-            document.getElementById("pressure").innerText = data.pressure;
-            document.getElementById("temperature").innerText = data.temperature;
-
-            document.getElementById("pressure").style.color = "green";
-            document.getElementById("temperature").style.color = "green";
-        } else {
-            document.getElementById("pressure").innerText = data.pressure;
-            document.getElementById("temperature").innerText = data.temperature;
-
-            document.getElementById("pressure").style.color = "#1f2d3a";
-            document.getElementById("temperature").style.color = "#1f2d3a";
         }
 
         let label = data.timestamp;
@@ -885,15 +858,18 @@ function updateTemperature(sensor) {
 async function startDevice() {
 
     if (!isConnected) {
-    alert("Please CONNECT device first");
-    return;
-}
+        alert("Please CONNECT device first");
+        return;
+    }
+
     isRunning = true;
 
     await fetch(`${BASE_URL}/start`, { method: "POST" });
 
-    // 🔥 force sampling sync on every start
     changeSamplingRate();
+
+    // 🔥 ADD THIS LINE (critical fix)
+    fetchData();
 
     document.getElementById("pressure").innerText = "STARTED";
     document.getElementById("temperature").innerText = "STARTED";
@@ -985,6 +961,9 @@ function applySamplingRate() {
 
     if (isRunning) {
         dataInterval = setInterval(fetchData, samplingRateSec * 1000);
+
+        // 🔥 ALSO fetch immediately (backup safety)
+        fetchData();
     }
 }
 
