@@ -728,13 +728,16 @@ async function fetchData() {
         const data = await res.json();
 
         // 🟢 AUTO RECONNECT DETECTION (USB plugged back)
-        // 🟢 AUTO CONNECT (USB plugged back properly)
-        if (data.status === "live") {
+      
+        if (data.status === "live" && !isRunning) {
+            // only show connected, don't override STOP/RESET behavior aggressively
             document.getElementById("pressure").innerText = "CONNECTED";
             document.getElementById("temperature").innerText = "CONNECTED";
 
             document.getElementById("pressure").style.color = "green";
             document.getElementById("temperature").style.color = "green";
+
+            return;
         }
 
         // 🔴 HANDLE DISCONNECTED / NO SIGNAL
