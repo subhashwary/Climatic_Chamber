@@ -660,6 +660,8 @@ let isRunning = false;
 let samplingRateSec = 1;
 let dataInterval = null;
 
+const MAX_POINTS = 500;
+
 // 🔴 FREEZE DETECTION
 let lastValues = [null, null, null, null, null];
 let freezeCount = [0, 0, 0, 0, 0];
@@ -727,7 +729,7 @@ async function fetchData() {
 
         // 🟢 AUTO RECONNECT DETECTION (USB plugged back)
         // 🟢 AUTO CONNECT (USB plugged back properly)
-        if (data.status === "live" && isRunning) {
+        if (data.status === "live") {
             document.getElementById("pressure").innerText = "CONNECTED";
             document.getElementById("temperature").innerText = "CONNECTED";
 
@@ -736,33 +738,38 @@ async function fetchData() {
         }
 
         // 🔴 HANDLE DISCONNECTED / NO SIGNAL
-        if (data.status === "disconnected" || data.status === "no_data") {
+        // 🔴 DISCONNECTED / NO SIGNAL
+if (data.status === "disconnected" || data.status === "no_data") {
 
-            let msg = (data.status === "disconnected") ? "DISCONNECTED" : "NO SIGNAL";
+    let msg = (data.status === "disconnected") ? "DISCONNECTED" : "NO SIGNAL";
 
-            document.getElementById("pressure").innerText = msg;
-            document.getElementById("temperature").innerText = msg;
+    document.getElementById("pressure").innerText = msg;
+    document.getElementById("temperature").innerText = msg;
 
-            document.getElementById("pressure").style.color = "red";
-            document.getElementById("temperature").style.color = "red";
+    document.getElementById("pressure").style.color = "red";
+    document.getElementById("temperature").style.color = "red";
 
-            return;
-        }
+    return;
+}
 
-        // 🟢 AUTO CONNECT DETECTION (when data resumes after unplug)
-        if (data.status === "live" && !isRunning) {
-            document.getElementById("pressure").innerText = data.pressure;
-            document.getElementById("temperature").innerText = data.temperature;
+// 🟢 CONNECTED but NOT running
+    if (data.status === "live" && !isRunning) {
 
-            document.getElementById("pressure").style.color = "green";
-            document.getElementById("temperature").style.color = "green";
-        } else {
-            document.getElementById("pressure").innerText = data.pressure;
-            document.getElementById("temperature").innerText = data.temperature;
+        document.getElementById("pressure").innerText = "CONNECTED";
+        document.getElementById("temperature").innerText = "CONNECTED";
 
-            document.getElementById("pressure").style.color = "#1f2d3a";
-            document.getElementById("temperature").style.color = "#1f2d3a";
-        }
+        document.getElementById("pressure").style.color = "green";
+        document.getElementById("temperature").style.color = "green";
+
+        return;
+    }
+
+    // 🟢 RUNNING → show actual values
+    document.getElementById("pressure").innerText = data.pressure;
+    document.getElementById("temperature").innerText = data.temperature;
+
+    document.getElementById("pressure").style.color = "#1f2d3a";
+    document.getElementById("temperature").style.color = "#1f2d3a";
 
         let label = data.timestamp;
 
@@ -817,10 +824,20 @@ async function fetchData() {
 
         // -------- LIMIT DATA --------
 
-        sensorChart.update();
-        temperatureChart.update();
+    if (sensorChart.data.labels.length > MAX_POINTS) {
+        sensorChart.data.labels.shift();
+        temperatureChart.data.labels.shift();
 
-    } catch (err) {
+        sensorChart.data.datasets.forEach(ds => ds.data.shift());
+        temperatureChart.data.datasets.forEach(ds => ds.data.shift());
+    }
+
+    // update charts
+    sensorChart.update();
+    temperatureChart.update();
+} 
+
+    catch (err) {
     console.log("Fetch error:", err);
 
     // 🔴 USB unplug / backend unreachable → mark as DISCONNECTED
@@ -829,6 +846,7 @@ async function fetchData() {
 
     document.getElementById("pressure").style.color = "red";
     document.getElementById("temperature").style.color = "red";
+
 }
 }
 
@@ -1026,8 +1044,7 @@ async function connectDevice() {
             document.getElementById("pressure").style.color = "green";
             document.getElementById("temperature").style.color = "green";
 
-            isRunning = true;
-            applySamplingRate();
+            isRunning = false;
         } else {
             alert("❌ " + data.message);
         }
