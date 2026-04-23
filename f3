@@ -717,6 +717,8 @@ window.onload = function () {
     });
     
     applySamplingRate();
+
+    changeSamplingRate();
 };
 
 // ---------------- FETCH DATA ----------------
@@ -881,7 +883,11 @@ function updateTemperature(sensor) {
 // ---------------- CONTROL ----------------
 async function startDevice() {
     isRunning = true;
+
     await fetch(`${BASE_URL}/start`, { method: "POST" });
+
+    // 🔥 force sampling sync on every start
+    changeSamplingRate();
 
     document.getElementById("pressure").innerText = "STARTED";
     document.getElementById("temperature").innerText = "STARTED";
@@ -978,7 +984,6 @@ function setActiveButton(activeId) {
 function changeSamplingRate() {
     samplingRateSec = parseInt(document.getElementById("samplingRate").value);
 
-    // 🔥 send to backend
     fetch(`${BASE_URL}/set_sampling`, {
         method: "POST",
         headers: {"Content-Type": "application/json"},
