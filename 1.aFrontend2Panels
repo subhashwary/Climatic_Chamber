@@ -470,8 +470,7 @@ input[type="checkbox"] {
     <div style="display: flex; gap: 10px; align-items: flex-start;">
 
         <!-- LEFT: CONNECT BUTTON -->
-        <button onclick="connectDevice()" 
-        style="margin-top: 22px; font-size: 14px; height: 36px; width: 100px;">
+        <button class="connect-btn" onclick="connectDevice()">
     CONNECT
 </button>
 
@@ -657,7 +656,9 @@ let sensorChart;
 let temperatureChart;
 
 let isRunning = false;
-let samplingRateSec = 2;
+
+let samplingRateSec = 1;
+let dataInterval = null;
 
 // 🔴 FREEZE DETECTION
 let lastValues = [null, null, null, null, null];
@@ -714,6 +715,8 @@ window.onload = function () {
             }
         }
     });
+    
+    applySamplingRate();
 };
 
 // ---------------- FETCH DATA ----------------
@@ -761,11 +764,12 @@ async function fetchData() {
             document.getElementById("temperature").style.color = "#1f2d3a";
         }
 
-        let now = new Date();
-        let label = now.toLocaleTimeString();
+        let label = data.timestamp;
 
-        sensorChart.data.labels.push(label);
-        temperatureChart.data.labels.push(label);
+        if (label) {
+            sensorChart.data.labels.push(label);
+            temperatureChart.data.labels.push(label);
+        }
 
         for (let i = 1; i <= 5; i++) {
 
@@ -814,12 +818,11 @@ async function fetchData() {
         // -------- LIMIT DATA --------
         if (sensorChart.data.labels.length > 100) {
 
-            // remove 2nd element instead of 1st → keeps origin (index 0)
-            sensorChart.data.labels.splice(1, 1);
-            temperatureChart.data.labels.splice(1, 1);
+            sensorChart.data.labels.shift();
+            temperatureChart.data.labels.shift();
 
-            sensorChart.data.datasets.forEach(ds => ds.data.splice(1, 1));
-            temperatureChart.data.datasets.forEach(ds => ds.data.splice(1, 1));
+            sensorChart.data.datasets.forEach(ds => ds.data.shift());
+            temperatureChart.data.datasets.forEach(ds => ds.data.shift());
         }
 
         sensorChart.update();
@@ -883,13 +886,15 @@ async function startDevice() {
     document.getElementById("pressure").innerText = "STARTED";
     document.getElementById("temperature").innerText = "STARTED";
 
-    clearInterval(window.dataInterval);
-    window.dataInterval = setInterval(fetchData, 500);
+    applySamplingRate();
     setActiveButton("startBtn");
 }
 
 async function stopDevice() {
-    clearInterval(window.dataInterval);
+    if (dataInterval) {
+    clearInterval(dataInterval);
+    dataInterval = null;
+}
     await fetch(`${BASE_URL}/stop`, { method: "POST" });
 
     document.getElementById("pressure").innerText = "STOPPED";
@@ -905,7 +910,10 @@ async function stopDevice() {
 function resetDevice() {
 
     // stop fetching
-    clearInterval(window.dataInterval);
+    if (dataInterval) {
+    clearInterval(dataInterval);
+    dataInterval = null;
+}
     isRunning = false;
 
     // reset UI text
@@ -940,26 +948,20 @@ function resetDevice() {
 
 // ---------------- EXPORT ----------------
 function exportCSV() {
-    let csv = "Time,Sensor1,Sensor2,Sensor3,Sensor4,Sensor5\n";
+    window.location.href = `${BASE_URL}/download_csv`;
+}
 
-    let labels = sensorChart.data.labels;
-    let datasets = sensorChart.data.datasets;
+// ---------------- SAMPLING CONTROL ----------------
+function applySamplingRate() {
 
-    for (let i = 0; i < labels.length; i++) {
-        let row = [labels[i]];
-        datasets.forEach(ds => row.push(ds.data[i] ?? ""));
-        csv += row.join(",") + "\n";
+    if (dataInterval) {
+        clearInterval(dataInterval);
+        dataInterval = null;
     }
 
-    let blob = new Blob([csv], { type: "text/csv" });
-    let url = URL.createObjectURL(blob);
-
-    let a = document.createElement("a");
-    a.href = url;
-    a.download = "sensor_data.csv";
-    a.click();
-
-    URL.revokeObjectURL(url);
+    if (isRunning) {
+        dataInterval = setInterval(fetchData, samplingRateSec * 1000);
+    }
 }
 
 // ---------------- HELPER FUNCTIONS ----------------
@@ -1004,8 +1006,8 @@ async function connectDevice() {
             document.getElementById("pressure").style.color = "green";
             document.getElementById("temperature").style.color = "green";
 
-            clearInterval(window.dataInterval);
-            window.dataInterval = setInterval(fetchData, 500);
+            isRunning = true;
+            applySamplingRate();
         } else {
             alert("❌ " + data.message);
         }
