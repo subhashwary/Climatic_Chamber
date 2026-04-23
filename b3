@@ -81,14 +81,25 @@ def connect():
 # ---------------- CONTROL ----------------
 @app.route('/start', methods=['POST'])
 def start():
-    global is_running, data_log
+    global is_running, data_log, last_logged_time, csv_file
 
     is_running = True
-    global last_logged_time
     last_logged_time = 0
 
-    # 🔥 session control (NO RESET NEEDED)
+    # 🔥 clear session memory
     data_log.clear()
+
+    # 🔥 create NEW CSV file for this session
+    csv_file = f"sensor_log_{time.strftime('%Y%m%d_%H%M%S')}.csv"
+
+    with open(csv_file, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow([
+            "Timestamp",
+            "P1_Volt","P2_Volt","P3_Volt","P4_Volt","P5_Volt",
+            "T1_Volt","T2_Volt","T3_Volt","T4_Volt","T5_Volt",
+            "T1_DegreeC","T2_DegreeC","T3_DegreeC","T4_DegreeC","T5_DegreeC"
+        ])
 
     return jsonify({"status": "started"})
 
