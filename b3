@@ -27,6 +27,8 @@ sampling_interval = 1   # seconds
 last_logged_time = 0
 
 ser = None
+last_port = "COM4"
+last_baud = 115200
 
 last_values = {
     "pressure": [0.0] * 5,
@@ -49,13 +51,15 @@ def serve_ui():
 # ---------------- CONNECT ----------------
 @app.route('/connect', methods=['POST'])
 def connect():
-    global ser, last_update_time, last_values
+    global ser, last_update_time, last_values, last_port, last_baud
 
     data = request.json
 
     try:
         port = data.get("com_port")
         baud = int(data.get("baud_rate"))
+        last_port = port
+        last_baud = baud
 
         if ser and ser.is_open:
             ser.close()
@@ -195,21 +199,19 @@ def serial_loop():
         time.sleep(0.05)
 
 def auto_reconnect():
-    global ser
+            global ser, last_port, last_baud
 
-    while True:
-        try:
-            if ser is None or not ser.is_open:
-                port = ser.port if ser else "COM6"
-                baud = ser.baudrate if ser else 115200
-                ser = serial.Serial(port, baud, timeout=1)
+            while True:
+                try:
+                    if ser is None or not ser.is_open:
+                        ser = serial.Serial(last_port, last_baud, timeout=1)
+                        time.sleep(2)
+                        ser.reset_input_buffer()
+                        print(f"🔁 Auto reconnected to {last_port}")
+                except:
+                    pass
+            
                 time.sleep(2)
-                ser.reset_input_buffer()
-                print("🔁 Auto reconnected to device")
-        except:
-            pass
-
-        time.sleep(2)
 
 threading.Thread(target=serial_loop, daemon=True).start()
 threading.Thread(target=auto_reconnect, daemon=True).start()
