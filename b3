@@ -216,6 +216,8 @@ def get_data():
     global last_values, last_update_time
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
 
+    print("SER:", last_values) 
+
     if ser is None or not ser.is_open:
         return jsonify({"status": "disconnected"})
 
