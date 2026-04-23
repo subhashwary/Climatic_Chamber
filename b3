@@ -10,8 +10,7 @@ import io
 app = Flask(__name__)
 CORS(app)
 
-
-sampling_rate = 1   # seconds
+sampling_rate_sec = 1
 last_log_time = 0
 
 ser = None
@@ -27,12 +26,6 @@ data_log = []
 
 is_running = False
 
-@app.route('/set_sampling', methods=['POST'])
-def set_sampling():
-    global sampling_rate
-    data = request.json
-    sampling_rate = int(data.get("rate", 1))
-    return jsonify({"status": "ok"})
 
 # ---------------- SERVE FRONTEND ----------------
 @app.route('/')
@@ -75,19 +68,15 @@ def connect():
 # ---------------- CONTROL ----------------
 @app.route('/start', methods=['POST'])
 def start():
-    global is_running, last_log_time
+    global is_running, data_log, sampling_rate_sec, last_log_time
+
+    data = request.json
+    sampling_rate_sec = int(data.get("sampling_rate", 1))
 
     is_running = True
+    data_log.clear()
 
-    # fresh file
-    with open("sensor_data_live.csv", "w", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerow([
-            "Timestamp",
-            "P1_Volt","P2_Volt","P3_Volt","P4_Volt","P5_Volt",
-            "T1_Volt","T2_Volt","T3_Volt","T4_Volt","T5_Volt",
-            "T1_DegreeC","T2_DegreeC","T3_DegreeC","T4_DegreeC","T5_DegreeC"
-        ])
+    last_log_time = time.time()
 
     return jsonify({"status": "started"})
 
@@ -132,23 +121,25 @@ def read_serial():
 
         last_update_time = time.time()
 
+        # ✅ ONLY LOG WHEN RUNNING (VERY IMPORTANT)
+        global last_log_time
+
         if is_running:
+            now = time.time()
+
+            if now - last_log_time >= sampling_rate_sec:
+                last_log_time = now
+
                 timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
 
-                row = (
-                    [timestamp] +
-                    [round(v, 3) for v in last_values["pressure"]] +
-                    [round(v, 3) for v in last_values["temperature"]] +
-                    [round((8*v)+10, 2) for v in last_values["temperature"]]
-                )
+                data_log.append({
+                    "timestamp": timestamp,
+                    "pressure": last_values["pressure"].copy(),
+                    "temperature": last_values["temperature"].copy()
+                })
 
-                data_log.append(row)
-
-                if len(data_log) >= 20:
-                    with open("sensor_data_live.csv", "a", newline="") as f:
-                        writer = csv.writer(f)
-                        writer.writerows(data_log)
-                    data_log.clear()
+                if len(data_log) > 10000:
+                    data_log.pop(0)
 
         print("UPDATED:",
               "P:", last_values["pressure"],
@@ -203,8 +194,6 @@ def get_data():
     global last_values, last_update_time
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
 
-    print("SER:", last_values) 
-
     if ser is None or not ser.is_open:
         return jsonify({"status": "disconnected"})
 
@@ -245,19 +234,38 @@ def get_data():
 
     return jsonify(response)
 
-@app.route('/disconnect', methods=['POST'])
-def disconnect():
-    global ser
-    if ser and ser.is_open:
-        ser.close()
-    return jsonify({"status": "disconnected"})
-
 
 # ---------------- CSV DOWNLOAD ----------------
-
 @app.route('/download_csv')
 def download_csv():
-    return send_from_directory('.', 'sensor_data_live.csv', as_attachment=True)
+    output = io.StringIO()
+    writer = csv.writer(output)
+
+    writer.writerow([
+    "Timestamp",
+    "P1_Volt","P2_Volt","P3_Volt","P4_Volt","P5_Volt",
+    "T1_Volt","T2_Volt","T3_Volt","T4_Volt","T5_Volt",
+    "T1_DegreeC","T2_DegreeC","T3_DegreeC","T4_DegreeC","T5_DegreeC"
+])
+
+    for entry in data_log:
+        temps = entry["temperature"]
+        
+        writer.writerow(
+            [entry["timestamp"]] +
+            [f"{v:.3f}" for v in entry["pressure"]] +
+            [f"{v:.3f}" for v in entry["temperature"]] +
+            [f"{(8*v)+10:.2f}" for v in entry["temperature"]]
+        )
+
+    output.seek(0)
+
+    return Response(
+        output,
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment;filename=sensor_data.csv"}
+    )
+
 
 # ---------------- RUN ----------------
 if __name__ == "__main__":
