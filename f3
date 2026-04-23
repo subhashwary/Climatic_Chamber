@@ -483,7 +483,7 @@ input[type="checkbox"] {
                     <option value="COM3">COM3</option>
                     <option value="COM4">COM4</option>
                     <option value="COM5">COM5</option>
-                    <option value="COM6" selected>COM4</option>
+                    <option value="COM6" selected>COM6</option>
                 </select>
             </div>
 
@@ -660,8 +660,6 @@ let isRunning = false;
 let samplingRateSec = 1;
 let dataInterval = null;
 
-const MAX_POINTS = 500;
-
 // 🔴 FREEZE DETECTION
 let lastValues = [null, null, null, null, null];
 let freezeCount = [0, 0, 0, 0, 0];
@@ -728,51 +726,43 @@ async function fetchData() {
         const data = await res.json();
 
         // 🟢 AUTO RECONNECT DETECTION (USB plugged back)
-      
-        if (data.status === "live" && !isRunning) {
-            // only show connected, don't override STOP/RESET behavior aggressively
+        // 🟢 AUTO CONNECT (USB plugged back properly)
+        if (data.status === "live" && isRunning) {
             document.getElementById("pressure").innerText = "CONNECTED";
             document.getElementById("temperature").innerText = "CONNECTED";
 
             document.getElementById("pressure").style.color = "green";
             document.getElementById("temperature").style.color = "green";
+        }
+
+        // 🔴 HANDLE DISCONNECTED / NO SIGNAL
+        if (data.status === "disconnected" || data.status === "no_data") {
+
+            let msg = (data.status === "disconnected") ? "DISCONNECTED" : "NO SIGNAL";
+
+            document.getElementById("pressure").innerText = msg;
+            document.getElementById("temperature").innerText = msg;
+
+            document.getElementById("pressure").style.color = "red";
+            document.getElementById("temperature").style.color = "red";
 
             return;
         }
 
-        // 🔴 HANDLE DISCONNECTED / NO SIGNAL
-        // 🔴 DISCONNECTED / NO SIGNAL
-if (data.status === "disconnected" || data.status === "no_data") {
+        // 🟢 AUTO CONNECT DETECTION (when data resumes after unplug)
+        if (data.status === "live" && !isRunning) {
+            document.getElementById("pressure").innerText = data.pressure;
+            document.getElementById("temperature").innerText = data.temperature;
 
-    let msg = (data.status === "disconnected") ? "DISCONNECTED" : "NO SIGNAL";
+            document.getElementById("pressure").style.color = "green";
+            document.getElementById("temperature").style.color = "green";
+        } else {
+            document.getElementById("pressure").innerText = data.pressure;
+            document.getElementById("temperature").innerText = data.temperature;
 
-    document.getElementById("pressure").innerText = msg;
-    document.getElementById("temperature").innerText = msg;
-
-    document.getElementById("pressure").style.color = "red";
-    document.getElementById("temperature").style.color = "red";
-
-    return;
-}
-
-// 🟢 CONNECTED but NOT running
-    if (data.status === "live" && !isRunning) {
-
-        document.getElementById("pressure").innerText = "CONNECTED";
-        document.getElementById("temperature").innerText = "CONNECTED";
-
-        document.getElementById("pressure").style.color = "green";
-        document.getElementById("temperature").style.color = "green";
-
-        return;
-    }
-
-    // 🟢 RUNNING → show actual values
-    document.getElementById("pressure").innerText = data.pressure;
-    document.getElementById("temperature").innerText = data.temperature;
-
-    document.getElementById("pressure").style.color = "#1f2d3a";
-    document.getElementById("temperature").style.color = "#1f2d3a";
+            document.getElementById("pressure").style.color = "#1f2d3a";
+            document.getElementById("temperature").style.color = "#1f2d3a";
+        }
 
         let label = data.timestamp;
 
@@ -826,21 +816,19 @@ if (data.status === "disconnected" || data.status === "no_data") {
         }
 
         // -------- LIMIT DATA --------
+        if (sensorChart.data.labels.length > 100) {
 
-    if (sensorChart.data.labels.length > MAX_POINTS) {
-        sensorChart.data.labels.shift();
-        temperatureChart.data.labels.shift();
+            sensorChart.data.labels.shift();
+            temperatureChart.data.labels.shift();
 
-        sensorChart.data.datasets.forEach(ds => ds.data.shift());
-        temperatureChart.data.datasets.forEach(ds => ds.data.shift());
-    }
+            sensorChart.data.datasets.forEach(ds => ds.data.shift());
+            temperatureChart.data.datasets.forEach(ds => ds.data.shift());
+        }
 
-    // update charts (no animation → better for long runs)
-    sensorChart.update('none');
-    temperatureChart.update('none');
-} 
+        sensorChart.update();
+        temperatureChart.update();
 
-    catch (err) {
+    } catch (err) {
     console.log("Fetch error:", err);
 
     // 🔴 USB unplug / backend unreachable → mark as DISCONNECTED
@@ -849,7 +837,6 @@ if (data.status === "disconnected" || data.status === "no_data") {
 
     document.getElementById("pressure").style.color = "red";
     document.getElementById("temperature").style.color = "red";
-
 }
 }
 
@@ -894,38 +881,20 @@ function updateTemperature(sensor) {
 // ---------------- CONTROL ----------------
 async function startDevice() {
     isRunning = true;
-
     await fetch(`${BASE_URL}/start`, { method: "POST" });
 
     document.getElementById("pressure").innerText = "STARTED";
     document.getElementById("temperature").innerText = "STARTED";
 
-    lastValues = [null, null, null, null, null];
-    freezeCount = [0, 0, 0, 0, 0];
-
-    // 🔥 IMPORTANT: clear old interval first
-    if (dataInterval) {
-        clearInterval(dataInterval);
-        dataInterval = null;
-    }
-
-    // 🔥 FORCE immediate fetch (fixes "stuck" feeling)
-    fetchData();
-
     applySamplingRate();
-
     setActiveButton("startBtn");
 }
 
 async function stopDevice() {
-
-    isRunning = false;
-
     if (dataInterval) {
-        clearInterval(dataInterval);
-        dataInterval = null;
-    }
-
+    clearInterval(dataInterval);
+    dataInterval = null;
+}
     await fetch(`${BASE_URL}/stop`, { method: "POST" });
 
     document.getElementById("pressure").innerText = "STOPPED";
@@ -934,6 +903,7 @@ async function stopDevice() {
     document.getElementById("pressure").style.color = "red";
     document.getElementById("temperature").style.color = "red";
 
+    isRunning = false;
     setActiveButton("stopBtn");
 }
 
@@ -989,12 +959,9 @@ function applySamplingRate() {
         dataInterval = null;
     }
 
-    if (!isRunning) return;
-
-    // 🔥 always start fresh interval
-    dataInterval = setInterval(() => {
-        fetchData();
-    }, samplingRateSec * 1000);
+    if (isRunning) {
+        dataInterval = setInterval(fetchData, samplingRateSec * 1000);
+    }
 }
 
 // ---------------- HELPER FUNCTIONS ----------------
@@ -1047,9 +1014,8 @@ async function connectDevice() {
             document.getElementById("pressure").style.color = "green";
             document.getElementById("temperature").style.color = "green";
 
-              // 🔥 ADD THIS
-    fetchData();  // immediate read
-
+            isRunning = true;
+            applySamplingRate();
         } else {
             alert("❌ " + data.message);
         }
