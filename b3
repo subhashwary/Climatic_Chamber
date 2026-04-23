@@ -199,19 +199,18 @@ def serial_loop():
         time.sleep(0.05)
 
 def auto_reconnect():
-            global ser, last_port, last_baud
+    global ser, last_port, last_baud
 
-            while True:
-                try:
-                    if ser is None or not ser.is_open:
-                        ser = serial.Serial(last_port, last_baud, timeout=1)
-                        time.sleep(2)
-                        ser.reset_input_buffer()
-                        print(f"🔁 Auto reconnected to {last_port}")
-                except:
-                    pass
-            
+    while True:
+        if ser is None or not ser.is_open:
+            try:
+                ser = serial.Serial(last_port, last_baud, timeout=1)
                 time.sleep(2)
+                ser.reset_input_buffer()
+                print(f"🔁 Reconnected to {last_port}")
+            except:
+                pass
+        time.sleep(5)   # 🔥 slower retry
 
 threading.Thread(target=serial_loop, daemon=True).start()
 threading.Thread(target=auto_reconnect, daemon=True).start()
