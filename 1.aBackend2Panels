@@ -157,7 +157,9 @@ def auto_reconnect():
     while True:
         try:
             if ser is None or not ser.is_open:
-                ser = serial.Serial("COM6", 115200, timeout=1)
+                port = ser.port if ser else "COM6"
+                baud = ser.baudrate if ser else 115200
+                ser = serial.Serial(port, baud, timeout=1)
                 time.sleep(2)
                 ser.reset_input_buffer()
                 print("🔁 Auto reconnected to device")
@@ -177,6 +179,7 @@ def calculate_psi(voltage):
 @app.route('/data')
 def get_data():
     global last_values, last_update_time
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
 
     if ser is None or not ser.is_open:
         return jsonify({"status": "disconnected"})
@@ -195,10 +198,11 @@ def get_data():
         })
 
     response = {
-        "status": "live",
-        "pressure": "LIVE",
-        "temperature": "LIVE"
-    }
+    "status": "live",
+    "pressure": "LIVE",
+    "temperature": "LIVE",
+    "timestamp": timestamp
+}
 
     for i in range(5):
         # PRESSURE
@@ -226,16 +230,20 @@ def download_csv():
 
     writer.writerow([
     "Timestamp",
-    "P1","P2","P3","P4","P5",
-    "T1","T2","T3","T4","T5"
+    "P1_Volt","P2_Volt","P3_Volt","P4_Volt","P5_Volt",
+    "T1_Volt","T2_Volt","T3_Volt","T4_Volt","T5_Volt",
+    "T1_DegreeC","T2_DegreeC","T3_DegreeC","T4_DegreeC","T5_DegreeC"
 ])
 
     for entry in data_log:
+        temps = entry["temperature"]
+        
         writer.writerow(
-    [entry["timestamp"]] +
-    [f"{v:.3f}" for v in entry["pressure"]] +
-    [f"{v:.3f}" for v in entry["temperature"]]
-)
+            [entry["timestamp"]] +
+            [f"{v:.3f}" for v in entry["pressure"]] +
+            [f"{v:.3f}" for v in entry["temperature"]] +
+            [f"{(8*v)+10:.2f}" for v in entry["temperature"]]
+        )
 
     output.seek(0)
 
@@ -249,4 +257,4 @@ def download_csv():
 # ---------------- RUN ----------------
 if __name__ == "__main__":
     webbrowser.open("http://127.0.0.1:5000")
-    app.run(debug=False)
+    app.run(debug=False, threaded=True, use_reloader=False)
