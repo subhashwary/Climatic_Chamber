@@ -819,7 +819,7 @@ async function fetchData() {
         }
 
         // -------- LIMIT DATA --------
-        if (sensorChart.data.labels.length > 100) {
+        if (sensorChart.data.labels.length > 2000) {
 
             sensorChart.data.labels.shift();
             temperatureChart.data.labels.shift();
