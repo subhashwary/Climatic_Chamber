@@ -655,6 +655,7 @@ const BASE_URL = "http://127.0.0.1:5000";
 let sensorChart;
 let temperatureChart;
 
+let isConnected = false;
 let isRunning = false;
 
 let samplingRateSec = 1;
@@ -882,6 +883,11 @@ function updateTemperature(sensor) {
 
 // ---------------- CONTROL ----------------
 async function startDevice() {
+
+    if (!isConnected) {
+    alert("Please CONNECT device first");
+    return;
+}
     isRunning = true;
 
     await fetch(`${BASE_URL}/start`, { method: "POST" });
@@ -910,6 +916,7 @@ async function stopDevice() {
     document.getElementById("temperature").style.color = "red";
 
     isRunning = false;
+
     setActiveButton("stopBtn");
 }
 
@@ -950,6 +957,17 @@ function resetDevice() {
     }
     // ✅ set active AFTER loop
     setActiveButton("resetBtn");
+}
+
+// ---------------- DISCONNECT ----------------
+async function disconnectDevice() {
+    await fetch(`${BASE_URL}/disconnect`, { method: "POST" });
+
+    isConnected = false;
+    isRunning = false;
+
+    document.getElementById("comPort").disabled = false;
+    document.getElementById("baudRate").disabled = false;
 }
 
 // ---------------- EXPORT ----------------
@@ -1011,6 +1029,9 @@ async function connectDevice() {
         const data = await res.json();
 
         if (data.status === "connected") {
+
+            document.getElementById("comPort").disabled = true;
+            document.getElementById("baudRate").disabled = true;
             alert("Device Connected ✅");
 
             document.getElementById("pressure").innerText = "CONNECTED";
@@ -1019,7 +1040,8 @@ async function connectDevice() {
             document.getElementById("pressure").style.color = "green";
             document.getElementById("temperature").style.color = "green";
 
-            isRunning = true;
+            isConnected = true;
+            isRunning = false;
             applySamplingRate();
         } else {
             alert("❌ " + data.message);
