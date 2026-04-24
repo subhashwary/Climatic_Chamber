@@ -884,20 +884,38 @@ function updateTemperature(sensor) {
 
 // ---------------- CONTROL ----------------
 async function startDevice() {
-    isRunning = true;
+
+    if (isRunning) return; // prevent double click issues
 
     const rate = samplingRateSec;
 
-    await fetch(`${BASE_URL}/start`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({
-            sampling_rate: rate
-        })
-    });
+    try {
+        const res = await fetch(`${BASE_URL}/start`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                sampling_rate: rate
+            })
+        });
 
-    applySamplingRate();
-    setActiveButton("startBtn");
+        const data = await res.json();
+
+        // ✅ PUT YOUR CODE HERE
+        if (data.status === "started") {
+            isRunning = true;
+
+            fetchData();              // 🔥 immediate first fetch
+            applySamplingRate();      // 🔁 start interval loop
+
+            setActiveButton("startBtn");
+        } else {
+            alert("Start failed");
+        }
+
+    } catch (err) {
+        console.log(err);
+        alert("Backend not reachable");
+    }
 }
 
 async function stopDevice() {
@@ -964,13 +982,16 @@ function exportCSV() {
 // ---------------- SAMPLING CONTROL ----------------
 function applySamplingRate() {
 
+    // 🔥 always clear previous interval
     if (dataInterval) {
         clearInterval(dataInterval);
         dataInterval = null;
     }
 
     if (isRunning) {
-        dataInterval = setInterval(fetchData, samplingRateSec * 1000);
+        dataInterval = setInterval(() => {
+            fetchData();
+        }, samplingRateSec * 1000);
     }
 }
 
