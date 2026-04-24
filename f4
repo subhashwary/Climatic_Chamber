@@ -1029,10 +1029,6 @@ async function connectDevice() {
     }
 }
 
-setTimeout(() => {
-    location.reload();
-}, 4 * 60 * 60 * 1000);
-
 // ---------------- AUTO FETCH ----------------
 
 </script>
