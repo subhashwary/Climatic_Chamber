@@ -715,8 +715,6 @@ window.onload = function () {
             }
         }
     });
-    
-    applySamplingRate();
 };
 
 // ---------------- FETCH DATA ----------------
@@ -841,9 +839,10 @@ async function fetchData() {
     } catch (err) {
     console.log("Fetch error:", err);
 
-    document.getElementById("pressure").innerText = "RECONNECTING...";
-    document.getElementById("temperature").innerText = "RECONNECTING...";
-}
+    if (isRunning) {
+        document.getElementById("pressure").innerText = "RECONNECTING...";
+        document.getElementById("temperature").innerText = "RECONNECTING...";
+    }
 }
 
 function toggleSensor(index) {
@@ -886,6 +885,9 @@ function updateTemperature(sensor) {
 
 // ---------------- CONTROL ----------------
 async function startDevice() {
+
+    if (isRunning) return;  // 🔥 prevent duplicate start
+
     isRunning = true;
 
     const rate = samplingRateSec;
@@ -966,14 +968,17 @@ function exportCSV() {
 // ---------------- SAMPLING CONTROL ----------------
 function applySamplingRate() {
 
-    if (dataInterval) {
+    // 🔥 HARD RESET (important)
+    if (dataInterval !== null) {
         clearInterval(dataInterval);
         dataInterval = null;
     }
 
-    if (isRunning) {
-        dataInterval = setInterval(fetchData, samplingRateSec * 1000);
-    }
+    if (!isRunning) return;
+
+    dataInterval = setInterval(() => {
+        fetchData();
+    }, samplingRateSec * 1000);
 }
 
 // ---------------- HELPER FUNCTIONS ----------------
@@ -1018,8 +1023,6 @@ async function connectDevice() {
             document.getElementById("pressure").style.color = "green";
             document.getElementById("temperature").style.color = "green";
 
-            isRunning = true;
-            applySamplingRate();
         } else {
             alert("❌ " + data.message);
         }
