@@ -8,6 +8,8 @@ import csv
 import io
 import os
 
+new_sample_flag = False
+
 if not os.path.exists("sensor_data.csv"):
     with open("sensor_data.csv", "w", newline="") as f:
         writer = csv.writer(f)
@@ -133,11 +135,14 @@ def read_serial():
 
         last_update_time = time.time()
 
-        now = time.time()
+        global new_sample_flag
 
-        # ✅ CSV logging (slow, based on sampling rate)
+        now = time.time()
+        new_sample_flag = False  # reset every loop
+
         if is_running and (now - last_log_time >= sampling_rate_sec):
             last_log_time = now
+            new_sample_flag = True
 
             timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
 
@@ -152,7 +157,7 @@ def read_serial():
                 writer.writerow([
                     timestamp,
                     *last_values["pressure"],
-                    *[(4*v)+5 for v in last_values["pressure"]],   # ✅ Psi added
+                    *[(4*v)+5 for v in last_values["pressure"]],
                     *last_values["temperature"],
                     *[(8*v)+10 for v in last_values["temperature"]]
                 ])
@@ -212,7 +217,8 @@ def calculate_psi(voltage):
 
 @app.route('/data')
 def get_data():
-    global last_values, last_update_time
+    global last_values, last_update_time, new_sample_flag
+
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
 
     if ser is None or not ser.is_open:
@@ -232,28 +238,29 @@ def get_data():
         })
 
     response = {
-    "status": "live",
-    "pressure": "LIVE",
-    "temperature": "LIVE",
-    "timestamp": timestamp
-}
+        "status": "live",
+        "pressure": "LIVE",
+        "temperature": "LIVE",
+        "timestamp": timestamp,
+        "new_sample": new_sample_flag
+    }
 
     for i in range(5):
-        # PRESSURE
         p_v = last_values["pressure"][i]
         psi = calculate_psi(p_v)
 
         response[f"p{i+1}_volt"] = round(p_v, 3)
         response[f"p{i+1}_psi"] = round(psi, 2)
 
-        # TEMPERATURE
         t_v = last_values["temperature"][i]
-        temp = (8 * t_v) + 10   # your chosen mapping
+        temp = (8 * t_v) + 10
 
         response[f"t{i+1}_volt"] = round(t_v, 3)
         response[f"t{i+1}_temp"] = round(temp, 2)
 
-    return jsonify(response)
+    resp = jsonify(response)
+    new_sample_flag = False   # 🔥 reset AFTER sending
+    return resp
 
 
 # ---------------- CSV DOWNLOAD ----------------
