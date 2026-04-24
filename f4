@@ -470,9 +470,7 @@ input[type="checkbox"] {
     <div style="display: flex; gap: 10px; align-items: flex-start;">
 
         <!-- LEFT: CONNECT BUTTON -->
-        <button class="connect-btn" onclick="connectDevice()">
-    CONNECT
-</button>
+        <button type="button" class="connect-btn" onclick="connectDevice()">CONNECT</button>
 
         <!-- RIGHT: INPUTS (STACKED) -->
         <div style="display: flex; flex-direction: column; gap: 6px;">
@@ -598,9 +596,9 @@ input[type="checkbox"] {
         <!-- CONTROL BUTTONS -->
         <div class="top-buttons">
 
-    <button id="startBtn" onclick="startDevice()" class="start-btn">START</button>
-    <button id="stopBtn" onclick="stopDevice()" class="stop-btn">STOP</button>
-    <button id="resetBtn" onclick="resetDevice()" style="background-color:#6c757d;">RESET</button>
+    <button type="button" id="startBtn" onclick="startDevice()" class="start-btn">START</button>
+    <button type="button" id="stopBtn" onclick="stopDevice()" class="stop-btn">STOP</button>
+    <button type="button" id="resetBtn" onclick="resetDevice()" style="background-color:#6c757d;">RESET</button>
 
 </div>
 
@@ -766,7 +764,7 @@ async function fetchData() {
 
         let label = data.timestamp;
 
-        if (label) {
+        if (data.new_sample) {
             sensorChart.data.labels.push(label);
             temperatureChart.data.labels.push(label);
         }
@@ -798,8 +796,10 @@ async function fetchData() {
         let tempVal = (temp != null) ? parseFloat(temp) : null;
 
         // -------- GRAPH UPDATE --------
-        sensorChart.data.datasets[i - 1].data.push(psiVal);
-        temperatureChart.data.datasets[i - 1].data.push(tempVal);
+        if (data.new_sample) {
+            sensorChart.data.datasets[i - 1].data.push(psiVal);
+            temperatureChart.data.datasets[i - 1].data.push(tempVal);
+        }
 
             // -------- FREEZE DETECTION --------
             if (psi !== null) {
@@ -981,18 +981,12 @@ function exportCSV() {
 
 // ---------------- SAMPLING CONTROL ----------------
 function applySamplingRate() {
-
-    // 🔥 always clear previous interval
     if (dataInterval) {
         clearInterval(dataInterval);
-        dataInterval = null;
     }
 
-    if (isRunning) {
-        dataInterval = setInterval(() => {
-            fetchData();
-        }, samplingRateSec * 1000);
-    }
+    // 🔥 FIX: poll faster than sampling (e.g., 500 ms)
+    dataInterval = setInterval(fetchData, 500);
 }
 
 // ---------------- HELPER FUNCTIONS ----------------
@@ -1037,8 +1031,6 @@ async function connectDevice() {
             document.getElementById("pressure").style.color = "green";
             document.getElementById("temperature").style.color = "green";
 
-            isRunning = true;
-            applySamplingRate();
         } else {
             alert("❌ " + data.message);
         }
