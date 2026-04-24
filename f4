@@ -470,7 +470,9 @@ input[type="checkbox"] {
     <div style="display: flex; gap: 10px; align-items: flex-start;">
 
         <!-- LEFT: CONNECT BUTTON -->
-        <button type="button" class="connect-btn" onclick="connectDevice()">CONNECT</button>
+        <button class="connect-btn" onclick="connectDevice()">
+    CONNECT
+</button>
 
         <!-- RIGHT: INPUTS (STACKED) -->
         <div style="display: flex; flex-direction: column; gap: 6px;">
@@ -596,9 +598,9 @@ input[type="checkbox"] {
         <!-- CONTROL BUTTONS -->
         <div class="top-buttons">
 
-    <button type="button" id="startBtn" onclick="startDevice()" class="start-btn">START</button>
-    <button type="button" id="stopBtn" onclick="stopDevice()" class="stop-btn">STOP</button>
-    <button type="button" id="resetBtn" onclick="resetDevice()" style="background-color:#6c757d;">RESET</button>
+    <button id="startBtn" onclick="startDevice()" class="start-btn">START</button>
+    <button id="stopBtn" onclick="stopDevice()" class="stop-btn">STOP</button>
+    <button id="resetBtn" onclick="resetDevice()" style="background-color:#6c757d;">RESET</button>
 
 </div>
 
@@ -764,52 +766,56 @@ async function fetchData() {
 
         let label = data.timestamp;
 
-        if (data.new_sample) {
+        if (data.logged && label) {
             sensorChart.data.labels.push(label);
-            temperatureChart.data.labels.push(label);
+
+            for (let i = 1; i <= 5; i++) {
+                let psi = parseFloat(data[`p${i}_psi`]);
+                let temp = parseFloat(data[`t${i}_temp`]);
+
+                sensorChart.data.datasets[i - 1].data.push(isNaN(psi) ? null : psi);
+                temperatureChart.data.datasets[i - 1].data.push(isNaN(temp) ? null : temp);
+            }
         }
 
         for (let i = 1; i <= 5; i++) {
 
-            // -------- UI UPDATE --------
-        let pVolt = data[`p${i}_volt`];
-        let tVolt = data[`t${i}_volt`];
+            let pVolt = data[`p${i}_volt`];
+            let tVolt = data[`t${i}_volt`];
 
-        document.getElementById(`p${i}_volt`).value =
-            (pVolt != null) ? Number(pVolt).toFixed(3) : "";
+            // Pressure input (don't override while typing)
+            let pInput = document.getElementById(`p${i}_volt`);
+            if (document.activeElement !== pInput) {
+                pInput.value = (pVolt != null) ? Number(pVolt).toFixed(3) : "";
+            }
 
-        document.getElementById(`t${i}_volt`).value =
-            (tVolt != null) ? Number(tVolt).toFixed(3) : "";
+            // Temperature input (same logic)
+            let tInput = document.getElementById(`t${i}_volt`);
+            if (document.activeElement !== tInput) {
+                tInput.value = (tVolt != null) ? Number(tVolt).toFixed(3) : "";
+            }
 
-        // Pressure UI
-        let psi = data[`p${i}_psi`];
-        document.getElementById(`p${i}_psi`).innerText =
-            (psi != null) ? Number(psi).toFixed(2) : "";
+            updatePressure(i);
+            updateTemperature(i);
 
-        // Temperature UI
-        let temp = data[`t${i}_temp`];
-        document.getElementById(`t${i}_temp`).innerText =
-            (temp != null) ? Number(temp).toFixed(2) : "";
+            // -------- CALCULATIONS --------
+            let psi = parseFloat(data[`p${i}_psi`]);
+            if (isNaN(psi)) psi = null;
 
-        // -------- GRAPH VALUES --------
-        let psiVal = (psi != null) ? parseFloat(psi) : null;
-        let tempVal = (temp != null) ? parseFloat(temp) : null;
+            let temp = parseFloat(tVolt);
+            temp = isNaN(temp) ? null : (8 * temp) + 10;
 
-        // -------- GRAPH UPDATE --------
-        if (data.new_sample) {
-            sensorChart.data.datasets[i - 1].data.push(psiVal);
-            temperatureChart.data.datasets[i - 1].data.push(tempVal);
-        }
+            // -------- GRAPH UPDATE --------
 
             // -------- FREEZE DETECTION --------
             if (psi !== null) {
-                if (psiVal === lastValues[i - 1]) {
+                if (psi === lastValues[i - 1]) {
                     freezeCount[i - 1]++;
                 } else {
                     freezeCount[i - 1] = 0;
                 }
 
-                lastValues[i - 1] = psiVal;
+                lastValues[i - 1] = psi;
 
                 if (freezeCount[i - 1] > FREEZE_LIMIT) {
                     sensorChart.data.datasets[i - 1].borderDash = [5, 5];
@@ -820,7 +826,7 @@ async function fetchData() {
         }
 
         // -------- LIMIT DATA --------
-        if (sensorChart.data.labels.length > 100) {
+        if (sensorChart.data.labels.length > 60) {
 
             sensorChart.data.labels.shift();
             temperatureChart.data.labels.shift();
@@ -835,12 +841,8 @@ async function fetchData() {
     } catch (err) {
     console.log("Fetch error:", err);
 
-    // 🔴 USB unplug / backend unreachable → mark as DISCONNECTED
-    document.getElementById("pressure").innerText = "DISCONNECTED";
-    document.getElementById("temperature").innerText = "DISCONNECTED";
-
-    document.getElementById("pressure").style.color = "red";
-    document.getElementById("temperature").style.color = "red";
+    document.getElementById("pressure").innerText = "RECONNECTING...";
+    document.getElementById("temperature").innerText = "RECONNECTING...";
 }
 }
 
@@ -884,38 +886,20 @@ function updateTemperature(sensor) {
 
 // ---------------- CONTROL ----------------
 async function startDevice() {
-
-    if (isRunning) return; // prevent double click issues
+    isRunning = true;
 
     const rate = samplingRateSec;
 
-    try {
-        const res = await fetch(`${BASE_URL}/start`, {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-                sampling_rate: rate
-            })
-        });
+    await fetch(`${BASE_URL}/start`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            sampling_rate: rate
+        })
+    });
 
-        const data = await res.json();
-
-        // ✅ PUT YOUR CODE HERE
-        if (data.status === "started") {
-            isRunning = true;
-
-            fetchData();              // 🔥 immediate first fetch
-            applySamplingRate();      // 🔁 start interval loop
-
-            setActiveButton("startBtn");
-        } else {
-            alert("Start failed");
-        }
-
-    } catch (err) {
-        console.log(err);
-        alert("Backend not reachable");
-    }
+    applySamplingRate();
+    setActiveButton("startBtn");
 }
 
 async function stopDevice() {
@@ -981,12 +965,15 @@ function exportCSV() {
 
 // ---------------- SAMPLING CONTROL ----------------
 function applySamplingRate() {
+
     if (dataInterval) {
         clearInterval(dataInterval);
+        dataInterval = null;
     }
 
-    // 🔥 FIX: poll faster than sampling (e.g., 500 ms)
-    dataInterval = setInterval(fetchData, 500);
+    if (isRunning) {
+        dataInterval = setInterval(fetchData, samplingRateSec * 1000);
+    }
 }
 
 // ---------------- HELPER FUNCTIONS ----------------
@@ -1031,6 +1018,8 @@ async function connectDevice() {
             document.getElementById("pressure").style.color = "green";
             document.getElementById("temperature").style.color = "green";
 
+            isRunning = true;
+            applySamplingRate();
         } else {
             alert("❌ " + data.message);
         }
@@ -1039,6 +1028,10 @@ async function connectDevice() {
         alert("Backend not reachable ❌");
     }
 }
+
+setTimeout(() => {
+    location.reload();
+}, 4 * 60 * 60 * 1000);
 
 // ---------------- AUTO FETCH ----------------
 
