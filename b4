@@ -8,18 +8,19 @@ import csv
 import io
 import os
 
-new_sample_flag = False
+CSV_FILE = "sensor_data.csv"
 
-if not os.path.exists("sensor_data.csv"):
-    with open("sensor_data.csv", "w", newline="") as f:
+if not os.path.exists(CSV_FILE):
+    with open(CSV_FILE, "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow([
             "Timestamp",
             "P1_Volt","P2_Volt","P3_Volt","P4_Volt","P5_Volt",
-            "P1_Psi","P2_Psi","P3_Psi","P4_Psi","P5_Psi",   # ✅ ADD THIS
             "T1_Volt","T2_Volt","T3_Volt","T4_Volt","T5_Volt",
             "T1_DegreeC","T2_DegreeC","T3_DegreeC","T4_DegreeC","T5_DegreeC"
         ])
+
+serial_lock = threading.Lock()
 
 app = Flask(__name__)
 CORS(app)
@@ -34,9 +35,6 @@ last_values = {
     "temperature": [0.0] * 5
 }
 last_update_time = 0
-
-# ✅ DATA LOG STORAGE
-data_log = []
 
 is_running = False
 
@@ -62,15 +60,15 @@ def connect():
             ser.close()
             time.sleep(1)
 
-        ser = serial.Serial(port, baud, timeout=1)
+        with serial_lock:
+            ser = serial.Serial(port, baud, timeout=1)
         time.sleep(2)
         ser.reset_input_buffer()
 
         last_values = {
     "pressure": [0.0] * 5,
     "temperature": [0.0] * 5
-}
-    
+}    
         last_update_time = time.time()
 
         return jsonify({"status": "connected"})
@@ -78,11 +76,10 @@ def connect():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
 
-
 # ---------------- CONTROL ----------------
 @app.route('/start', methods=['POST'])
 def start():
-    global is_running, data_log, sampling_rate_sec, last_log_time
+    global is_running, sampling_rate_sec, last_log_time
 
     data = request.json
     sampling_rate_sec = int(data.get("sampling_rate", 1))
@@ -100,16 +97,16 @@ def stop():
     is_running = False
     return jsonify({"status": "stopped"})
 
-
 # ---------------- SERIAL READ ----------------
 def read_serial():
-    global ser, last_values, last_update_time, data_log, last_log_time
+    global ser, last_values, last_update_time
 
     if ser is None or not ser.is_open:
         return
 
     try:
-        line = ser.readline().decode('utf-8', errors='ignore').strip()
+        with serial_lock:
+            line = ser.readline().decode('utf-8', errors='ignore').strip()
 
         if not line:
             return
@@ -121,7 +118,6 @@ def read_serial():
 
         values = [float(x) for x in parts[:10]]
 
-        # split into pressure + temperature
         p_values = values[:5]
         t_values = values[5:]
 
@@ -135,46 +131,41 @@ def read_serial():
 
         last_update_time = time.time()
 
-        global new_sample_flag
+        global last_log_time
 
-        now = time.time()
-        new_sample_flag = False  # reset every loop
+        if is_running:
+            now = time.time()
 
-        if is_running and (now - last_log_time >= sampling_rate_sec):
-            last_log_time = now
-            new_sample_flag = True
+            if now - last_log_time >= sampling_rate_sec:
+                last_log_time = now
 
-            timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+                timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
 
-            data_log.append({
-                "timestamp": timestamp,
-                "pressure": last_values["pressure"].copy(),
-                "temperature": last_values["temperature"].copy()
-            })
+                with open(CSV_FILE, "a", newline="") as f:
+                    writer = csv.writer(f)
 
-            with open("sensor_data.csv", "a", newline="") as f:
-                writer = csv.writer(f)
-                writer.writerow([
-                    timestamp,
-                    *last_values["pressure"],
-                    *[(4*v)+5 for v in last_values["pressure"]],
-                    *last_values["temperature"],
-                    *[(8*v)+10 for v in last_values["temperature"]]
-                ])
+                    row = (
+                        [timestamp] +
+                        [f"{v:.3f}" for v in last_values["pressure"]] +
+                        [f"{v:.3f}" for v in last_values["temperature"]] +
+                        [f"{(8*v)+10:.2f}" for v in last_values["temperature"]]
+                    )
 
-            print(f"[CSV LOGGED] {timestamp}")
+                    writer.writerow(row)
 
-            if len(data_log) > 10000:
-                data_log.pop(0)
-
-        print("UPDATED:",
-              "P:", last_values["pressure"],
-              "T:", last_values["temperature"])
-        
     except Exception as e:
         print("Serial error:", e)
+        try:
+            if ser and ser.is_open:
+                ser.close()
+        except:
+            pass
 
-        # 🔴 ADD THIS BLOCK (USB unplug detection)
+        last_update_time = 0
+
+    # ✅ WATCHDOG (CORRECT PLACE)
+    if time.time() - last_update_time > max(5, sampling_rate_sec * 2):
+        print("⚠️ No data for 5s, forcing reconnect")
         try:
             if ser and ser.is_open:
                 ser.close()
@@ -198,7 +189,8 @@ def auto_reconnect():
             if ser is None or not ser.is_open:
                 port = ser.port if ser else "COM6"
                 baud = ser.baudrate if ser else 115200
-                ser = serial.Serial(port, baud, timeout=1)
+                with serial_lock:
+                    ser = serial.Serial(port, baud, timeout=1)
                 time.sleep(2)
                 ser.reset_input_buffer()
                 print("🔁 Auto reconnected to device")
@@ -214,11 +206,9 @@ threading.Thread(target=auto_reconnect, daemon=True).start()
 def calculate_psi(voltage):
     return (4 * voltage) + 5
 
-
 @app.route('/data')
 def get_data():
-    global last_values, last_update_time, new_sample_flag
-
+    global last_values, last_update_time
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
 
     if ser is None or not ser.is_open:
@@ -226,7 +216,7 @@ def get_data():
 
     age = time.time() - last_update_time
 
-    if age > 2:
+    if age > max(5, sampling_rate_sec * 2):
         return jsonify({
             "status": "no_data",
             "pressure": "NO SIGNAL",
@@ -238,62 +228,34 @@ def get_data():
         })
 
     response = {
-        "status": "live",
-        "pressure": "LIVE",
-        "temperature": "LIVE",
-        "timestamp": timestamp,
-        "new_sample": new_sample_flag
-    }
+    "status": "live",
+    "pressure": "LIVE",
+    "temperature": "LIVE",
+    "timestamp": timestamp,
+    "logged": (time.time() - last_log_time < 0.2)
+}
 
     for i in range(5):
+        # PRESSURE
         p_v = last_values["pressure"][i]
         psi = calculate_psi(p_v)
 
         response[f"p{i+1}_volt"] = round(p_v, 3)
         response[f"p{i+1}_psi"] = round(psi, 2)
 
+        # TEMPERATURE
         t_v = last_values["temperature"][i]
-        temp = (8 * t_v) + 10
+        temp = (8 * t_v) + 10   # your chosen mapping
 
         response[f"t{i+1}_volt"] = round(t_v, 3)
         response[f"t{i+1}_temp"] = round(temp, 2)
 
-    resp = jsonify(response)
-    new_sample_flag = False   # 🔥 reset AFTER sending
-    return resp
-
+    return jsonify(response)
 
 # ---------------- CSV DOWNLOAD ----------------
 @app.route('/download_csv')
 def download_csv():
-    output = io.StringIO()
-    writer = csv.writer(output)
-
-    writer.writerow([
-    "Timestamp",
-    "P1_Volt","P2_Volt","P3_Volt","P4_Volt","P5_Volt",
-    "P1_Psi","P2_Psi","P3_Psi","P4_Psi","P5_Psi",   # ✅ ADD THIS
-    "T1_Volt","T2_Volt","T3_Volt","T4_Volt","T5_Volt",
-    "T1_DegreeC","T2_DegreeC","T3_DegreeC","T4_DegreeC","T5_DegreeC"
-])
-
-    for entry in data_log:
-        writer.writerow(
-            [entry["timestamp"]] +
-            entry["pressure"] +
-            [(4*v)+5 for v in entry["pressure"]] +   # ✅ Psi added
-            entry["temperature"] +
-            [(8*v)+10 for v in entry["temperature"]]
-        )
-
-    output.seek(0)
-
-    return Response(
-        output,
-        mimetype="text/csv",
-        headers={"Content-Disposition": "attachment;filename=sensor_data.csv"}
-    )
-
+    return send_from_directory('.', CSV_FILE, as_attachment=True)
 
 # ---------------- RUN ----------------
 if __name__ == "__main__":
