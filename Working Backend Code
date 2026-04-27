@@ -10,6 +10,13 @@ import io
 app = Flask(__name__)
 CORS(app)
 
+sampling_rate_sec = 1
+last_log_time = 0
+
+serial_lock = threading.Lock()
+
+sample_counter = 0
+
 ser = None
 
 last_values = {
@@ -21,7 +28,8 @@ last_update_time = 0
 # ✅ DATA LOG STORAGE
 data_log = []
 
-is_running = False
+is_running = False          # controls acquisition visibility + logging
+frozen_values = None        # stores last STOP snapshot
 
 
 # ---------------- SERVE FRONTEND ----------------
@@ -41,11 +49,12 @@ def connect():
         port = data.get("com_port")
         baud = int(data.get("baud_rate"))
 
-        if ser and ser.is_open:
-            ser.close()
-            time.sleep(1)
+        with serial_lock:
+            if ser and ser.is_open:
+                ser.close()
+                time.sleep(1)
 
-        ser = serial.Serial(port, baud, timeout=1)
+            ser = serial.Serial(port, baud, timeout=1)
         time.sleep(2)
         ser.reset_input_buffer()
 
@@ -65,31 +74,62 @@ def connect():
 # ---------------- CONTROL ----------------
 @app.route('/start', methods=['POST'])
 def start():
-    global is_running, data_log
+    global is_running, sampling_rate_sec, last_log_time, frozen_values
+
+    data = request.json
+    sampling_rate_sec = int(data.get("sampling_rate", 1))
 
     is_running = True
-
-    # 🔥 session control (NO RESET NEEDED)
-    data_log.clear()
+    frozen_values = None   # unfreeze
 
     return jsonify({"status": "started"})
 
 @app.route('/stop', methods=['POST'])
 def stop():
-    global is_running
+    global is_running, frozen_values, last_values
+
     is_running = False
+
+    frozen_values = {
+        "pressure": last_values["pressure"].copy(),
+        "temperature": last_values["temperature"].copy()
+    }
+
     return jsonify({"status": "stopped"})
+
+@app.route('/reset', methods=['POST'])
+def reset():
+    global is_running, data_log, sample_counter, last_log_time
+    global last_values, last_update_time, frozen_values
+
+    is_running = False
+    frozen_values = None
+
+    data_log.clear()
+    sample_counter = 0
+    last_log_time = 0
+
+    last_values = {
+        "pressure": [0.0] * 5,
+        "temperature": [0.0] * 5
+    }
+
+    last_update_time = 0
+
+    return jsonify({"status": "reset"})
 
 
 # ---------------- SERIAL READ ----------------
 def read_serial():
     global ser, last_values, last_update_time, data_log
 
-    if ser is None or not ser.is_open:
-        return
+    with serial_lock:
+        if ser is None or not ser.is_open:
+            return
 
     try:
-        line = ser.readline().decode('utf-8', errors='ignore').strip()
+        with serial_lock:
+            line = ser.readline().decode('utf-8', errors='ignore').strip()
 
         if not line:
             return
@@ -116,33 +156,81 @@ def read_serial():
         last_update_time = time.time()
 
         # ✅ ONLY LOG WHEN RUNNING (VERY IMPORTANT)
+        global last_log_time
+
         if is_running:
-            timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+            now = time.time()
 
-            data_log.append({
-                "timestamp": timestamp,
-                "pressure": last_values["pressure"].copy(),
-                "temperature": last_values["temperature"].copy()
-            })
+            if now - last_log_time >= sampling_rate_sec:
+                last_log_time = now
 
-            if len(data_log) > 10000:
-                data_log.pop(0)
+                timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+
+                global sample_counter
+                sample_counter += 1
+
+                data_log.append({
+                    "sample_id": sample_counter,
+                    "timestamp": timestamp,
+                    "pressure": last_values["pressure"].copy(),
+                    "temperature": last_values["temperature"].copy()
+                })
+
+                if len(data_log) > 10000:
+                    data_log.pop(0)
 
         print("UPDATED:",
               "P:", last_values["pressure"],
               "T:", last_values["temperature"])
         
     except Exception as e:
-            print("Serial error:", e)
+        print("Serial error:", e)
+
+        # 🔴 ADD THIS BLOCK (USB unplug detection)
+        try:
+            if ser and ser.is_open:
+                ser.close()
+        except:
+            pass
+
+        # force backend to report disconnect
+        last_update_time = 0
 
 def serial_loop():
     while True:
-        if ser and ser.is_open and is_running:
+        if ser and ser.is_open:
             read_serial()
         time.sleep(0.05)
 
+def auto_reconnect():
+    global ser
+
+    while True:
+        try:
+            with serial_lock:
+                if ser is None or not ser.is_open:
+                    port = "COM6"
+                    baud = 115200
+
+                    try:
+                        if ser:
+                            port = ser.port
+                            baud = ser.baudrate
+                    except:
+                        pass
+
+                    ser = serial.Serial(port, baud, timeout=1)
+                    time.sleep(2)
+                    ser.reset_input_buffer()
+                    print("🔁 Auto reconnected to device")
+
+        except:
+            pass
+
+        time.sleep(2)
 
 threading.Thread(target=serial_loop, daemon=True).start()
+threading.Thread(target=auto_reconnect, daemon=True).start()
 
 # ---------------- DATA API ----------------
 def calculate_psi(voltage):
@@ -151,7 +239,9 @@ def calculate_psi(voltage):
 
 @app.route('/data')
 def get_data():
-    global last_values, last_update_time
+    global last_values, last_update_time, frozen_values
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+    global frozen_values
 
     if ser is None or not ser.is_open:
         return jsonify({"status": "disconnected"})
@@ -168,11 +258,42 @@ def get_data():
             **{f"t{i}_volt": "" for i in range(1, 6)},
             **{f"t{i}_temp": "" for i in range(1, 6)}
         })
+    
+    global frozen_values
+
+    if not is_running and frozen_values is not None:
+
+        response = {
+            "status": "stopped",
+            "pressure": "STOPPED",
+            "temperature": "STOPPED",
+            "timestamp": timestamp,
+            "sample_id": -1
+        }
+
+        for i in range(5):
+            p_v = frozen_values["pressure"][i]
+            psi = calculate_psi(p_v)
+
+            t_v = frozen_values["temperature"][i]
+            temp = (8 * t_v) + 10
+
+            response[f"p{i+1}_volt"] = round(p_v, 3)
+            response[f"p{i+1}_psi"] = round(psi, 2)
+
+            response[f"t{i+1}_volt"] = round(t_v, 3)
+            response[f"t{i+1}_temp"] = round(temp, 2)
+
+        return jsonify(response)
+
+    current_sample_id = sample_counter if len(data_log) > 0 else -1
 
     response = {
         "status": "live",
         "pressure": "LIVE",
-        "temperature": "LIVE"
+        "temperature": "LIVE",
+        "timestamp": timestamp,
+        "sample_id": current_sample_id
     }
 
     for i in range(5):
@@ -201,16 +322,24 @@ def download_csv():
 
     writer.writerow([
     "Timestamp",
-    "P1","P2","P3","P4","P5",
-    "T1","T2","T3","T4","T5"
+
+    "P1_Volt","P2_Volt","P3_Volt","P4_Volt","P5_Volt",
+    "P1_Psi","P2_Psi","P3_Psi","P4_Psi","P5_Psi",
+
+    "T1_Volt","T2_Volt","T3_Volt","T4_Volt","T5_Volt",
+    "T1_DegreeC","T2_DegreeC","T3_DegreeC","T4_DegreeC","T5_DegreeC"
 ])
 
     for entry in data_log:
+        temps = entry["temperature"]
+        
         writer.writerow(
-    [entry["timestamp"]] +
-    [f"{v:.3f}" for v in entry["pressure"]] +
-    [f"{v:.3f}" for v in entry["temperature"]]
-)
+            [entry["timestamp"]] +
+            [f"{v:.3f}" for v in entry["pressure"]] +
+            [f"{(4*v)+5:.2f}" for v in entry["pressure"]] +
+            [f"{v:.3f}" for v in entry["temperature"]] +
+            [f"{(8*v)+10:.2f}" for v in entry["temperature"]]
+        )
 
     output.seek(0)
 
@@ -224,4 +353,4 @@ def download_csv():
 # ---------------- RUN ----------------
 if __name__ == "__main__":
     webbrowser.open("http://127.0.0.1:5000")
-    app.run(debug=False)
+    app.run(debug=False, threaded=True, use_reloader=False)
