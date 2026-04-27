@@ -725,8 +725,6 @@ window.onload = function () {
                 },
 
                 // 🔥 IMPORTANT: match tight range like your image
-                min: 5,
-                max: 25,
                 ticks: {
                     stepSize: 2,
                     callback: val => val + " psi"
@@ -776,8 +774,6 @@ window.onload = function () {
                 },
 
                 // 🔥 FIXED RANGE (same style as pressure)
-                min: 10,      // adjust based on your real temp range
-                max: 50,      // adjust accordingly
 
                 ticks: {
                     stepSize: 5,
@@ -886,6 +882,9 @@ async function fetchData() {
             sensorChart.data.datasets.forEach(ds => ds.data.shift());
             temperatureChart.data.datasets.forEach(ds => ds.data.shift());
         }
+
+        autoScaleYAxis(sensorChart);
+        autoScaleYAxis(temperatureChart);
 
         sensorChart.update('none');
         temperatureChart.update('none');
@@ -1010,6 +1009,34 @@ function exportCSV() {
 // ---------------- SAMPLING CONTROL ----------------
 function applySamplingRate() {
     // no interval logic needed anymore
+}
+
+function autoScaleYAxis(chart) {
+    let allValues = [];
+
+    chart.data.datasets.forEach(ds => {
+        ds.data.forEach(v => {
+            if (v !== null && !isNaN(v)) {
+                allValues.push(v);
+            }
+        });
+    });
+
+    if (allValues.length === 0) return;
+
+    let min = Math.min(...allValues);
+    let max = Math.max(...allValues);
+
+    // 🔥 FIX: prevent flat-line collapse
+    if (min === max) {
+        min -= 0.1;
+        max += 0.1;
+    }
+
+    let padding = (max - min) * 0.2; // zoom tightness
+
+    chart.options.scales.y.min = min - padding;
+    chart.options.scales.y.max = max + padding;
 }
 
 // ---------------- HELPER FUNCTIONS ----------------
