@@ -197,8 +197,9 @@ def read_serial():
 
                 timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
 
-                global sample_counter
+                global sample_counter, new_sample_ready
                 sample_counter += 1
+                new_sample_ready = True
 
                 with data_lock:
                     data_log.append({
@@ -268,9 +269,12 @@ def calculate_psi(voltage):
 
 @app.route('/data')
 def get_data():
-    global last_values, last_update_time, frozen_values
+    global last_values, last_update_time, frozen_values, new_sample_ready
+
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-    global frozen_values
+
+    sample_created = new_sample_ready
+    new_sample_ready = False
 
     if ser is None or not ser.is_open:
         return jsonify({"status": "disconnected"})
@@ -318,12 +322,13 @@ def get_data():
     with data_lock:
         current_sample_id = sample_counter if len(data_log) > 0 else -1
 
-    response = {
+        response = {
         "status": "live",
         "pressure": "LIVE",
         "temperature": "LIVE",
         "timestamp": timestamp,
-        "sample_id": current_sample_id
+        "sample_id": current_sample_id,
+        "new_sample": sample_created
     }
 
     for i in range(5):
