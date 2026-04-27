@@ -886,12 +886,7 @@ async function startDevice() {
         })
     });
 
-    const statusRes = await fetch(`${BASE_URL}/data`);
-    const statusData = await statusRes.json();
-
-    if (statusData.sample_id !== undefined) {
-        lastPlottedSampleId = statusData.sample_id;
-    }
+    lastPlottedSampleId = -1;
 
     setActiveButton("startBtn");
 }
