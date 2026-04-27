@@ -529,23 +529,23 @@ input[type="checkbox"] {
 
     <!-- SENSOR ROWS -->
 <div class="sensor-label">Sensor 1</div>
-<input type="number" class="btn-box" id="p1_volt" oninput="updatePressure(1)">
+<input type="text" readonly class="btn-box" id="p1_volt" oninput="updatePressure(1)">
 <div class="btn-box" id="p1_psi"></div>
 
 <div class="sensor-label">Sensor 2</div>
-<input type="number" class="btn-box" id="p2_volt" oninput="updatePressure(2)">
+<input type="text" readonly class="btn-box" id="p2_volt" oninput="updatePressure(2)">
 <div class="btn-box" id="p2_psi"></div>
 
 <div class="sensor-label">Sensor 3</div>
-<input type="number" class="btn-box" id="p3_volt" oninput="updatePressure(3)">
+<input type="text" readonly class="btn-box" id="p3_volt" oninput="updatePressure(3)">
 <div class="btn-box" id="p3_psi"></div>
 
 <div class="sensor-label">Sensor 4</div>
-<input type="number" class="btn-box" id="p4_volt" oninput="updatePressure(4)">
+<input type="text" readonly class="btn-box" id="p4_volt" oninput="updatePressure(4)">
 <div class="btn-box" id="p4_psi"></div>
 
 <div class="sensor-label">Sensor 5</div>
-<input type="number" class="btn-box" id="p5_volt" oninput="updatePressure(5)">
+<input type="text" readonly class="btn-box" id="p5_volt" oninput="updatePressure(5)">
 <div class="btn-box" id="p5_psi"></div>
 
 </div>
@@ -569,23 +569,23 @@ input[type="checkbox"] {
 
     <!-- SENSOR ROWS -->
     <div class="sensor-label">Sensor 1</div>
-<input type="number" class="btn-box" id="t1_volt" oninput="updateTemperature(1)">
+<input type="text" readonly class="btn-box" id="t1_volt" oninput="updateTemperature(1)">
 <div class="btn-box" id="t1_temp"></div>
 
 <div class="sensor-label">Sensor 2</div>
-<input type="number" class="btn-box" id="t2_volt" oninput="updateTemperature(2)">
+<input type="text" readonly class="btn-box" id="t2_volt" oninput="updateTemperature(2)">
 <div class="btn-box" id="t2_temp"></div>
 
 <div class="sensor-label">Sensor 3</div>
-<input type="number" class="btn-box" id="t3_volt" oninput="updateTemperature(3)">
+<input type="text" readonly class="btn-box" id="t3_volt" oninput="updateTemperature(3)">
 <div class="btn-box" id="t3_temp"></div>
 
 <div class="sensor-label">Sensor 4</div>
-<input type="number" class="btn-box" id="t4_volt" oninput="updateTemperature(4)">
+<input type="text" readonly class="btn-box" id="t4_volt" oninput="updateTemperature(4)">
 <div class="btn-box" id="t4_temp"></div>
 
 <div class="sensor-label">Sensor 5</div>
-<input type="number" class="btn-box" id="t5_volt" oninput="updateTemperature(5)">
+<input type="text" readonly class="btn-box" id="t5_volt" oninput="updateTemperature(5)">
 <div class="btn-box" id="t5_temp"></div>
 
 </div>
@@ -867,8 +867,6 @@ function updateTemperature(sensor) {
 async function startDevice() {
     isRunning = true;
 
-    lastPlottedSampleId = -1;
-
     const rate = samplingRateSec;
 
     await fetch(`${BASE_URL}/start`, {
@@ -879,7 +877,13 @@ async function startDevice() {
         })
     });
 
-    applySamplingRate();
+    const statusRes = await fetch(`${BASE_URL}/data`);
+    const statusData = await statusRes.json();
+
+    if (statusData.sample_id !== undefined) {
+        lastPlottedSampleId = statusData.sample_id;
+    }
+
     setActiveButton("startBtn");
 }
 
@@ -896,14 +900,18 @@ async function stopDevice() {
     setActiveButton("stopBtn");
 }
 
-function resetDevice() {
-    isRunning = false;
+async function resetDevice() {
+    await fetch(`${BASE_URL}/reset`, { method: "POST" });
 
-    // reset UI text
+    isRunning = false;
+    lastPlottedSampleId = -1;
+
     document.getElementById("pressure").innerText = "RESET";
     document.getElementById("temperature").innerText = "RESET";
 
-    // clear charts completely
+    document.getElementById("pressure").style.color = "red";
+    document.getElementById("temperature").style.color = "red";
+
     sensorChart.data.labels = [];
     temperatureChart.data.labels = [];
 
@@ -913,7 +921,6 @@ function resetDevice() {
     sensorChart.update();
     temperatureChart.update();
 
-    // clear input + output boxes
     for (let i = 1; i <= 5; i++) {
         document.getElementById(`p${i}_volt`).value = "";
         document.getElementById(`p${i}_psi`).innerText = "";
@@ -921,7 +928,7 @@ function resetDevice() {
         document.getElementById(`t${i}_volt`).value = "";
         document.getElementById(`t${i}_temp`).innerText = "";
     }
-    // ✅ set active AFTER loop
+
     setActiveButton("resetBtn");
 }
 
