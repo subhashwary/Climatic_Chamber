@@ -655,6 +655,8 @@ const BASE_URL = "http://127.0.0.1:5000";
 let sensorChart;
 let temperatureChart;
 
+let displayCounter = 0;
+
 let isRunning = false;
 
 let samplingRateSec = 1;
@@ -857,7 +859,8 @@ async function fetchData() {
 
         lastPlottedSampleId = data.sample_id;
 
-        let label = data.sample_id;
+        displayCounter++;
+        let label = displayCounter;
 
         sensorChart.data.labels.push(label);
         temperatureChart.data.labels.push(label);
@@ -974,6 +977,8 @@ async function resetDevice() {
 
     isRunning = false;
     lastPlottedSampleId = -1;
+
+    displayCounter = 0;
 
     document.getElementById("pressure").innerText = "RESET";
     document.getElementById("temperature").innerText = "RESET";
