@@ -795,12 +795,10 @@ async function fetchData() {
             updateTemperature(i);
         }
 
-        // -------- ONLY PLOT + REDRAW WHEN BACKEND LOGS NEW SAMPLE --------
-    if (isRunning && data.sample_id !== undefined && data.sample_id !== lastPlottedSampleId) {
+        // -------- REALTIME FLOWING GRAPH ENGINE --------
+    if (isRunning) {
 
-        lastPlottedSampleId = data.sample_id;
-
-        let label = data.sample_id;
+        let label = sensorChart.data.labels.length + 1;
 
         sensorChart.data.labels.push(label);
         temperatureChart.data.labels.push(label);
@@ -810,14 +808,22 @@ async function fetchData() {
             let psi = parseFloat(data[`p${i}_psi`]);
             if (isNaN(psi)) psi = null;
 
-            let tVolt = parseFloat(data[`t${i}_volt`]);
-            let temp = isNaN(tVolt) ? null : (8 * tVolt) + 10;
+            let temp = parseFloat(data[`t${i}_temp`]);
+            if (isNaN(temp)) temp = null;
 
             sensorChart.data.datasets[i - 1].data.push(psi);
             temperatureChart.data.datasets[i - 1].data.push(temp);
         }
 
-        // redraw ONLY when new sample comes
+        // keep only last 100 points for smooth scrolling
+        if (sensorChart.data.labels.length > 100) {
+            sensorChart.data.labels.shift();
+            temperatureChart.data.labels.shift();
+
+            sensorChart.data.datasets.forEach(ds => ds.data.shift());
+            temperatureChart.data.datasets.forEach(ds => ds.data.shift());
+        }
+
         sensorChart.update('none');
         temperatureChart.update('none');
     }
