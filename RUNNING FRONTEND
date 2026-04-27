@@ -683,7 +683,7 @@ window.onload = function () {
             responsive: true,
             animation: false,
             scales: {
-                x: { title: { display: true, text: "Time (HH:MM:SS)" } },
+                x: { title: { display: true, text: "Sample Number" } },
                 y: { title: { display: true, text: "Pressure (Psi)" } }
             }
         }
@@ -707,7 +707,7 @@ window.onload = function () {
             responsive: true,
             animation: false,
             scales: {
-                x: { title: { display: true, text: "Time (HH:MM:SS)" } },
+                x: { title: { display: true, text: "Sample Number" } },
                 y: { title: { display: true, text: "Temperature (°C)" } }
             }
         }
@@ -789,12 +789,13 @@ async function fetchData() {
         // -------- ONLY PLOT WHEN BACKEND LOGS NEW SAMPLE --------
         if (isRunning && data.sample_id !== undefined && data.sample_id !== lastPlottedSampleId) {
 
-            lastPlottedSampleId = data.sample_id;
+        lastPlottedSampleId = data.sample_id;
 
-            let label = data.timestamp;
+        // UI graph label = sample number only
+        let label = data.sample_id;
 
-            sensorChart.data.labels.push(label);
-            temperatureChart.data.labels.push(label);
+        sensorChart.data.labels.push(label);
+        temperatureChart.data.labels.push(label);
 
             for (let i = 1; i <= 5; i++) {
 
