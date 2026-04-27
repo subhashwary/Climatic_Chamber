@@ -660,10 +660,7 @@ let isRunning = false;
 let samplingRateSec = 1;
 let dataInterval = null;
 
-// 🔴 FREEZE DETECTION
-let lastValues = [null, null, null, null, null];
-let freezeCount = [0, 0, 0, 0, 0];
-const FREEZE_LIMIT = 5;
+let lastPlottedSampleId = -1;
 
 // ---------------- CHART SETUP ----------------
 window.onload = function () {
@@ -675,11 +672,11 @@ window.onload = function () {
         data: {
             labels: [],
             datasets: [
-                { label: 'Sensor 1', borderColor: 'red', data: [], fill: false },
-                { label: 'Sensor 2', borderColor: 'blue', data: [], fill: false },
-                { label: 'Sensor 3', borderColor: 'green', data: [], fill: false },
-                { label: 'Sensor 4', borderColor: 'orange', data: [], fill: false },
-                { label: 'Sensor 5', borderColor: 'purple', data: [], fill: false }
+                { label: 'Sensor 1', borderColor: 'red', data: [], fill: false, borderDash: [] },
+                { label: 'Sensor 2', borderColor: 'blue', data: [], fill: false, borderDash: [] },
+                { label: 'Sensor 3', borderColor: 'green', data: [], fill: false, borderDash: [] },
+                { label: 'Sensor 4', borderColor: 'orange', data: [], fill: false, borderDash: [] },
+                { label: 'Sensor 5', borderColor: 'purple', data: [], fill: false, borderDash: [] }
             ]
         },
         options: {
@@ -699,11 +696,11 @@ window.onload = function () {
         data: {
             labels: [],
             datasets: [
-                { label: 'Sensor 1', borderColor: 'red', data: [], fill: false },
-                { label: 'Sensor 2', borderColor: 'blue', data: [], fill: false },
-                { label: 'Sensor 3', borderColor: 'green', data: [], fill: false },
-                { label: 'Sensor 4', borderColor: 'orange', data: [], fill: false },
-                { label: 'Sensor 5', borderColor: 'purple', data: [], fill: false }
+                { label: 'Sensor 1', borderColor: 'red', data: [], fill: false, borderDash: [] },
+                { label: 'Sensor 2', borderColor: 'blue', data: [], fill: false, borderDash: [] },
+                { label: 'Sensor 3', borderColor: 'green', data: [], fill: false, borderDash: [] },
+                { label: 'Sensor 4', borderColor: 'orange', data: [], fill: false, borderDash: [] },
+                { label: 'Sensor 5', borderColor: 'purple', data: [], fill: false, borderDash: [] }
             ]
         },
         options: {
@@ -764,12 +761,6 @@ async function fetchData() {
             document.getElementById("temperature").style.color = "#1f2d3a";
         }
 
-        let now = new Date();
-        let label = now.toLocaleTimeString();
-
-        sensorChart.data.labels.push(label);
-        temperatureChart.data.labels.push(label);
-
         for (let i = 1; i <= 5; i++) {
 
             // -------- UI UPDATE --------
@@ -784,34 +775,39 @@ async function fetchData() {
 
             updatePressure(i);
             updateTemperature(i);
+        }
 
-            // -------- CALCULATIONS --------
-            let psi = parseFloat(data[`p${i}_psi`]);
-            if (isNaN(psi)) psi = null;
+        // -------- ONLY PLOT WHEN BACKEND LOGS NEW SAMPLE --------
+        if (data.sample_id !== undefined && data.sample_id !== lastPlottedSampleId) {
 
-            let temp = parseFloat(tVolt);
-            temp = isNaN(temp) ? null : (8 * temp) + 10;
+            lastPlottedSampleId = data.sample_id;
 
-            // -------- GRAPH UPDATE --------
-            sensorChart.data.datasets[i - 1].data.push(psi);
-            temperatureChart.data.datasets[i - 1].data.push(temp);
+            let label = data.timestamp;
 
-            // -------- FREEZE DETECTION --------
-            if (psi !== null) {
-                if (psi === lastValues[i - 1]) {
-                    freezeCount[i - 1]++;
-                } else {
-                    freezeCount[i - 1] = 0;
-                }
+            sensorChart.data.labels.push(label);
+            temperatureChart.data.labels.push(label);
 
-                lastValues[i - 1] = psi;
+            for (let i = 1; i <= 5; i++) {
 
-                if (freezeCount[i - 1] > FREEZE_LIMIT) {
-                    sensorChart.data.datasets[i - 1].borderDash = [5, 5];
-                } else {
-                    sensorChart.data.datasets[i - 1].borderDash = [];
-                }
+                let psi = parseFloat(data[`p${i}_psi`]);
+                if (isNaN(psi)) psi = null;
+
+                let tVolt = parseFloat(data[`t${i}_volt`]);
+                let temp = isNaN(tVolt) ? null : (8 * tVolt) + 10;
+
+                sensorChart.data.datasets[i - 1].data.push(psi);
+                temperatureChart.data.datasets[i - 1].data.push(temp);
             }
+        }
+
+        // -------- LIMIT DATA --------
+        if (sensorChart.data.labels.length > 100) {
+
+            sensorChart.data.labels.shift();
+            temperatureChart.data.labels.shift();
+
+            sensorChart.data.datasets.forEach(ds => ds.data.shift());
+            temperatureChart.data.datasets.forEach(ds => ds.data.shift());
         }
 
         sensorChart.update();
@@ -870,20 +866,24 @@ function updateTemperature(sensor) {
 // ---------------- CONTROL ----------------
 async function startDevice() {
     isRunning = true;
-    await fetch(`${BASE_URL}/start`, { method: "POST" });
 
-    document.getElementById("pressure").innerText = "STARTED";
-    document.getElementById("temperature").innerText = "STARTED";
+    lastPlottedSampleId = -1;
+
+    const rate = samplingRateSec;
+
+    await fetch(`${BASE_URL}/start`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            sampling_rate: rate
+        })
+    });
 
     applySamplingRate();
     setActiveButton("startBtn");
 }
 
 async function stopDevice() {
-    if (dataInterval) {
-    clearInterval(dataInterval);
-    dataInterval = null;
-}
     await fetch(`${BASE_URL}/stop`, { method: "POST" });
 
     document.getElementById("pressure").innerText = "STOPPED";
@@ -897,12 +897,6 @@ async function stopDevice() {
 }
 
 function resetDevice() {
-
-    // stop fetching
-    if (dataInterval) {
-    clearInterval(dataInterval);
-    dataInterval = null;
-}
     isRunning = false;
 
     // reset UI text
@@ -919,10 +913,6 @@ function resetDevice() {
     sensorChart.update();
     temperatureChart.update();
 
-    // reset freeze detection
-    lastValues = [null, null, null, null, null];
-    freezeCount = [0, 0, 0, 0, 0];
-
     // clear input + output boxes
     for (let i = 1; i <= 5; i++) {
         document.getElementById(`p${i}_volt`).value = "";
@@ -937,40 +927,12 @@ function resetDevice() {
 
 // ---------------- EXPORT ----------------
 function exportCSV() {
-    let csv = "Time,Sensor1,Sensor2,Sensor3,Sensor4,Sensor5\n";
-
-    let labels = sensorChart.data.labels;
-    let datasets = sensorChart.data.datasets;
-
-    for (let i = 0; i < labels.length; i++) {
-        let row = [labels[i]];
-        datasets.forEach(ds => row.push(ds.data[i] ?? ""));
-        csv += row.join(",") + "\n";
-    }
-
-    let blob = new Blob([csv], { type: "text/csv" });
-    let url = URL.createObjectURL(blob);
-
-    let a = document.createElement("a");
-    a.href = url;
-    a.download = "sensor_data.csv";
-    a.click();
-
-    URL.revokeObjectURL(url);
+    window.location.href = `${BASE_URL}/download_csv`;
 }
 
 // ---------------- SAMPLING CONTROL ----------------
 function applySamplingRate() {
-
-    // stop existing loop
-    if (dataInterval) {
-        clearInterval(dataInterval);
-    }
-
-    // restart only if system is running
-    if (isRunning) {
-        dataInterval = setInterval(fetchData, samplingRateSec * 1000);
-    }
+    // no interval logic needed anymore
 }
 
 // ---------------- HELPER FUNCTIONS ----------------
@@ -1015,8 +977,7 @@ async function connectDevice() {
             document.getElementById("pressure").style.color = "green";
             document.getElementById("temperature").style.color = "green";
 
-            isRunning = true;
-            applySamplingRate();
+            isRunning = false;
         } else {
             alert("❌ " + data.message);
         }
@@ -1025,6 +986,8 @@ async function connectDevice() {
         alert("Backend not reachable ❌");
     }
 }
+
+setInterval(fetchData, 500);
 
 // ---------------- AUTO FETCH ----------------
 
