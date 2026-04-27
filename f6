@@ -769,11 +769,22 @@ window.onload = function () {
                 title: { display: true, text: "Sample Number" }
             },
             y: {
-                y: {
-                    title: { display: true, text: "Temperature (°C)" },
-                min: 9.02,
-                max: 9.16,
-                ticks: { stepSize: 0.02 }
+                title: {
+                    display: true,
+                    text: "Temperature (°C)"
+                },
+
+                // 🔥 FIXED RANGE (same style as pressure)
+                min: 10,      // adjust based on your real temp range
+                max: 50,      // adjust accordingly
+
+                ticks: {
+                    stepSize: 2   // smooth readable steps
+                },
+
+                grid: {
+                    display: true
+                }
             }
         }
     }
