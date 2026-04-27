@@ -611,11 +611,11 @@ input[type="checkbox"] {
     <div style="display:flex; gap:12px; align-items:center;">
         <label style="font-weight:600;">Sensors:</label>
 
-        <label><input type="checkbox" checked onchange="toggleSensor(0)"> S1</label>
-        <label><input type="checkbox" checked onchange="toggleSensor(1)"> S2</label>
-        <label><input type="checkbox" checked onchange="toggleSensor(2)"> S3</label>
-        <label><input type="checkbox" checked onchange="toggleSensor(3)"> S4</label>
-        <label><input type="checkbox" checked onchange="toggleSensor(4)"> S5</label>
+        <label><input type="checkbox" checked onchange="toggleSensor(0, event)"> S1</label>
+        <label><input type="checkbox" checked onchange="toggleSensor(1, event)"> S2</label>
+        <label><input type="checkbox" checked onchange="toggleSensor(2, event)"> S3</label>
+        <label><input type="checkbox" checked onchange="toggleSensor(3, event)"> S4</label>
+        <label><input type="checkbox" checked onchange="toggleSensor(4, event)"> S5</label>
     </div>
 
     <!-- RIGHT: SAMPLING RATE (UNCHANGED FUNCTIONALITY) -->
@@ -680,56 +680,104 @@ window.onload = function () {
             ]
         },
         options: {
-            responsive: true,
-            animation: false,
-            normalized: true,
-            parsing: false,
-            plugins: {
-                decimation: {
-                    enabled: true,
-                    algorithm: 'lttb',
-                    samples: 500
+        responsive: true,
+        animation: false,
+
+        elements: {
+            line: {
+                tension: 0.2,   // 🔥 smooth curves like your image
+                borderWidth: 2
+            },
+            point: {
+                radius: 4,      // 🔥 visible points
+                hoverRadius: 6
+            }
+        },
+
+        plugins: {
+            legend: {
+                position: 'top'
+            },
+            decimation: {
+                enabled: true,
+                algorithm: 'lttb',
+                samples: 500
+            }
+        },
+
+        scales: {
+            x: {
+                title: {
+                    display: true,
+                    text: "Sample Number"
+                },
+                grid: {
+                    display: true
                 }
             },
-            scales: {
-                x: { title: { display: true, text: "Sample Number" } },
-                y: { title: { display: true, text: "Pressure (Psi)" } }
+            y: {
+                title: {
+                    display: true,
+                    text: "Pressure (Psi)"
+                },
+                grid: {
+                    display: true
+                },
+
+                // 🔥 IMPORTANT: match tight range like your image
+                min: 9.02,
+                max: 9.16,
+                ticks: {
+                    stepSize: 0.02
+                }
             }
         }
+    }
     });
 
     // TEMPERATURE CHART
     const tctx = document.getElementById('temperatureChart').getContext('2d');
     temperatureChart = new Chart(tctx, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [
-                { label: 'Sensor 1', borderColor: 'red', data: [], fill: false, borderDash: [] },
-                { label: 'Sensor 2', borderColor: 'blue', data: [], fill: false, borderDash: [] },
-                { label: 'Sensor 3', borderColor: 'green', data: [], fill: false, borderDash: [] },
-                { label: 'Sensor 4', borderColor: 'orange', data: [], fill: false, borderDash: [] },
-                { label: 'Sensor 5', borderColor: 'purple', data: [], fill: false, borderDash: [] }
-            ]
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [
+            { label: 'Sensor 1', borderColor: 'red', data: [], fill: false },
+            { label: 'Sensor 2', borderColor: 'blue', data: [], fill: false },
+            { label: 'Sensor 3', borderColor: 'green', data: [], fill: false },
+            { label: 'Sensor 4', borderColor: 'orange', data: [], fill: false },
+            { label: 'Sensor 5', borderColor: 'purple', data: [], fill: false }
+        ]
+    },
+    options: {
+        responsive: true,
+        animation: false,
+        elements: {
+            line: { tension: 0.2, borderWidth: 2 },
+            point: { radius: 4, hoverRadius: 6 }
         },
-        options: {
-            responsive: true,
-            animation: false,
-            normalized: true,
-            parsing: false,
-            plugins: {
-                decimation: {
-                    enabled: true,
-                    algorithm: 'lttb',
-                    samples: 500
-                }
+        plugins: {
+            legend: { position: 'top' },
+            decimation: {
+                enabled: true,
+                algorithm: 'lttb',
+                samples: 500
+            }
+        },
+        scales: {
+            x: {
+                title: { display: true, text: "Sample Number" }
             },
-            scales: {
-                x: { title: { display: true, text: "Sample Number" } },
-                y: { title: { display: true, text: "Temperature (°C)" } }
+            y: {
+                y: {
+                    title: { display: true, text: "Temperature (°C)" },
+                min: 9.02,
+                max: 9.16,
+                ticks: { stepSize: 0.02 }
             }
         }
-    });
+    }
+});  // ✅ REQUIRED
     
     applySamplingRate();
 };
@@ -842,13 +890,10 @@ async function fetchData() {
 }
 }
 
-function toggleSensor(index) {
+function toggleSensor(index, event) {
     const checked = event.target.checked;
 
-    // Pressure chart
     sensorChart.data.datasets[index].hidden = !checked;
-
-    // Temperature chart
     temperatureChart.data.datasets[index].hidden = !checked;
 
     sensorChart.update();
