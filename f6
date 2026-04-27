@@ -672,11 +672,11 @@ window.onload = function () {
         data: {
             labels: [],
             datasets: [
-                { label: 'Sensor 1', borderColor: 'red', data: [], fill: false, borderDash: [] },
-                { label: 'Sensor 2', borderColor: 'blue', data: [], fill: false, borderDash: [] },
-                { label: 'Sensor 3', borderColor: 'green', data: [], fill: false, borderDash: [] },
-                { label: 'Sensor 4', borderColor: 'orange', data: [], fill: false, borderDash: [] },
-                { label: 'Sensor 5', borderColor: 'purple', data: [], fill: false, borderDash: [] }
+                { label: 'Sensor 1', borderColor: '#e41a1c', data: [], fill: false },
+                { label: 'Sensor 2', borderColor: '#377eb8', data: [], fill: false },
+                { label: 'Sensor 3', borderColor: '#4daf4a', data: [], fill: false },
+                { label: 'Sensor 4', borderColor: '#ff7f00', data: [], fill: false },
+                { label: 'Sensor 5', borderColor: '#984ea3', data: [], fill: false }
             ]
         },
         options: {
@@ -685,12 +685,12 @@ window.onload = function () {
 
         elements: {
             line: {
-                tension: 0.2,   // 🔥 smooth curves like your image
-                borderWidth: 2
+                tension: 0.2,
+                borderWidth: 3   // thicker lines
             },
             point: {
-                radius: 4,      // 🔥 visible points
-                hoverRadius: 6
+                radius: 5,       // bigger dots
+                hoverRadius: 7
             }
         },
 
@@ -725,10 +725,11 @@ window.onload = function () {
                 },
 
                 // 🔥 IMPORTANT: match tight range like your image
-                min: 9.02,
-                max: 9.16,
+                min: 5,
+                max: 25,
                 ticks: {
-                    stepSize: 0.02
+                    stepSize: 2,
+                    callback: val => val + " psi"
                 }
             }
         }
@@ -742,19 +743,19 @@ window.onload = function () {
     data: {
         labels: [],
         datasets: [
-            { label: 'Sensor 1', borderColor: 'red', data: [], fill: false },
-            { label: 'Sensor 2', borderColor: 'blue', data: [], fill: false },
-            { label: 'Sensor 3', borderColor: 'green', data: [], fill: false },
-            { label: 'Sensor 4', borderColor: 'orange', data: [], fill: false },
-            { label: 'Sensor 5', borderColor: 'purple', data: [], fill: false }
+            { label: 'Sensor 1', borderColor: '#e41a1c', data: [], fill: false },
+            { label: 'Sensor 2', borderColor: '#377eb8', data: [], fill: false },
+            { label: 'Sensor 3', borderColor: '#4daf4a', data: [], fill: false },
+            { label: 'Sensor 4', borderColor: '#ff7f00', data: [], fill: false },
+            { label: 'Sensor 5', borderColor: '#984ea3', data: [], fill: false }
         ]
     },
     options: {
         responsive: true,
         animation: false,
         elements: {
-            line: { tension: 0.2, borderWidth: 2 },
-            point: { radius: 4, hoverRadius: 6 }
+            line: { tension: 0.2, borderWidth: 3 },
+            point: { radius: 5, hoverRadius: 7 }
         },
         plugins: {
             legend: { position: 'top' },
@@ -779,7 +780,8 @@ window.onload = function () {
                 max: 50,      // adjust accordingly
 
                 ticks: {
-                    stepSize: 2   // smooth readable steps
+                    stepSize: 5,
+                    callback: val => val + "°C"  // smooth readable steps
                 },
 
                 grid: {
