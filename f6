@@ -795,10 +795,12 @@ async function fetchData() {
             updateTemperature(i);
         }
 
-        // -------- REALTIME FLOWING GRAPH ENGINE --------
-    if (isRunning) {
+        // -------- SAMPLE-SYNC GRAPH ENGINE (CSV = GRAPH) --------
+        if (isRunning && data.new_sample === true && data.sample_id !== -1) {
 
-        let label = sensorChart.data.labels.length + 1;
+        lastPlottedSampleId = data.sample_id;
+
+        let label = data.sample_id;
 
         sensorChart.data.labels.push(label);
         temperatureChart.data.labels.push(label);
@@ -815,7 +817,7 @@ async function fetchData() {
             temperatureChart.data.datasets[i - 1].data.push(temp);
         }
 
-        // keep only last 100 points for smooth scrolling
+        // keep chart memory bounded
         if (sensorChart.data.labels.length > 100) {
             sensorChart.data.labels.shift();
             temperatureChart.data.labels.shift();
