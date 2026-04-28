@@ -6,6 +6,7 @@ import time
 import threading
 import csv
 import io
+from flask import send_file
 
 serial_lock = threading.Lock()
 data_lock = threading.Lock()
@@ -98,9 +99,15 @@ def start():
     frozen_values = None
     last_log_time = 0
 
+    # 🔥 CLOSE OLD FILE IF EXISTS
+    if csv_file:
+        try:
+            csv_file.close()
+        except:
+            pass
+
     # 🔥 CREATE NEW CSV FILE HERE
     filename = time.strftime("sensor_log_%Y%m%d_%H%M%S.csv")
-
     csv_file = open(filename, mode='w', newline='')
     csv_writer = csv.writer(csv_file)
 
@@ -204,7 +211,7 @@ def read_serial():
         p_values = values[:5]
         t_values = values[5:]
 
-        if not all(0 <= v <= 5 for v in p_values + t_values):
+        if not all(-0.5 <= v <= 5.5 for v in p_values + t_values):
             return
 
         last_values = {
@@ -302,6 +309,14 @@ def auto_reconnect():
 threading.Thread(target=serial_loop, daemon=True).start()
 threading.Thread(target=auto_reconnect, daemon=True).start()
 
+def safe_write(row):
+    global csv_writer, csv_file
+    try:
+        if csv_writer and csv_file:
+            csv_writer.writerow(row)
+    except Exception as e:
+        print("CSV write error:", e)
+
 # ---------------- DATA API ----------------
 def calculate_psi(voltage):
     return (4 * voltage) + 5
@@ -313,8 +328,9 @@ def get_data():
 
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
 
-    sample_created = new_sample_ready
-    new_sample_ready = False
+    with data_lock:
+        sample_created = new_sample_ready
+        new_sample_ready = False
 
     if ser is None or not ser.is_open:
         return jsonify({"status": "disconnected"})
@@ -388,6 +404,11 @@ def get_data():
 
     return jsonify(response)
 
+@app.route('/download_file')
+def download_file():
+    if csv_file and not csv_file.closed:
+        return send_file(csv_file.name, as_attachment=True)
+    return jsonify({"error": "No active file"})
 
 # ---------------- CSV DOWNLOAD ----------------
 @app.route('/download_csv')
