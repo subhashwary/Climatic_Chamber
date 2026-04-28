@@ -6,49 +6,15 @@ import time
 import threading
 import csv
 import io
-import os
-from datetime import datetime
-import logging
-logging.basicConfig(level=logging.INFO)
-
-log_file = None
-current_date = None
-
-def get_log_file():
-    global log_file, current_date
-
-    today = datetime.now().strftime("%Y-%m-%d")
-
-    if current_date != today:
-        current_date = today
-
-        if log_file:
-            log_file.close()
-
-        filename = f"sensor_data_{today}.csv"
-        file_exists = os.path.isfile(filename)
-
-        log_file = open(filename, "a", newline='')
-        writer = csv.writer(log_file)
-
-        if not file_exists:
-            writer.writerow([
-                "Timestamp", "Sample_ID",
-                "P1_Volt","P2_Volt","P3_Volt","P4_Volt","P5_Volt",
-                "P1_Psi","P2_Psi","P3_Psi","P4_Psi","P5_Psi",
-                "T1_Volt","T2_Volt","T3_Volt","T4_Volt","T5_Volt",
-                "T1_C","T2_C","T3_C","T4_C","T5_C"
-            ])
-
-        return writer
-
-    return csv.writer(log_file)
 
 serial_lock = threading.Lock()
 data_lock = threading.Lock()
 
 saved_port = None
 saved_baud = None
+
+csv_file = None
+csv_writer = None
 
 new_sample_ready = False
 
@@ -110,6 +76,9 @@ def connect():
     "pressure": [0.0] * 5,
     "temperature": [0.0] * 5
 }
+    
+        last_update_time = time.time()
+
         return jsonify({"status": "connected"})
 
     except Exception as e:
@@ -120,13 +89,28 @@ def connect():
 @app.route('/start', methods=['POST'])
 def start():
     global is_running, sampling_rate_sec, last_log_time, frozen_values
+    global csv_file, csv_writer
 
     data = request.json
     sampling_rate_sec = int(data.get("sampling_rate", 1))
 
     is_running = True
     frozen_values = None
-    last_log_time = 0   # 🔥 fresh sampling cycle starts immediately
+    last_log_time = 0
+
+    # 🔥 CREATE NEW CSV FILE HERE
+    filename = time.strftime("sensor_log_%Y%m%d_%H%M%S.csv")
+
+    csv_file = open(filename, mode='w', newline='')
+    csv_writer = csv.writer(csv_file)
+
+    csv_writer.writerow([
+        "Timestamp","Sample_ID",
+        "P1_Volt","P2_Volt","P3_Volt","P4_Volt","P5_Volt",
+        "P1_Psi","P2_Psi","P3_Psi","P4_Psi","P5_Psi",
+        "T1_Volt","T2_Volt","T3_Volt","T4_Volt","T5_Volt",
+        "T1_C","T2_C","T3_C","T4_C","T5_C"
+    ])
 
     return jsonify({"status": "started"})
 
@@ -153,6 +137,7 @@ def set_sampling_rate():
 @app.route('/stop', methods=['POST'])
 def stop():
     global is_running, frozen_values, last_values
+    global csv_file
 
     is_running = False
 
@@ -160,6 +145,13 @@ def stop():
         "pressure": last_values["pressure"].copy(),
         "temperature": last_values["temperature"].copy()
     }
+
+    # 🔥 CLOSE FILE SAFELY
+    try:
+        if csv_file:
+            csv_file.close()
+    except:
+        pass
 
     return jsonify({"status": "stopped"})
 
@@ -206,18 +198,13 @@ def read_serial():
         if len(parts) < 10:
             return
 
-        try:
-            values = [float(x) for x in parts[:10]]
-        except ValueError:
-            print("Invalid sensor values:", values)
-            return
+        values = [float(x) for x in parts[:10]]
 
         # split into pressure + temperature
         p_values = values[:5]
         t_values = values[5:]
 
         if not all(0 <= v <= 5 for v in p_values + t_values):
-            print("Invalid sensor values:", values)
             return
 
         last_values = {
@@ -242,36 +229,27 @@ def read_serial():
                 sample_counter += 1
                 new_sample_ready = True
 
-                row = [
-                    timestamp,
-                    sample_counter,
+                row = (
+                    [timestamp, sample_counter] +
+                    [f"{v:.3f}" for v in last_values["pressure"]] +
+                    [f"{(4*v)+5:.2f}" for v in last_values["pressure"]] +
+                    [f"{v:.3f}" for v in last_values["temperature"]] +
+                    [f"{(8*v)+10:.2f}" for v in last_values["temperature"]]
+                )
 
-                    *[f"{v:.3f}" for v in last_values["pressure"]],
-                    *[f"{calculate_psi(v):.2f}" for v in last_values["pressure"]],
+                if csv_writer and csv_file:
+                    csv_writer.writerow(row)
+                    csv_file.flush()
 
-                    *[f"{v:.3f}" for v in last_values["temperature"]],
-                    *[f"{calculate_temp(v):.2f}" for v in last_values["temperature"]]
-                ]
-
-                # ✅ ONLY ONE LOGGING BLOCK
                 with data_lock:
-                    writer = get_log_file()
-                    writer.writerow(row)
+                    data_log.append({
+                        "sample_id": sample_counter,
+                        "timestamp": timestamp,
+                        "pressure": last_values["pressure"].copy(),
+                        "temperature": last_values["temperature"].copy()
+                    })
 
-                    try:
-                        if log_file and not log_file.closed:
-                            log_file.flush()
-
-                            if sample_counter % 10 == 0:
-                                os.fsync(log_file.fileno())
-
-                    except Exception as e:
-                        print("Flush error:", e)
-
-                # optional RAM buffer
-                with data_lock:
-                    data_log.append(row)
-                    if len(data_log) > 1000:
+                    if len(data_log) > 10000:
                         data_log.pop(0)
 
         print("UPDATED:",
@@ -308,22 +286,18 @@ def auto_reconnect():
 
             with serial_lock:
                 if ser is None or not ser.is_open:
-                    try:
-                        ser = serial.Serial(saved_port, saved_baud, timeout=1)
-                        time.sleep(2)
-                        ser.reset_input_buffer()
+                    ser = serial.Serial(saved_port, saved_baud, timeout=1)
+                    time.sleep(2)
+                    ser.reset_input_buffer()
 
-                        last_update_time = time.time()
-                        print("🔁 Auto reconnected")
+                    last_update_time = time.time()   # 🔥 ADD EXACTLY HERE
 
-                    except Exception as e:
-                        print("Reconnect failed:", e)
-                        time.sleep(3)
+                    print("🔁 Auto reconnected to device")
 
-        except Exception as e:
-            # 🔥 CRITICAL: prevent thread death
-            print("Auto-reconnect loop error:", e)
-            time.sleep(3)
+        except:
+            pass
+
+        time.sleep(2)
 
 threading.Thread(target=serial_loop, daemon=True).start()
 threading.Thread(target=auto_reconnect, daemon=True).start()
@@ -332,9 +306,6 @@ threading.Thread(target=auto_reconnect, daemon=True).start()
 def calculate_psi(voltage):
     return (4 * voltage) + 5
 
-def calculate_temp(voltage):
-    return (8 * voltage) + 10
-
 
 @app.route('/data')
 def get_data():
@@ -342,16 +313,15 @@ def get_data():
 
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
 
-    with data_lock:
-        sample_created = new_sample_ready
-        new_sample_ready = False
+    sample_created = new_sample_ready
+    new_sample_ready = False
 
     if ser is None or not ser.is_open:
         return jsonify({"status": "disconnected"})
 
     age = time.time() - last_update_time
 
-    if age > 5:
+    if age > 2:
         return jsonify({
             "status": "no_data",
             "pressure": "NO SIGNAL",
@@ -379,7 +349,7 @@ def get_data():
             psi = calculate_psi(p_v)
 
             t_v = frozen_values["temperature"][i]
-            temp = calculate_temp(t_v)
+            temp = (8 * t_v) + 10
 
             response[f"p{i+1}_volt"] = round(p_v, 3)
             response[f"p{i+1}_psi"] = round(psi, 2)
@@ -411,7 +381,7 @@ def get_data():
 
         # TEMPERATURE
         t_v = last_values["temperature"][i]
-        temp = calculate_temp(t_v)
+        temp = (8 * t_v) + 10   # your chosen mapping
 
         response[f"t{i+1}_volt"] = round(t_v, 3)
         response[f"t{i+1}_temp"] = round(temp, 2)
@@ -420,42 +390,46 @@ def get_data():
 
 
 # ---------------- CSV DOWNLOAD ----------------
-from datetime import datetime
-
 @app.route('/download_csv')
 def download_csv():
-    global current_date
+    output = io.StringIO()
+    writer = csv.writer(output)
 
-    if current_date is None:
-        current_date = datetime.now().strftime("%Y-%m-%d")
+    writer.writerow([
+    "Timestamp",
+    "Sample_ID",
 
-    filename = f"sensor_data_{current_date}.csv"
+    "P1_Volt","P2_Volt","P3_Volt","P4_Volt","P5_Volt",
+    "P1_Psi","P2_Psi","P3_Psi","P4_Psi","P5_Psi",
 
-    if not os.path.isfile(filename):
-        return jsonify({"error": "No data file yet. Start acquisition first."})
+    "T1_Volt","T2_Volt","T3_Volt","T4_Volt","T5_Volt",
+    "T1_DegreeC","T2_DegreeC","T3_DegreeC","T4_DegreeC","T5_DegreeC"
+])
 
-    return send_from_directory('.', filename, as_attachment=True)
+    with data_lock:
+        log_copy = data_log.copy()
+
+    for entry in log_copy:
+        temps = entry["temperature"]
+        
+        writer.writerow(
+            [entry["timestamp"], entry["sample_id"]] +
+            [f"{v:.3f}" for v in entry["pressure"]] +
+            [f"{(4*v)+5:.2f}" for v in entry["pressure"]] +
+            [f"{v:.3f}" for v in entry["temperature"]] +
+            [f"{(8*v)+10:.2f}" for v in entry["temperature"]]
+        )
+
+    output.seek(0)
+
+    return Response(
+        output,
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment;filename=sensor_data.csv"}
+    )
+
 
 # ---------------- RUN ----------------
 if __name__ == "__main__":
     webbrowser.open("http://127.0.0.1:5000")
     app.run(debug=False, threaded=True, use_reloader=False)
-
-import atexit
-
-def close_log_file():
-    global log_file, ser
-
-    try:
-        if log_file and not log_file.closed:
-            log_file.close()
-    except:
-        pass
-
-    try:
-        if ser and ser.is_open:
-            ser.close()
-    except:
-        pass
-
-atexit.register(close_log_file)
