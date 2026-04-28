@@ -256,8 +256,10 @@ def read_serial():
                         "temperature": last_values["temperature"].copy()
                     })
 
-                    if len(data_log) > 10000:
-                        data_log.pop(0)
+                    MAX_LOG = 20000
+
+                    if len(data_log) > MAX_LOG:
+                        data_log = data_log[-MAX_LOG:]
 
         print("UPDATED:",
               "P:", last_values["pressure"],
