@@ -234,7 +234,7 @@ def read_serial():
 
                 global sample_counter, new_sample_ready
                 sample_counter += 1
-                new_sample_ready = True
+                last_sample_id = sample_counter
 
                 row = (
                     [timestamp, sample_counter] +
@@ -323,7 +323,6 @@ def safe_write(row):
 def calculate_psi(voltage):
     return (4 * voltage) + 5
 
-
 @app.route('/data')
 def get_data():
     global last_values, last_update_time, frozen_values, new_sample_ready
@@ -332,7 +331,6 @@ def get_data():
 
     with data_lock:
         sample_created = new_sample_ready
-        new_sample_ready = False
 
     if ser is None or not ser.is_open:
         return jsonify({"status": "disconnected"})
@@ -403,6 +401,8 @@ def get_data():
 
         response[f"t{i+1}_volt"] = round(t_v, 3)
         response[f"t{i+1}_temp"] = round(temp, 2)
+
+    new_sample_ready = False
 
     return jsonify(response)
 
