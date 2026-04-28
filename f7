@@ -662,6 +662,9 @@ let isRunning = false;
 let samplingRateSec = 1;
 let dataInterval = null;
 
+let fetchInterval = null;
+let lastSampleId = -1;
+
 let lastPlottedSampleId = -1;
 
 // ---------------- CHART SETUP ----------------
@@ -791,6 +794,7 @@ window.onload = function () {
 });  // ✅ REQUIRED
     
     applySamplingRate();
+    restartFetchLoop();
 };
 
 // ---------------- FETCH DATA ----------------
@@ -878,7 +882,9 @@ async function fetchData() {
         }
 
         // keep chart memory bounded
-        if (sensorChart.data.labels.length > 100) {
+        const MAX_POINTS = 10800; // 3 hours @ 1 sec
+
+        if (sensorChart.data.labels.length > MAX_POINTS) {
             sensorChart.data.labels.shift();
             temperatureChart.data.labels.shift();
 
@@ -1044,6 +1050,12 @@ function autoScaleYAxis(chart) {
     chart.options.scales.y.max = max + padding;
 }
 
+function restartFetchLoop() {
+    if (fetchInterval) clearInterval(fetchInterval);
+
+    fetchInterval = setInterval(fetchData, samplingRateSec * 1000);
+}
+
 // ---------------- HELPER FUNCTIONS ----------------
 function setActiveButton(activeId) {
     const buttons = ["startBtn", "stopBtn", "resetBtn"];
@@ -1071,6 +1083,8 @@ async function changeSamplingRate() {
 
         if (data.status === "ok") {
             console.log("Sampling changed to", data.sampling_rate, "sec");
+
+            restartFetchLoop();
         } else {
             alert("Sampling rate update failed");
         }
@@ -1115,8 +1129,6 @@ async function connectDevice() {
         alert("Backend not reachable ❌");
     }
 }
-
-setInterval(fetchData, 1000);
 
 // ---------------- AUTO FETCH ----------------
 
