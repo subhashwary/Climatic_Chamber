@@ -859,7 +859,7 @@ async function fetchData() {
         }
 
         // -------- SAMPLE-SYNC GRAPH ENGINE (CSV = GRAPH) --------
-        if (isRunning && data.new_sample === true && data.sample_id !== -1) {
+        if (isRunning && data.sample_id !== -1) {
 
         lastPlottedSampleId = data.sample_id;
 
@@ -961,6 +961,8 @@ async function startDevice() {
     });
 
     lastPlottedSampleId = -1;
+
+    await fetchData();   // 🔥 immediate first sync
 
     setActiveButton("startBtn");
 }
