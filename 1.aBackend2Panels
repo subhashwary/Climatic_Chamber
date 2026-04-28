@@ -7,11 +7,21 @@ import threading
 import csv
 import io
 
+serial_lock = threading.Lock()
+data_lock = threading.Lock()
+
+saved_port = None
+saved_baud = None
+
+new_sample_ready = False
+
 app = Flask(__name__)
 CORS(app)
 
 sampling_rate_sec = 1
 last_log_time = 0
+
+sample_counter = 0
 
 ser = None
 
@@ -24,7 +34,8 @@ last_update_time = 0
 # ✅ DATA LOG STORAGE
 data_log = []
 
-is_running = False
+is_running = False          # controls acquisition visibility + logging
+frozen_values = None        # stores last STOP snapshot
 
 
 # ---------------- SERVE FRONTEND ----------------
@@ -36,7 +47,7 @@ def serve_ui():
 # ---------------- CONNECT ----------------
 @app.route('/connect', methods=['POST'])
 def connect():
-    global ser, last_update_time, last_values
+    global ser, last_update_time, last_values, saved_port, saved_baud
 
     data = request.json
 
@@ -44,13 +55,19 @@ def connect():
         port = data.get("com_port")
         baud = int(data.get("baud_rate"))
 
-        if ser and ser.is_open:
-            ser.close()
-            time.sleep(1)
+        with serial_lock:
+            if ser and ser.is_open:
+                ser.close()
+                time.sleep(1)
 
-        ser = serial.Serial(port, baud, timeout=1)
+            ser = serial.Serial(port, baud, timeout=1)
+
+            saved_port = port      # 🔥 remember last successful COM port
+            saved_baud = baud      # 🔥 remember last successful baud
+
         time.sleep(2)
         ser.reset_input_buffer()
+        last_update_time = time.time()
 
         last_values = {
     "pressure": [0.0] * 5,
@@ -68,34 +85,84 @@ def connect():
 # ---------------- CONTROL ----------------
 @app.route('/start', methods=['POST'])
 def start():
-    global is_running, data_log, sampling_rate_sec, last_log_time
+    global is_running, sampling_rate_sec, last_log_time, frozen_values
 
     data = request.json
     sampling_rate_sec = int(data.get("sampling_rate", 1))
 
     is_running = True
-    data_log.clear()
-
-    last_log_time = time.time()
+    frozen_values = None
+    last_log_time = 0   # 🔥 fresh sampling cycle starts immediately
 
     return jsonify({"status": "started"})
 
+@app.route('/set_sampling_rate', methods=['POST'])
+def set_sampling_rate():
+    global sampling_rate_sec, last_log_time
+
+    data = request.json
+    new_rate = int(data.get("sampling_rate", 1))
+
+    if new_rate not in [1, 5, 10, 30, 60, 120]:
+        return jsonify({"status": "error", "message": "Invalid sampling rate"})
+
+    sampling_rate_sec = new_rate
+    last_log_time = time.time()   # restart timer from this moment
+
+    print(f"✅ Sampling rate changed live to {sampling_rate_sec} sec")
+
+    return jsonify({
+        "status": "ok",
+        "sampling_rate": sampling_rate_sec
+    })
+
 @app.route('/stop', methods=['POST'])
 def stop():
-    global is_running
+    global is_running, frozen_values, last_values
+
     is_running = False
+
+    frozen_values = {
+        "pressure": last_values["pressure"].copy(),
+        "temperature": last_values["temperature"].copy()
+    }
+
     return jsonify({"status": "stopped"})
+
+@app.route('/reset', methods=['POST'])
+def reset():
+    global is_running, data_log, sample_counter, last_log_time
+    global last_values, last_update_time, frozen_values
+
+    is_running = False
+    frozen_values = None
+
+    with data_lock:
+        data_log.clear()
+    sample_counter = 0
+    last_log_time = 0
+
+    last_values = {
+        "pressure": [0.0] * 5,
+        "temperature": [0.0] * 5
+    }
+
+    last_update_time = 0
+
+    return jsonify({"status": "reset"})
 
 
 # ---------------- SERIAL READ ----------------
 def read_serial():
     global ser, last_values, last_update_time, data_log
 
-    if ser is None or not ser.is_open:
-        return
+    with serial_lock:
+        if ser is None or not ser.is_open:
+            return
 
     try:
-        line = ser.readline().decode('utf-8', errors='ignore').strip()
+        with serial_lock:
+            line = ser.readline().decode('utf-8', errors='ignore').strip()
 
         if not line:
             return
@@ -132,14 +199,20 @@ def read_serial():
 
                 timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
 
-                data_log.append({
-                    "timestamp": timestamp,
-                    "pressure": last_values["pressure"].copy(),
-                    "temperature": last_values["temperature"].copy()
-                })
+                global sample_counter, new_sample_ready
+                sample_counter += 1
+                new_sample_ready = True
 
-                if len(data_log) > 10000:
-                    data_log.pop(0)
+                with data_lock:
+                    data_log.append({
+                        "sample_id": sample_counter,
+                        "timestamp": timestamp,
+                        "pressure": last_values["pressure"].copy(),
+                        "temperature": last_values["temperature"].copy()
+                    })
+
+                    if len(data_log) > 10000:
+                        data_log.pop(0)
 
         print("UPDATED:",
               "P:", last_values["pressure"],
@@ -165,17 +238,24 @@ def serial_loop():
         time.sleep(0.05)
 
 def auto_reconnect():
-    global ser
+    global ser, saved_port, saved_baud, last_update_time
 
     while True:
         try:
-            if ser is None or not ser.is_open:
-                port = ser.port if ser else "COM6"
-                baud = ser.baudrate if ser else 115200
-                ser = serial.Serial(port, baud, timeout=1)
+            if saved_port is None:
                 time.sleep(2)
-                ser.reset_input_buffer()
-                print("🔁 Auto reconnected to device")
+                continue
+
+            with serial_lock:
+                if ser is None or not ser.is_open:
+                    ser = serial.Serial(saved_port, saved_baud, timeout=1)
+                    time.sleep(2)
+                    ser.reset_input_buffer()
+
+                    last_update_time = time.time()   # 🔥 ADD EXACTLY HERE
+
+                    print("🔁 Auto reconnected to device")
+
         except:
             pass
 
@@ -191,8 +271,12 @@ def calculate_psi(voltage):
 
 @app.route('/data')
 def get_data():
-    global last_values, last_update_time
+    global last_values, last_update_time, frozen_values, new_sample_ready
+
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+
+    sample_created = new_sample_ready
+    new_sample_ready = False
 
     if ser is None or not ser.is_open:
         return jsonify({"status": "disconnected"})
@@ -209,13 +293,45 @@ def get_data():
             **{f"t{i}_volt": "" for i in range(1, 6)},
             **{f"t{i}_temp": "" for i in range(1, 6)}
         })
+    
+    global frozen_values
 
-    response = {
-    "status": "live",
-    "pressure": "LIVE",
-    "temperature": "LIVE",
-    "timestamp": timestamp
-}
+    if not is_running and frozen_values is not None:
+
+        response = {
+            "status": "stopped",
+            "pressure": "STOPPED",
+            "temperature": "STOPPED",
+            "timestamp": timestamp,
+            "sample_id": -1
+        }
+
+        for i in range(5):
+            p_v = frozen_values["pressure"][i]
+            psi = calculate_psi(p_v)
+
+            t_v = frozen_values["temperature"][i]
+            temp = (8 * t_v) + 10
+
+            response[f"p{i+1}_volt"] = round(p_v, 3)
+            response[f"p{i+1}_psi"] = round(psi, 2)
+
+            response[f"t{i+1}_volt"] = round(t_v, 3)
+            response[f"t{i+1}_temp"] = round(temp, 2)
+
+        return jsonify(response)
+
+    with data_lock:
+        current_sample_id = sample_counter if len(data_log) > 0 else -1
+
+        response = {
+        "status": "live",
+        "pressure": "LIVE",
+        "temperature": "LIVE",
+        "timestamp": timestamp,
+        "sample_id": current_sample_id,
+        "new_sample": sample_created
+    }
 
     for i in range(5):
         # PRESSURE
@@ -243,17 +359,25 @@ def download_csv():
 
     writer.writerow([
     "Timestamp",
+    "Sample_ID",
+
     "P1_Volt","P2_Volt","P3_Volt","P4_Volt","P5_Volt",
+    "P1_Psi","P2_Psi","P3_Psi","P4_Psi","P5_Psi",
+
     "T1_Volt","T2_Volt","T3_Volt","T4_Volt","T5_Volt",
     "T1_DegreeC","T2_DegreeC","T3_DegreeC","T4_DegreeC","T5_DegreeC"
 ])
 
-    for entry in data_log:
+    with data_lock:
+        log_copy = data_log.copy()
+
+    for entry in log_copy:
         temps = entry["temperature"]
         
         writer.writerow(
-            [entry["timestamp"]] +
+            [entry["timestamp"], entry["sample_id"]] +
             [f"{v:.3f}" for v in entry["pressure"]] +
+            [f"{(4*v)+5:.2f}" for v in entry["pressure"]] +
             [f"{v:.3f}" for v in entry["temperature"]] +
             [f"{(8*v)+10:.2f}" for v in entry["temperature"]]
         )
