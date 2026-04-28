@@ -1,6 +1,5 @@
 import webbrowser
 from flask import Flask, jsonify, request, send_from_directory, Response
-from flask import send_from_directory
 from flask_cors import CORS
 import serial
 import time
@@ -9,6 +8,8 @@ import csv
 import io
 import os
 from datetime import datetime
+import logging
+logging.basicConfig(level=logging.INFO)
 
 log_file = None
 current_date = None
@@ -109,9 +110,6 @@ def connect():
     "pressure": [0.0] * 5,
     "temperature": [0.0] * 5
 }
-    
-        last_update_time = time.time()
-
         return jsonify({"status": "connected"})
 
     except Exception as e:
@@ -208,13 +206,18 @@ def read_serial():
         if len(parts) < 10:
             return
 
-        values = [float(x) for x in parts[:10]]
+        try:
+            values = [float(x) for x in parts[:10]]
+        except ValueError:
+            print("Invalid sensor values:", values)
+            return
 
         # split into pressure + temperature
         p_values = values[:5]
         t_values = values[5:]
 
         if not all(0 <= v <= 5 for v in p_values + t_values):
+            print("Invalid sensor values:", values)
             return
 
         last_values = {
@@ -244,27 +247,28 @@ def read_serial():
                     sample_counter,
 
                     *[f"{v:.3f}" for v in last_values["pressure"]],
-                    *[f"{(4*v)+5:.2f}" for v in last_values["pressure"]],
+                    *[f"{calculate_psi(v):.2f}" for v in last_values["pressure"]],
 
                     *[f"{v:.3f}" for v in last_values["temperature"]],
-                    *[f"{(8*v)+10:.2f}" for v in last_values["temperature"]]
+                    *[f"{calculate_temp(v):.2f}" for v in last_values["temperature"]]
                 ]
 
+                # ✅ ONLY ONE LOGGING BLOCK
                 with data_lock:
                     writer = get_log_file()
                     writer.writerow(row)
 
                     try:
-                        log_file.flush()
+                        if log_file and not log_file.closed:
+                            log_file.flush()
 
-                        # reduce disk stress
-                        if sample_counter % 10 == 0:
-                            os.fsync(log_file.fileno())
+                            if sample_counter % 10 == 0:
+                                os.fsync(log_file.fileno())
 
-                    except:
-                        pass
+                    except Exception as e:
+                        print("Flush error:", e)
 
-                # optional: keep limited RAM buffer for UI
+                # optional RAM buffer
                 with data_lock:
                     data_log.append(row)
                     if len(data_log) > 1000:
@@ -304,16 +308,21 @@ def auto_reconnect():
 
             with serial_lock:
                 if ser is None or not ser.is_open:
-                    ser = serial.Serial(saved_port, saved_baud, timeout=1)
-                    time.sleep(2)
-                    ser.reset_input_buffer()
+                    try:
+                        ser = serial.Serial(saved_port, saved_baud, timeout=1)
+                        time.sleep(2)
+                        ser.reset_input_buffer()
 
-                    last_update_time = time.time()   # 🔥 ADD EXACTLY HERE
+                        last_update_time = time.time()
+                        print("🔁 Auto reconnected")
 
-                    print("🔁 Auto reconnected to device")
+                    except Exception as e:
+                        print("Reconnect failed:", e)
+                        time.sleep(3)
 
         except Exception as e:
-            print("Reconnect failed:", e)
+            # 🔥 CRITICAL: prevent thread death
+            print("Auto-reconnect loop error:", e)
             time.sleep(3)
 
 threading.Thread(target=serial_loop, daemon=True).start()
@@ -323,6 +332,9 @@ threading.Thread(target=auto_reconnect, daemon=True).start()
 def calculate_psi(voltage):
     return (4 * voltage) + 5
 
+def calculate_temp(voltage):
+    return (8 * voltage) + 10
+
 
 @app.route('/data')
 def get_data():
@@ -330,15 +342,16 @@ def get_data():
 
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
 
-    sample_created = new_sample_ready
-    new_sample_ready = False
+    with data_lock:
+        sample_created = new_sample_ready
+        new_sample_ready = False
 
     if ser is None or not ser.is_open:
         return jsonify({"status": "disconnected"})
 
     age = time.time() - last_update_time
 
-    if age > 2:
+    if age > 5:
         return jsonify({
             "status": "no_data",
             "pressure": "NO SIGNAL",
@@ -366,7 +379,7 @@ def get_data():
             psi = calculate_psi(p_v)
 
             t_v = frozen_values["temperature"][i]
-            temp = (8 * t_v) + 10
+            temp = calculate_temp(t_v)
 
             response[f"p{i+1}_volt"] = round(p_v, 3)
             response[f"p{i+1}_psi"] = round(psi, 2)
@@ -398,7 +411,7 @@ def get_data():
 
         # TEMPERATURE
         t_v = last_values["temperature"][i]
-        temp = (8 * t_v) + 10   # your chosen mapping
+        temp = calculate_temp(t_v)
 
         response[f"t{i+1}_volt"] = round(t_v, 3)
         response[f"t{i+1}_temp"] = round(temp, 2)
@@ -431,8 +444,18 @@ if __name__ == "__main__":
 import atexit
 
 def close_log_file():
-    global log_file
-    if log_file:
-        log_file.close()
+    global log_file, ser
+
+    try:
+        if log_file and not log_file.closed:
+            log_file.close()
+    except:
+        pass
+
+    try:
+        if ser and ser.is_open:
+            ser.close()
+    except:
+        pass
 
 atexit.register(close_log_file)
