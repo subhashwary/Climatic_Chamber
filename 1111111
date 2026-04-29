@@ -1,0 +1,1 @@
+pyinstaller --onefile --add-data "index.html;." --add-data "images;images" app.py
