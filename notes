@@ -18,3 +18,20 @@ if __name__ == "__main__":
     )
 
     webview.start()
+
+
+
+[Setup]
+AppName=GTRE Sensor Dashboard
+AppVersion=1.0
+DefaultDirName={pf}\GTRE Dashboard
+DefaultGroupName=GTRE Dashboard
+OutputDir=output
+OutputBaseFilename=GTRE_Setup
+
+[Files]
+Source: "dist\app.exe"; DestDir: "{app}"; Flags: ignoreversion
+
+[Icons]
+Name: "{commondesktop}\GTRE Dashboard"; Filename: "{app}\app.exe"
+Name: "{group}\GTRE Dashboard"; Filename: "{app}\app.exe"
