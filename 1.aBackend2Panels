@@ -6,6 +6,11 @@ import time
 import threading
 import csv
 import io
+import os
+
+log_file = "sensor_log.csv"
+file_lock = threading.Lock()
+file_initialized = False
 
 serial_lock = threading.Lock()
 data_lock = threading.Lock()
@@ -36,6 +41,30 @@ data_log = []
 
 is_running = False          # controls acquisition visibility + logging
 frozen_values = None        # stores last STOP snapshot
+
+def init_csv():
+    global file_initialized
+
+    # ✅ If file already exists → DO NOT overwrite
+    if os.path.exists(log_file):
+        file_initialized = True
+        return
+
+    with file_lock:
+        with open(log_file, "w", newline="") as f:
+            writer = csv.writer(f)
+
+            writer.writerow([
+                "Timestamp", "Sample_ID",
+
+                "P1_Volt","P2_Volt","P3_Volt","P4_Volt","P5_Volt",
+                "P1_Psi","P2_Psi","P3_Psi","P4_Psi","P5_Psi",
+
+                "T1_Volt","T2_Volt","T3_Volt","T4_Volt","T5_Volt",
+                "T1_DegreeC","T2_DegreeC","T3_DegreeC","T4_DegreeC","T5_DegreeC"
+            ])
+
+    file_initialized = True
 
 
 # ---------------- SERVE FRONTEND ----------------
@@ -132,15 +161,22 @@ def stop():
 @app.route('/reset', methods=['POST'])
 def reset():
     global is_running, data_log, sample_counter, last_log_time
-    global last_values, last_update_time, frozen_values
+    global last_values, last_update_time, frozen_values, file_initialized
 
     is_running = False
     frozen_values = None
 
     with data_lock:
         data_log.clear()
+
     sample_counter = 0
     last_log_time = 0
+
+    # 🔥 DELETE OLD CSV FILE
+    if os.path.exists(log_file):
+        os.remove(log_file)
+
+    file_initialized = False   # 🔥 IMPORTANT
 
     last_values = {
         "pressure": [0.0] * 5,
@@ -150,7 +186,6 @@ def reset():
     last_update_time = 0
 
     return jsonify({"status": "reset"})
-
 
 # ---------------- SERIAL READ ----------------
 def read_serial():
@@ -202,6 +237,23 @@ def read_serial():
                 global sample_counter, new_sample_ready
                 sample_counter += 1
                 new_sample_ready = True
+
+                timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+
+                # 🔥 WRITE TO CSV FILE (FULL HISTORY)
+                init_csv()
+
+                with file_lock:
+                    with open(log_file, "a", newline="") as f:
+                        writer = csv.writer(f)
+
+                        writer.writerow(
+                            [timestamp, sample_counter] +
+                            [f"{v:.3f}" for v in last_values["pressure"]] +
+                            [f"{(4*v)+5:.2f}" for v in last_values["pressure"]] +
+                            [f"{v:.3f}" for v in last_values["temperature"]] +
+                            [f"{(8*v)+10:.2f}" for v in last_values["temperature"]]
+                        )
 
                 with data_lock:
                     data_log.append({
@@ -322,7 +374,7 @@ def get_data():
         return jsonify(response)
 
     with data_lock:
-        current_sample_id = sample_counter if len(data_log) > 0 else -1
+        current_sample_id = sample_counter if sample_created else -1
 
         response = {
         "status": "live",
@@ -354,44 +406,34 @@ def get_data():
 # ---------------- CSV DOWNLOAD ----------------
 @app.route('/download_csv')
 def download_csv():
-    output = io.StringIO()
-    writer = csv.writer(output)
-
-    writer.writerow([
-    "Timestamp",
-    "Sample_ID",
-
-    "P1_Volt","P2_Volt","P3_Volt","P4_Volt","P5_Volt",
-    "P1_Psi","P2_Psi","P3_Psi","P4_Psi","P5_Psi",
-
-    "T1_Volt","T2_Volt","T3_Volt","T4_Volt","T5_Volt",
-    "T1_DegreeC","T2_DegreeC","T3_DegreeC","T4_DegreeC","T5_DegreeC"
-])
-
-    with data_lock:
-        log_copy = data_log.copy()
-
-    for entry in log_copy:
-        temps = entry["temperature"]
-        
-        writer.writerow(
-            [entry["timestamp"], entry["sample_id"]] +
-            [f"{v:.3f}" for v in entry["pressure"]] +
-            [f"{(4*v)+5:.2f}" for v in entry["pressure"]] +
-            [f"{v:.3f}" for v in entry["temperature"]] +
-            [f"{(8*v)+10:.2f}" for v in entry["temperature"]]
+    try:
+        return send_from_directory(
+            directory='.',
+            path=log_file,
+            as_attachment=True
         )
-
-    output.seek(0)
-
-    return Response(
-        output,
-        mimetype="text/csv",
-        headers={"Content-Disposition": "attachment;filename=sensor_data.csv"}
-    )
-
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
 
 # ---------------- RUN ----------------
-if __name__ == "__main__":
-    webbrowser.open("http://127.0.0.1:5000")
+import threading
+import webview
+
+def start_server():
     app.run(debug=False, threaded=True, use_reloader=False)
+
+if __name__ == "__main__":
+    # Start Flask in background thread
+    threading.Thread(target=start_server, daemon=True).start()
+
+    # Create desktop window
+    webview.create_window(
+        "GTRE Sensor Dashboard",
+        "http://127.0.0.1:5000",
+        width=1200,
+        height=800,
+        resizable=True
+    )
+
+    webview.start()
+
