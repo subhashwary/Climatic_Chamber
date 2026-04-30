@@ -1,2 +1,14 @@
 if __name__ == "__main__":
     app.run(debug=False)
+
+
+
+
+# ---------------- RUN ----------------
+import threading
+
+def start_server():
+    app.run(debug=False, threaded=True, use_reloader=False)
+
+if __name__ == "__main__":
+    app.run(debug=False)
