@@ -12,3 +12,33 @@ def start_server():
 
 if __name__ == "__main__":
     app.run(debug=False)
+
+
+
+# ---------------- RUN (DESKTOP MODE) ----------------
+import threading
+import tkinter as tk
+import webbrowser
+
+def start_server():
+    app.run(debug=False, threaded=True, use_reloader=False)
+
+if __name__ == "__main__":
+    # Start backend server
+    threading.Thread(target=start_server, daemon=True).start()
+
+    # Open UI automatically
+    webbrowser.open("http://127.0.0.1:5000")
+
+    # Create desktop window (native)
+    root = tk.Tk()
+    root.title("GTRE Sensor Dashboard")
+
+    root.geometry("1200x800")
+    root.configure(bg="#f4f7fb")
+
+    label = tk.Label(root, text="GTRE Sensor Dashboard Running...",
+                     font=("Arial", 16), bg="#f4f7fb")
+    label.pack(pady=20)
+
+    root.mainloop()
