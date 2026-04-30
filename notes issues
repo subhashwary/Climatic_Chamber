@@ -1,46 +1,27 @@
-        6 Dir(s)  188,771,168,256 bytes free
-
-(venv) C:\Users\Subhash\Desktop\GTRE>pip install pywebview
-WARNING: Retrying (Retry(total=4, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x0000023940932900>: Failed to establish a new connection: [Errno 11001] getaddrinfo failed')': /simple/pywebview/
-WARNING: Retrying (Retry(total=3, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x00000239409A4410>: Failed to establish a new connection: [Errno 11001] getaddrinfo failed')': /simple/pywebview/
-WARNING: Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x00000239409A4550>: Failed to establish a new connection: [Errno 11001] getaddrinfo failed')': /simple/pywebview/
-WARNING: Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x00000239409A4690>: Failed to establish a new connection: [Errno 11001] getaddrinfo failed')': /simple/pywebview/
-WARNING: Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x00000239409A47D0>: Failed to establish a new connection: [Errno 11001] getaddrinfo failed')': /simple/pywebview/
-ERROR: Could not find a version that satisfies the requirement pywebview (from versions: none)
-
 [notice] A new release of pip is available: 26.0.1 -> 26.1
 [notice] To update, run: python.exe -m pip install --upgrade pip
-ERROR: No matching distribution found for pywebview
 
-(venv) C:\Users\Subhash\Desktop\GTRE>pip install pywebview
-Collecting pywebview
-  Downloading pywebview-6.2.1-py3-none-any.whl.metadata (4.9 kB)
-Collecting pythonnet (from pywebview)
-  Downloading pythonnet-2.5.2.tar.gz (1.9 MB)
-     ---------------------------------------- 1.9/1.9 MB 121.7 kB/s  0:00:13
+(venv) C:\Users\Subhash\Desktop\GTRE>pip install pywebview==4.4
+Collecting pywebview==4.4
+  Downloading pywebview-4.4-py3-none-any.whl.metadata (4.0 kB)
+Collecting proxy-tools (from pywebview==4.4)
+  Using cached proxy_tools-0.1.0-py3-none-any.whl
+Collecting bottle (from pywebview==4.4)
+  Using cached bottle-0.13.4-py2.py3-none-any.whl.metadata (1.6 kB)
+Collecting typing-extensions (from pywebview==4.4)
+  Using cached typing_extensions-4.15.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting pythonnet (from pywebview==4.4)
+  Using cached pythonnet-2.5.2.tar.gz (1.9 MB)
   Installing build dependencies ... done
   Getting requirements to build wheel ... done
   Preparing metadata (pyproject.toml) ... done
-Collecting proxy_tools (from pywebview)
-  Downloading proxy_tools-0.1.0.tar.gz (3.0 kB)
-  Installing build dependencies ... done
-  Getting requirements to build wheel ... done
-  Preparing metadata (pyproject.toml) ... done
-Collecting bottle (from pywebview)
-  Downloading bottle-0.13.4-py2.py3-none-any.whl.metadata (1.6 kB)
-Collecting typing_extensions (from pywebview)
-  Downloading typing_extensions-4.15.0-py3-none-any.whl.metadata (3.3 kB)
-Collecting pycparser (from pythonnet->pywebview)
-  Downloading pycparser-3.0-py3-none-any.whl.metadata (8.2 kB)
-Downloading pywebview-6.2.1-py3-none-any.whl (525 kB)
-   ---------------------------------------- 525.5/525.5 kB 204.7 kB/s  0:00:03
-Downloading bottle-0.13.4-py2.py3-none-any.whl (103 kB)
-Downloading pycparser-3.0-py3-none-any.whl (48 kB)
-Downloading typing_extensions-4.15.0-py3-none-any.whl (44 kB)
-Building wheels for collected packages: proxy_tools, pythonnet
-  Building wheel for proxy_tools (pyproject.toml) ... done
-  Created wheel for proxy_tools: filename=proxy_tools-0.1.0-py3-none-any.whl size=2943 sha256=b9e14eb03208e469d5ba9f741371f3eb5c16e32aa1c607b29198c7da502b7543
-  Stored in directory: c:\users\subhash\appdata\local\pip\cache\wheels\54\b4\ac\2b81b90ec2895608a2d68ceca60a4476b409bdfe16398a4251
+Collecting pycparser (from pythonnet->pywebview==4.4)
+  Using cached pycparser-3.0-py3-none-any.whl.metadata (8.2 kB)
+Downloading pywebview-4.4-py3-none-any.whl (405 kB)
+Using cached bottle-0.13.4-py2.py3-none-any.whl (103 kB)
+Using cached pycparser-3.0-py3-none-any.whl (48 kB)
+Using cached typing_extensions-4.15.0-py3-none-any.whl (44 kB)
+Building wheels for collected packages: pythonnet
   Building wheel for pythonnet (pyproject.toml) ... error
   error: subprocess-exited-with-error
 
@@ -49,9 +30,9 @@ Building wheels for collected packages: proxy_tools, pythonnet
   ╰─> [116 lines of output]
       <string>:468: SyntaxWarning: "\*" is an invalid escape sequence. Such sequences will not work in the future. Did you mean "\\*"? A raw string is also an option.
       <string>:533: SyntaxWarning: "\*" is an invalid escape sequence. Such sequences will not work in the future. Did you mean "\\*"? A raw string is also an option.
-      C:\Users\Subhash\AppData\Local\Temp\pip-build-env-t2cxzu66\overlay\Lib\site-packages\setuptools\_vendor\wheel\bdist_wheel.py:4: FutureWarning: The 'wheel' package is no longer the canonical location of the 'bdist_wheel' command, and will be removed in a future release. Please update to setuptools v70.1 or later which contains an integrated version of this command.
+      C:\Users\Subhash\AppData\Local\Temp\pip-build-env-m9l9540y\overlay\Lib\site-packages\setuptools\_vendor\wheel\bdist_wheel.py:4: FutureWarning: The 'wheel' package is no longer the canonical location of the 'bdist_wheel' command, and will be removed in a future release. Please update to setuptools v70.1 or later which contains an integrated version of this command.
         warn(
-      C:\Users\Subhash\AppData\Local\Temp\pip-build-env-t2cxzu66\overlay\Lib\site-packages\setuptools\dist.py:765: SetuptoolsDeprecationWarning: License classifiers are deprecated.
+      C:\Users\Subhash\AppData\Local\Temp\pip-build-env-m9l9540y\overlay\Lib\site-packages\setuptools\dist.py:765: SetuptoolsDeprecationWarning: License classifiers are deprecated.
       !!
 
               ********************************************************************************
@@ -85,9 +66,9 @@ Building wheels for collected packages: proxy_tools, pythonnet
               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
           )
           ^
-        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-t2cxzu66\overlay\Lib\site-packages\setuptools\build_meta.py", line 441, in build_wheel
+        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-m9l9540y\overlay\Lib\site-packages\setuptools\build_meta.py", line 441, in build_wheel
           return _build(['bdist_wheel', '--dist-info-dir', str(metadata_directory)])
-        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-t2cxzu66\overlay\Lib\site-packages\setuptools\build_meta.py", line 429, in _build
+        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-m9l9540y\overlay\Lib\site-packages\setuptools\build_meta.py", line 429, in _build
           return self._build_with_temp_dir(
                  ~~~~~~~~~~~~~~~~~~~~~~~~~^
               cmd,
@@ -97,65 +78,65 @@ Building wheels for collected packages: proxy_tools, pythonnet
               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
           )
           ^
-        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-t2cxzu66\overlay\Lib\site-packages\setuptools\build_meta.py", line 410, in _build_with_temp_dir
+        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-m9l9540y\overlay\Lib\site-packages\setuptools\build_meta.py", line 410, in _build_with_temp_dir
           self.run_setup()
           ~~~~~~~~~~~~~~^^
-        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-t2cxzu66\overlay\Lib\site-packages\setuptools\build_meta.py", line 520, in run_setup
+        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-m9l9540y\overlay\Lib\site-packages\setuptools\build_meta.py", line 520, in run_setup
           super().run_setup(setup_script=setup_script)
           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-t2cxzu66\overlay\Lib\site-packages\setuptools\build_meta.py", line 317, in run_setup
+        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-m9l9540y\overlay\Lib\site-packages\setuptools\build_meta.py", line 317, in run_setup
           exec(code, locals())
           ~~~~^^^^^^^^^^^^^^^^
         File "<string>", line 630, in <module>
-        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-t2cxzu66\overlay\Lib\site-packages\setuptools\__init__.py", line 117, in setup
+        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-m9l9540y\overlay\Lib\site-packages\setuptools\__init__.py", line 117, in setup
           return distutils.core.setup(**attrs)  # type: ignore[return-value]
                  ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
-        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-t2cxzu66\overlay\Lib\site-packages\setuptools\_distutils\core.py", line 186, in setup
+        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-m9l9540y\overlay\Lib\site-packages\setuptools\_distutils\core.py", line 186, in setup
           return run_commands(dist)
-        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-t2cxzu66\overlay\Lib\site-packages\setuptools\_distutils\core.py", line 202, in run_commands
+        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-m9l9540y\overlay\Lib\site-packages\setuptools\_distutils\core.py", line 202, in run_commands
           dist.run_commands()
           ~~~~~~~~~~~~~~~~~^^
-        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-t2cxzu66\overlay\Lib\site-packages\setuptools\_distutils\dist.py", line 1000, in run_commands
+        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-m9l9540y\overlay\Lib\site-packages\setuptools\_distutils\dist.py", line 1000, in run_commands
           self.run_command(cmd)
           ~~~~~~~~~~~~~~~~^^^^^
-        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-t2cxzu66\overlay\Lib\site-packages\setuptools\dist.py", line 1107, in run_command
+        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-m9l9540y\overlay\Lib\site-packages\setuptools\dist.py", line 1107, in run_command
           super().run_command(command)
           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^
-        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-t2cxzu66\overlay\Lib\site-packages\setuptools\_distutils\dist.py", line 1019, in run_command
+        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-m9l9540y\overlay\Lib\site-packages\setuptools\_distutils\dist.py", line 1019, in run_command
           cmd_obj.run()
           ~~~~~~~~~~~^^
         File "<string>", line 612, in run
-        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-t2cxzu66\overlay\Lib\site-packages\setuptools\command\bdist_wheel.py", line 370, in run
+        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-m9l9540y\overlay\Lib\site-packages\setuptools\command\bdist_wheel.py", line 370, in run
           self.run_command("build")
           ~~~~~~~~~~~~~~~~^^^^^^^^^
-        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-t2cxzu66\overlay\Lib\site-packages\setuptools\_distutils\cmd.py", line 341, in run_command
+        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-m9l9540y\overlay\Lib\site-packages\setuptools\_distutils\cmd.py", line 341, in run_command
           self.distribution.run_command(command)
           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
-        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-t2cxzu66\overlay\Lib\site-packages\setuptools\dist.py", line 1107, in run_command
+        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-m9l9540y\overlay\Lib\site-packages\setuptools\dist.py", line 1107, in run_command
           super().run_command(command)
           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^
-        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-t2cxzu66\overlay\Lib\site-packages\setuptools\_distutils\dist.py", line 1019, in run_command
+        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-m9l9540y\overlay\Lib\site-packages\setuptools\_distutils\dist.py", line 1019, in run_command
           cmd_obj.run()
           ~~~~~~~~~~~^^
-        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-t2cxzu66\overlay\Lib\site-packages\setuptools\_distutils\command\build.py", line 135, in run
+        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-m9l9540y\overlay\Lib\site-packages\setuptools\_distutils\command\build.py", line 135, in run
           self.run_command(cmd_name)
           ~~~~~~~~~~~~~~~~^^^^^^^^^^
-        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-t2cxzu66\overlay\Lib\site-packages\setuptools\_distutils\cmd.py", line 341, in run_command
+        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-m9l9540y\overlay\Lib\site-packages\setuptools\_distutils\cmd.py", line 341, in run_command
           self.distribution.run_command(command)
           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
-        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-t2cxzu66\overlay\Lib\site-packages\setuptools\dist.py", line 1107, in run_command
+        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-m9l9540y\overlay\Lib\site-packages\setuptools\dist.py", line 1107, in run_command
           super().run_command(command)
           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^
-        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-t2cxzu66\overlay\Lib\site-packages\setuptools\_distutils\dist.py", line 1019, in run_command
+        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-m9l9540y\overlay\Lib\site-packages\setuptools\_distutils\dist.py", line 1019, in run_command
           cmd_obj.run()
           ~~~~~~~~~~~^^
-        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-t2cxzu66\overlay\Lib\site-packages\setuptools\_distutils\command\build_ext.py", line 367, in run
+        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-m9l9540y\overlay\Lib\site-packages\setuptools\_distutils\command\build_ext.py", line 367, in run
           self.build_extensions()
           ~~~~~~~~~~~~~~~~~~~~~^^
-        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-t2cxzu66\overlay\Lib\site-packages\setuptools\_distutils\command\build_ext.py", line 483, in build_extensions
+        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-m9l9540y\overlay\Lib\site-packages\setuptools\_distutils\command\build_ext.py", line 483, in build_extensions
           self._build_extensions_serial()
           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
-        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-t2cxzu66\overlay\Lib\site-packages\setuptools\_distutils\command\build_ext.py", line 509, in _build_extensions_serial
+        File "C:\Users\Subhash\AppData\Local\Temp\pip-build-env-m9l9540y\overlay\Lib\site-packages\setuptools\_distutils\command\build_ext.py", line 509, in _build_extensions_serial
           self.build_extension(ext)
           ~~~~~~~~~~~~~~~~~~~~^^^^^
         File "<string>", line 249, in build_extension
@@ -167,7 +148,6 @@ Building wheels for collected packages: proxy_tools, pythonnet
 
   note: This error originates from a subprocess, and is likely not a problem with pip.
   ERROR: Failed building wheel for pythonnet
-Successfully built proxy_tools
 Failed to build pythonnet
 
 [notice] A new release of pip is available: 26.0.1 -> 26.1
@@ -176,11 +156,5 @@ error: failed-wheel-build-for-install
 
 × Failed to build installable wheels for some pyproject.toml based projects
 ╰─> pythonnet
-
-(venv) C:\Users\Subhash\Desktop\GTRE>python app.py
-Traceback (most recent call last):
-  File "C:\Users\Subhash\Desktop\GTRE\app.py", line 420, in <module>
-    import webview
-ModuleNotFoundError: No module named 'webview'
 
 (venv) C:\Users\Subhash\Desktop\GTRE>
