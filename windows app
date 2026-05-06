@@ -3,3 +3,9 @@ pyinstaller --onefile --noconsole ^
 --add-data "templates;templates" ^
 --add-data "images;images" ^
 launcher.py
+
+
+python -m PyInstaller --onefile --noconsole ^
+--add-data "templates;templates" ^
+--add-data "images;images" ^
+launcher.py
