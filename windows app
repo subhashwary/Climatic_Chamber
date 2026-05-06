@@ -1,8 +1,36 @@
 
-(venv) PS D:\Wary\sensor_app> py -0
-Installed Pythons found by C:\WINDOWS\py.exe Launcher for Windows
- -3.1-64 *
-
-(venv) PS D:\Wary\sensor_app> py -3.11 --version
-Python 3.14.4
+(venv) PS C:\Users\mahim> cd D:\Wary\sensor_app
+(venv) PS D:\Wary\sensor_app> deactivate rmdir /s /q venv
+PS D:\Wary\sensor_app> py -3.11 -m venv venv
+PS D:\Wary\sensor_app> .\venv\Scripts\activate
+(venv) PS D:\Wary\sensor_app> python --version
+Python 3.11.0a2
+(venv) PS D:\Wary\sensor_app> pip install --upgrade pip
+Traceback (most recent call last):
+  File "C:\Users\mahim\AppData\Local\Programs\Python\Python311\lib\runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mahim\AppData\Local\Programs\Python\Python311\lib\runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Wary\sensor_app\venv\Scripts\pip.exe\__main__.py", line 5, in <module>
+  File "D:\Wary\sensor_app\venv\lib\site-packages\pip\_internal\cli\main.py", line 47, in main
+    from pip._internal.cli.autocompletion import autocomplete
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Wary\sensor_app\venv\lib\site-packages\pip\_internal\cli\autocompletion.py", line 12, in <module>
+    from pip._internal.cli.main_parser import create_main_parser
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Wary\sensor_app\venv\lib\site-packages\pip\_internal\cli\main_parser.py", line 11, in <module>
+    from pip._internal.build_env import get_runnable_pip
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Wary\sensor_app\venv\lib\site-packages\pip\_internal\build_env.py", line 22, in <module>
+    from pip._internal.cli.spinners import open_rich_spinner, open_spinner
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Wary\sensor_app\venv\lib\site-packages\pip\_internal\cli\spinners.py", line 21, in <module>
+    from pip._internal.utils.compat import WINDOWS
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Wary\sensor_app\venv\lib\site-packages\pip\_internal\utils\compat.py", line 71, in <module>
+    import tomllib
+    ^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'tomllib'
 (venv) PS D:\Wary\sensor_app>
