@@ -174,3 +174,383 @@ if __name__ == "__main__":
     webview.start()
 
 
+
+
+
+auncher.py
+647 INFO: PyInstaller: 6.19.0, contrib hooks: 2026.4
+649 INFO: Python: 3.14.4
+704 INFO: Platform: Windows-10-10.0.19045-SP0
+704 INFO: Python environment: C:\Users\mahim\AppData\Local\Python\pythoncore-3.14-64
+705 INFO: wrote D:\Wary\sensor_app\launcher.spec
+756 INFO: Module search paths (PYTHONPATH):
+['D:\\Wary\\sensor_app',
+ 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\python314.zip',
+ 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\DLLs',
+ 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib',
+ 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64',
+ 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages',
+ 'D:\\Wary\\sensor_app']
+1309 INFO: Appending 'datas' from .spec
+1310 INFO: checking Analysis
+1461 INFO: Building because D:\Wary\sensor_app\launcher.py changed
+1462 INFO: Looking for Python shared library...
+1462 INFO: Using Python shared library: C:\Users\mahim\AppData\Local\Python\pythoncore-3.14-64\python314.dll
+1462 INFO: Running Analysis Analysis-00.toc
+1462 INFO: Target bytecode optimization level: 0
+1462 INFO: Initializing module dependency graph...
+1465 INFO: Initializing module graph hook caches...
+1866 INFO: Analyzing modules for base_library.zip ...
+5128 INFO: Processing standard module hook 'hook-encodings.py' from 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks'
+9995 INFO: Processing standard module hook 'hook-difflib.py' from 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks'
+10036 INFO: Processing standard module hook 'hook-heapq.py' from 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks'
+10317 INFO: Processing standard module hook 'hook-pickle.py' from 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks'
+14869 INFO: Caching module dependency graph...
+14933 INFO: Analyzing D:\Wary\sensor_app\launcher.py
+15237 INFO: Processing standard module hook 'hook-sysconfig.py' from 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks'
+15277 INFO: Processing standard module hook 'hook-_ctypes.py' from 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks'
+16248 INFO: Processing pre-safe-import-module hook 'hook-typing_extensions.py' from 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+16274 INFO: SetuptoolsInfo: initializing cached setuptools info...
+20077 INFO: Processing standard module hook 'hook-platform.py' from 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks'
+20239 INFO: Processing standard module hook 'hook-multiprocessing.util.py' from 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks'
+20565 INFO: Processing standard module hook 'hook-xml.py' from 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks'
+23284 INFO: Processing standard module hook 'hook-jinja2.py' from 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+26682 INFO: Processing pre-safe-import-module hook 'hook-importlib_metadata.py' from 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+26692 INFO: Setuptools: 'importlib_metadata' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.importlib_metadata'!
+26743 INFO: Processing standard module hook 'hook-setuptools.py' from 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks'
+26826 INFO: Processing pre-safe-import-module hook 'hook-distutils.py' from 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+26929 INFO: Processing pre-safe-import-module hook 'hook-jaraco.py' from 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+26931 INFO: Setuptools: 'jaraco' appears to be a full setuptools-vendored copy - creating alias to 'setuptools._vendor.jaraco'!
+26962 INFO: Processing pre-safe-import-module hook 'hook-more_itertools.py' from 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+26964 INFO: Setuptools: 'more_itertools' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.more_itertools'!
+27607 INFO: Processing pre-safe-import-module hook 'hook-packaging.py' from 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+28405 INFO: Processing standard module hook 'hook-setuptools._vendor.jaraco.text.py' from 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks'
+28416 INFO: Processing pre-safe-import-module hook 'hook-importlib_resources.py' from 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+28448 INFO: Processing pre-safe-import-module hook 'hook-backports.py' from 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+28450 INFO: Setuptools: 'backports' appears to be a full setuptools-vendored copy - creating alias to 'setuptools._vendor.backports'!
+29629 INFO: Processing pre-safe-import-module hook 'hook-tomli.py' from 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+29630 INFO: Setuptools: 'tomli' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.tomli'!
+31204 INFO: Processing pre-safe-import-module hook 'hook-wheel.py' from 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+31205 INFO: Setuptools: 'wheel' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.wheel'!
+31437 INFO: Processing standard module hook 'hook-setuptools._vendor.importlib_metadata.py' from 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks'
+31544 INFO: Processing pre-safe-import-module hook 'hook-zipp.py' from 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+31545 INFO: Setuptools: 'zipp' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.zipp'!
+31974 INFO: Processing module hooks (post-graph stage)...
+33824 INFO: Performing binary vs. data reclassification (12 entries)
+33940 INFO: Looking for ctypes DLLs
+34069 INFO: Analyzing run-time hooks ...
+34073 INFO: Including run-time hook 'pyi_rth_inspect.py' from 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks'
+34098 INFO: Including run-time hook 'pyi_rth_pkgutil.py' from 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks'
+34107 INFO: Including run-time hook 'pyi_rth_multiprocessing.py' from 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks'
+34112 INFO: Including run-time hook 'pyi_rth_setuptools.py' from 'C:\\Users\\mahim\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks'
+34174 INFO: Creating base_library.zip...
+34229 INFO: Looking for dynamic libraries
+37861 INFO: Extra DLL search directories (AddDllDirectory): []
+37862 INFO: Extra DLL search directories (PATH): []
+38700 INFO: Warnings written to D:\Wary\sensor_app\build\launcher\warn-launcher.txt
+38794 INFO: Graph cross-reference written to D:\Wary\sensor_app\build\launcher\xref-launcher.html
+38924 INFO: checking PYZ
+39000 INFO: Building because D:\Wary\sensor_app\app.py changed
+39000 INFO: Building PYZ (ZlibArchive) D:\Wary\sensor_app\build\launcher\PYZ-00.pyz
+39551 INFO: Building PYZ (ZlibArchive) D:\Wary\sensor_app\build\launcher\PYZ-00.pyz completed successfully.
+39615 INFO: checking PKG
+39680 INFO: Building because toc changed
+39681 INFO: Building PKG (CArchive) launcher.pkg
+41430 INFO: Building PKG (CArchive) launcher.pkg completed successfully.
+41435 INFO: Bootloader C:\Users\mahim\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\PyInstaller\boot
+41435 INFO: checking EXE
+41600 INFO: Building because console changed
+41600 INFO: Building EXE from EXE-00.toc
+41603 INFO: Copying bootloader EXE to D:\Wary\sensor_app\dist\launcher.exe
+42360 INFO: Copying icon to EXE
+42505 INFO: Copying 0 resources to EXE
+42505 INFO: Embedding manifest in EXE
+42636 INFO: Appending PKG archive to EXE
+42852 INFO: Fixing EXE headers
+43354 INFO: Building EXE from EXE-00.toc completed successfully.
+43359 INFO: Build complete! The results are available in: D:\Wary\sensor_app\dist
+PS D:\Wary\sensor_app> cd dist
+>> .\launcher.exe
+>> 
+ * Serving Flask app 'app'
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:5000
+Press CTRL+C to quit
+127.0.0.1 - - [06/May/2026 10:53:43] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:53:44] "GET /images/cense.png HTTP/1.1" 404 -
+127.0.0.1 - - [06/May/2026 10:53:44] "GET /images/IISc.png HTTP/1.1" 404 -
+127.0.0.1 - - [06/May/2026 10:53:44] "GET /images/phone.png HTTP/1.1" 404 -
+127.0.0.1 - - [06/May/2026 10:53:44] "GET /images/web.png HTTP/1.1" 404 -
+127.0.0.1 - - [06/May/2026 10:53:45] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:53:46] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:53:47] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:53:48] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:53:49] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:53:50] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:53:51] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:53:52] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:53:53] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:53:54] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:53:55] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:53:56] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:53:57] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:53:58] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:53:59] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:00] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:01] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:02] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:03] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:04] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:05] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:06] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:07] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:08] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:09] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:10] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:12] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:13] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:14] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:15] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:15] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:16] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:17] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:18] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:19] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:20] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:21] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:22] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:23] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:24] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:25] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:26] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:27] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:28] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:29] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:30] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:31] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:32] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:33] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:34] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:35] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:36] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:37] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:38] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:39] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:40] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:41] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:42] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:43] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:44] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:45] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:46] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:47] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:48] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:49] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:50] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:51] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:52] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:53] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:54] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:55] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:56] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:57] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:58] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:54:59] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:55:00] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:55:02] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:55:03] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:55:04] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:55:05] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:55:06] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:55:07] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:55:08] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:55:09] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2026 10:55:10] "GET /data HTTP/1.1" 200 -
+  File "launcher.py", line 17, in <module>
+[PYI-3304:ERROR] Failed to execute script 'launcher' due to unhandled exception!
+PS D:\Wary\sensor_app\dist> D:\Wary\sensor_app\dist
+D:\Wary\sensor_app\dist : The term 'D:\Wary\sensor_app\dist' is not recognized as the name of a cmdlet, 
+function, script file, or operable program. Check the spelling of the name, or if a path was included, verify 
+that the path is correct and try again.
+At line:1 char:1
++ D:\Wary\sensor_app\dist
++ ~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (D:\Wary\sensor_app\dist:String) [], CommandNotFoundException
+ 
+PS D:\Wary\sensor_app\dist> cd
+PS D:\Wary\sensor_app\dist> ^C
+PS D:\Wary\sensor_app\dist> D:\Wary\sensor_app\dist
+D:\Wary\sensor_app\dist : The term 'D:\Wary\sensor_app\dist' is not recognized as the name of a cmdlet, 
+function, script file, or operable program. Check the spelling of the name, or if a path was included, verify 
+that the path is correct and try again.
+At line:1 char:1
++ D:\Wary\sensor_app\dist
++ ~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (D:\Wary\sensor_app\dist:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+ 
+PS D:\Wary\sensor_app\dist> pip install pywebview
+Collecting pywebview
+  Downloading pywebview-6.2.1-py3-none-any.whl.metadata (4.9 kB)
+Collecting pythonnet (from pywebview)
+  Downloading pythonnet-2.5.2.tar.gz (1.9 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.9/1.9 MB 86.8 kB/s  0:00:23
+  Installing build dependencies ... done
+  Getting requirements to build wheel ... done
+  Preparing metadata (pyproject.toml) ... done
+Collecting proxy_tools (from pywebview)
+  Downloading proxy_tools-0.1.0.tar.gz (3.0 kB)
+  Installing build dependencies ... done
+  Getting requirements to build wheel ... done
+  Preparing metadata (pyproject.toml) ... done
+Collecting bottle (from pywebview)
+  Downloading bottle-0.13.4-py2.py3-none-any.whl.metadata (1.6 kB)
+Collecting typing_extensions (from pywebview)
+  Downloading typing_extensions-4.15.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting pycparser (from pythonnet->pywebview)
+  Downloading pycparser-3.0-py3-none-any.whl.metadata (8.2 kB)
+Downloading pywebview-6.2.1-py3-none-any.whl (525 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 525.5/525.5 kB 82.2 kB/s  0:00:04
+Downloading bottle-0.13.4-py2.py3-none-any.whl (103 kB)
+Downloading pycparser-3.0-py3-none-any.whl (48 kB)
+Downloading typing_extensions-4.15.0-py3-none-any.whl (44 kB)
+Building wheels for collected packages: proxy_tools, pythonnet
+  Building wheel for proxy_tools (pyproject.toml) ... done
+  Created wheel for proxy_tools: filename=proxy_tools-0.1.0-py3-none-any.whl size=2943 sha256=6fa511ed28b334a6985d46bc777c1e88b25ac684c774e68975addfa00df18a8b
+  Stored in directory: c:\users\mahim\appdata\local\pip\cache\wheels\54\b4\ac\2b81b90ec2895608a2d68ceca60a4476b409bdfe16398a4251
+  Building wheel for pythonnet (pyproject.toml) ... error
+  error: subprocess-exited-with-error
+  
+  × Building wheel for pythonnet (pyproject.toml) did not run successfully.
+  │ exit code: 1
+  ╰─> [116 lines of output]
+      <string>:468: SyntaxWarning: "\*" is an invalid escape sequence. Such sequences will not work in the future. Did you mean "\\*"? A raw string is also an option.
+      <string>:533: SyntaxWarning: "\*" is an invalid escape sequence. Such sequences will not work in the future. Did you mean "\\*"? A raw string is also an option.
+      C:\Users\mahim\AppData\Local\Temp\pip-build-env-0mwbbk11\overlay\Lib\site-packages\setuptools\_vendor\wheel\bdist_wheel.py:4: FutureWarning: The 'wheel' package is no longer the canonical location of the 'bdist_wheel' command, and will be removed in a future release. Please update to setuptools v70.1 or later which contains an integrated version of this command.
+        warn(
+      C:\Users\mahim\AppData\Local\Temp\pip-build-env-0mwbbk11\overlay\Lib\site-packages\setuptools\dist.py:765: SetuptoolsDeprecationWarning: License classifiers are deprecated.
+      !!
+      
+              ********************************************************************************
+              Please consider removing the following classifiers in favor of a SPDX license expression:
+      
+              License :: OSI Approved :: MIT License
+      
+              See https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#license for details.
+              ********************************************************************************
+      
+      !!
+        self._finalize_license_expression()
+      running bdist_wheel
+      running build
+      running build_ext
+      Checking for updates from https://www.nuget.org/api/v2/.
+      Currently running NuGet.exe 4.1.0.
+      Updating NuGet.exe to 7.3.1.
+      Content Types XML does not match schema. Line 11, position 2.
+      Traceback (most recent call last):
+        File "C:\Users\mahim\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pip\_vendor\pyproject_hooks\_in_process\_in_process.py", line 389, in <module>
+          main()
+          ~~~~^^
+        File "C:\Users\mahim\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pip\_vendor\pyproject_hooks\_in_process\_in_process.py", line 373, in main
+          json_out["return_val"] = hook(**hook_input["kwargs"])
+                                   ~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        File "C:\Users\mahim\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pip\_vendor\pyproject_hooks\_in_process\_in_process.py", line 280, in build_wheel
+          return _build_backend().build_wheel(
+                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+              wheel_directory, config_settings, metadata_directory
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          )
+          ^
+        File "C:\Users\mahim\AppData\Local\Temp\pip-build-env-0mwbbk11\overlay\Lib\site-packages\setuptools\build_meta.py", line 441, in build_wheel
+          return _build(['bdist_wheel', '--dist-info-dir', str(metadata_directory)])
+        File "C:\Users\mahim\AppData\Local\Temp\pip-build-env-0mwbbk11\overlay\Lib\site-packages\setuptools\build_meta.py", line 429, in _build
+          return self._build_with_temp_dir(
+                 ~~~~~~~~~~~~~~~~~~~~~~~~~^
+              cmd,
+              ^^^^
+          ...<3 lines>...
+              self._arbitrary_args(config_settings),
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          )
+          ^
+        File "C:\Users\mahim\AppData\Local\Temp\pip-build-env-0mwbbk11\overlay\Lib\site-packages\setuptools\build_meta.py", line 410, in _build_with_temp_dir
+          self.run_setup()
+          ~~~~~~~~~~~~~~^^
+        File "C:\Users\mahim\AppData\Local\Temp\pip-build-env-0mwbbk11\overlay\Lib\site-packages\setuptools\build_meta.py", line 520, in run_setup
+          super().run_setup(setup_script=setup_script)
+          ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File "C:\Users\mahim\AppData\Local\Temp\pip-build-env-0mwbbk11\overlay\Lib\site-packages\setuptools\build_meta.py", line 317, in run_setup
+          exec(code, locals())
+          ~~~~^^^^^^^^^^^^^^^^
+        File "<string>", line 630, in <module>
+        File "C:\Users\mahim\AppData\Local\Temp\pip-build-env-0mwbbk11\overlay\Lib\site-packages\setuptools\__init__.py", line 117, in setup
+          return distutils.core.setup(**attrs)  # type: ignore[return-value]
+                 ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+        File "C:\Users\mahim\AppData\Local\Temp\pip-build-env-0mwbbk11\overlay\Lib\site-packages\setuptools\_distutils\core.py", line 186, in setup
+          return run_commands(dist)
+        File "C:\Users\mahim\AppData\Local\Temp\pip-build-env-0mwbbk11\overlay\Lib\site-packages\setuptools\_distutils\core.py", line 202, in run_commands
+          dist.run_commands()
+          ~~~~~~~~~~~~~~~~~^^
+        File "C:\Users\mahim\AppData\Local\Temp\pip-build-env-0mwbbk11\overlay\Lib\site-packages\setuptools\_distutils\dist.py", line 1000, in run_commands
+          self.run_command(cmd)
+          ~~~~~~~~~~~~~~~~^^^^^
+        File "C:\Users\mahim\AppData\Local\Temp\pip-build-env-0mwbbk11\overlay\Lib\site-packages\setuptools\dist.py", line 1107, in run_command
+          super().run_command(command)
+          ~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+        File "C:\Users\mahim\AppData\Local\Temp\pip-build-env-0mwbbk11\overlay\Lib\site-packages\setuptools\_distutils\dist.py", line 1019, in run_command
+          cmd_obj.run()
+          ~~~~~~~~~~~^^
+        File "<string>", line 612, in run
+        File "C:\Users\mahim\AppData\Local\Temp\pip-build-env-0mwbbk11\overlay\Lib\site-packages\setuptools\command\bdist_wheel.py", line 370, in run
+          self.run_command("build")
+          ~~~~~~~~~~~~~~~~^^^^^^^^^
+        File "C:\Users\mahim\AppData\Local\Temp\pip-build-env-0mwbbk11\overlay\Lib\site-packages\setuptools\_distutils\cmd.py", line 341, in run_command
+          self.distribution.run_command(command)
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+        File "C:\Users\mahim\AppData\Local\Temp\pip-build-env-0mwbbk11\overlay\Lib\site-packages\setuptools\dist.py", line 1107, in run_command
+          super().run_command(command)
+          ~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+        File "C:\Users\mahim\AppData\Local\Temp\pip-build-env-0mwbbk11\overlay\Lib\site-packages\setuptools\_distutils\dist.py", line 1019, in run_command
+          cmd_obj.run()
+          ~~~~~~~~~~~^^
+        File "C:\Users\mahim\AppData\Local\Temp\pip-build-env-0mwbbk11\overlay\Lib\site-packages\setuptools\_distutils\command\build.py", line 135, in run
+          self.run_command(cmd_name)
+          ~~~~~~~~~~~~~~~~^^^^^^^^^^
+        File "C:\Users\mahim\AppData\Local\Temp\pip-build-env-0mwbbk11\overlay\Lib\site-packages\setuptools\_distutils\cmd.py", line 341, in run_command
+          self.distribution.run_command(command)
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+        File "C:\Users\mahim\AppData\Local\Temp\pip-build-env-0mwbbk11\overlay\Lib\site-packages\setuptools\dist.py", line 1107, in run_command
+          super().run_command(command)
+          ~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+        File "C:\Users\mahim\AppData\Local\Temp\pip-build-env-0mwbbk11\overlay\Lib\site-packages\setuptools\_distutils\dist.py", line 1019, in run_command
+          cmd_obj.run()
+          ~~~~~~~~~~~^^
+        File "C:\Users\mahim\AppData\Local\Temp\pip-build-env-0mwbbk11\overlay\Lib\site-packages\setuptools\_distutils\command\build_ext.py", line 367, in run
+          self.build_extensions()
+          ~~~~~~~~~~~~~~~~~~~~~^^
+        File "C:\Users\mahim\AppData\Local\Temp\pip-build-env-0mwbbk11\overlay\Lib\site-packages\setuptools\_distutils\command\build_ext.py", line 483, in build_extensions
+          self._build_extensions_serial()
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+        File "C:\Users\mahim\AppData\Local\Temp\pip-build-env-0mwbbk11\overlay\Lib\site-packages\setuptools\_distutils\command\build_ext.py", line 509, in _build_extensions_serial
+          self.build_extension(ext)
+          ~~~~~~~~~~~~~~~~~~~~^^^^^
+        File "<string>", line 249, in build_extension
+        File "<string>", line 438, in _install_packages
+        File "C:\Users\mahim\AppData\Local\Python\pythoncore-3.14-64\Lib\subprocess.py", line 420, in check_call          raise CalledProcessError(retcode, cmd)
+      subprocess.CalledProcessError: Command 'tools\nuget\nuget.exe update -self' returned non-zero exit status 1.
+      [end of output]
+  
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+  ERROR: Failed building wheel for pythonnet
+Successfully built proxy_tools
+Failed to build pythonnet
+
+[notice] A new release of pip is available: 26.0.1 -> 26.1.1
+[notice] To update, run: C:\Users\mahim\AppData\Local\Python\pythoncore-3.14-64\python.exe -m pip install --upgrade pip
+error: failed-wheel-build-for-install
+
+× Failed to build installable wheels for some pyproject.toml based projects
+╰─> pythonnet
+PS D:\Wary\sensor_app\dist> ^C
