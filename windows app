@@ -1,1 +1,12 @@
-pyinstaller --onefile --add-data "templates;templates" --add-data "static;static" launcher.py
+_app\\dist\\templates' when adding binary and data files.
+(venv) PS D:\Wary\sensor_app\dist> cd dist
+(venv) PS D:\Wary\sensor_app\dist\dist> .\launcher.exe
+.\launcher.exe : The term '.\launcher.exe' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:1
++ .\launcher.exe
++ ~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (.\launcher.exe:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(venv) PS D
