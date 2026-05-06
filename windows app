@@ -1,7 +1,11 @@
-serial_lock = threading.Lock()
-data_lock = threading.Lock()
+import threading
+import webview
+from app import app
 
-saved_port = None
-saved_baud = None
+def run_flask():
+    app.run(debug=False, threaded=True, use_reloader=False)
 
-new_sample_ready = False
+if __name__ == '__main__':
+    threading.Thread(target=run_flask, daemon=True).start()
+    webview.create_window("Sensor App", "http://127.0.0.1:5000")
+    webview.start()
