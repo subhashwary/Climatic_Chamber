@@ -1,18 +1,17 @@
+import os
+import sys
 
-PS C:\Users\mahim> py -0
-Installed Pythons found by C:\WINDOWS\py.exe Launcher for Windows
- -3.14-64 *
- -3.11-64
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
 
-PS C:\Users\mahim> py -3.11 --version
-Python 3.11.9
-PS C:\Users\mahim> cd D:\Wary\sensor_app
-PS D:\Wary\sensor_app> rmdir /s /q venv
-Remove-Item : A positional parameter cannot be found that accepts argument '/q'.
-At line:1 char:1
-+ rmdir /s /q venv
-+ ~~~~~~~~~~~~~~~~
-    + CategoryInfo          : InvalidArgument: (:) [Remove-Item], ParameterBindingException
-    + FullyQualifiedErrorId : PositionalParameterNotFound,Microsoft.PowerShell.Commands.RemoveItemCommand
+from flask import Flask, render_template
 
-PS D:\Wary\sensor_app>
+app = Flask(
+    __name__,
+    template_folder=resource_path("templates"),
+    static_folder=resource_path("static")
+)
