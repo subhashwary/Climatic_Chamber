@@ -62,3 +62,20 @@ app = Flask(
 @app.route('/')
 def serve_ui():
     return render_template("index.html")
+
+
+
+
+PS D:\Wary\sensor_app> python launcher.py
+PS D:\Wary\sensor_app> .\launcher.exe
+.\launcher.exe : The term '.\launcher.exe' is not recognized as the name of a cmdlet, function, script file, 
+or operable program. Check the spelling of the name, or if a path was included, verify that the path is 
+correct and try again.
+At line:1 char:1
++ .\launcher.exe
++ ~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (.\launcher.exe:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+ 
+PS D:\Wary\sensor_app> 
+
