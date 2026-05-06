@@ -13,3 +13,20 @@ launcher.py
 
 
 py -m PyInstaller --onefile --noconsole --add-data "templates;templates" --add-data "images;images" launcher.py
+
+
+
+
+PS D:\Wary\sensor_app\dist> .\launcher.exe
+PS D:\Wary\sensor_app\dist> launcher.exe
+launcher.exe : The term 'launcher.exe' is not recognized as the name of a cmdlet, function, script file, or 
+operable program. Check the spelling of the name, or if a path was included, verify that the path is correct 
+and try again.
+At line:1 char:1
++ launcher.exe
++ ~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (launcher.exe:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+ 
+
+Suggestion [3,General]: The command launcher.exe was not found, but does exist in the current location. Windows PowerShell does not load commands from the current location by default. If you trust this command, instead type: ".\launcher.exe". See "get-help about_Command_Precedence" for more details.
