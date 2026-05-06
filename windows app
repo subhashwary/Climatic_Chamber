@@ -115,3 +115,39 @@ D:\Wary\sensor_app\dist
 
 launcher.exe → SensorApp.exe
 
+
+
+
+
+OutFile "SensorAppSetup.exe"
+InstallDir $PROGRAMFILES\SensorApp
+
+RequestExecutionLevel admin
+
+Page directory
+Page instfiles
+
+Section "Install"
+
+  SetOutPath $INSTDIR
+
+  File "dist\SensorApp.exe"
+
+  CreateShortcut "$DESKTOP\SensorApp.lnk" "$INSTDIR\SensorApp.exe"
+  CreateShortcut "$SMPROGRAMS\SensorApp.lnk" "$INSTDIR\SensorApp.exe"
+
+  WriteUninstaller "$INSTDIR\Uninstall.exe"
+
+SectionEnd
+
+
+Section "Uninstall"
+
+  Delete "$INSTDIR\SensorApp.exe"
+  Delete "$DESKTOP\SensorApp.lnk"
+  Delete "$SMPROGRAMS\SensorApp.lnk"
+
+  RMDir "$INSTDIR"
+
+SectionEnd
+
