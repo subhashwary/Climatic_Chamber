@@ -274,100 +274,7 @@ PS D:\Wary\sensor_app> cd dist
 >> 
  * Serving Flask app 'app'
  * Debug mode: off
-WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
- * Running on http://127.0.0.1:5000
-Press CTRL+C to quit
-127.0.0.1 - - [06/May/2026 10:53:43] "GET / HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:53:44] "GET /images/cense.png HTTP/1.1" 404 -
-127.0.0.1 - - [06/May/2026 10:53:44] "GET /images/IISc.png HTTP/1.1" 404 -
-127.0.0.1 - - [06/May/2026 10:53:44] "GET /images/phone.png HTTP/1.1" 404 -
-127.0.0.1 - - [06/May/2026 10:53:44] "GET /images/web.png HTTP/1.1" 404 -
-127.0.0.1 - - [06/May/2026 10:53:45] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:53:46] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:53:47] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:53:48] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:53:49] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:53:50] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:53:51] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:53:52] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:53:53] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:53:54] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:53:55] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:53:56] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:53:57] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:53:58] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:53:59] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:00] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:01] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:02] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:03] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:04] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:05] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:06] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:07] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:08] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:09] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:10] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:12] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:13] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:14] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:15] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:15] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:16] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:17] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:18] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:19] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:20] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:21] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:22] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:23] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:24] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:25] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:26] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:27] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:28] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:29] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:30] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:31] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:32] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:33] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:34] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:35] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:36] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:37] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:38] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:39] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:40] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:41] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:42] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:43] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:44] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:45] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:46] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:47] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:48] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:49] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:50] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:51] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:52] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:53] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:54] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:55] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:56] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:57] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:58] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:54:59] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:55:00] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:55:02] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:55:03] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:55:04] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:55:05] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:55:06] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:55:07] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:55:08] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:55:09] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2026 10:55:10] "GET /data HTTP/1.1" 200 -
-  File "launcher.py", line 17, in <module>
+WARNING: This is a development server. Do >
 [PYI-3304:ERROR] Failed to execute script 'launcher' due to unhandled exception!
 PS D:\Wary\sensor_app\dist> D:\Wary\sensor_app\dist
 D:\Wary\sensor_app\dist : The term 'D:\Wary\sensor_app\dist' is not recognized as the name of a cmdlet, 
@@ -554,3 +461,29 @@ error: failed-wheel-build-for-install
 × Failed to build installable wheels for some pyproject.toml based projects
 ╰─> pythonnet
 PS D:\Wary\sensor_app\dist> ^C
+
+
+
+
+
+
+PS D:\Wary\sensor_app> py -3.11 -m venv venv
+PS D:\Wary\sensor_app> venve\Scripts\activate 
+venve\Scripts\activate : The module 'venve' could not be loaded. For more information, run 'Import-Module 
+venve'.
+At line:1 char:1
++ venve\Scripts\activate
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (venve\Scripts\activate:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CouldNotAutoLoadModule
+ 
+PS D:\Wary\sensor_app> py -3.11 -m venv venv 
+PS D:\Wary\sensor_app> venv\Scripts\activate 
+venv\Scripts\activate : File D:\Wary\sensor_app\venv\Scripts\Activate.ps1 cannot be loaded because running 
+scripts is disabled on this system. For more information, see about_Execution_Policies at 
+https:/go.microsoft.com/fwlink/?LinkID=135170.
+At line:1 char:1
++ venv\Scripts\activate
++ ~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : SecurityError: (:) [], PSSecurityException
+    + FullyQualifiedErrorId : UnauthorizedAccess
