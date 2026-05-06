@@ -1,14 +1,18 @@
-Windows PowerShell
-Copyright (C) Microsoft Corporation. All rights reserved.
+CurrentUser
 
-Try the new cross-platform PowerShell https://aka.ms/pscore6
-
-PS C:\Users\mahim> Set-ExecutionPolicy -ExectionPolicy RemoteSigned -Scope CurrentUser
-Set-ExecutionPolicy : A parameter cannot be found that matches parameter name 'ExectionPolicy'.
-At line:1 char:21
-+ Set-ExecutionPolicy -ExectionPolicy RemoteSigned -Scope CurrentUser
-+                     ~~~~~~~~~~~~~~~
-    + CategoryInfo          : InvalidArgument: (:) [Set-ExecutionPolicy], ParameterBindingException
-    + FullyQualifiedErrorId : NamedParameterNotFound,Microsoft.PowerShell.Commands.SetExecutionPolicyCommand
+Execution Policy Change
+The execution policy helps protect you from scripts that you do not trust. Changing the execution policy might expose
+you to the security risks described in the about_Execution_Policies help topic at
+https:/go.microsoft.com/fwlink/?LinkID=135170. Do you want to change the execution policy?
+[Y] Yes  [A] Yes to All  [N] No  [L] No to All  [S] Suspend  [?] Help (default is "N"): y
+PS C:\Users\mahim> .\venv\Scripts\Activate.ps1
+.\venv\Scripts\Activate.ps1 : The term '.\venv\Scripts\Activate.ps1' is not recognized as the name of a cmdlet,
+function, script file, or operable program. Check the spelling of the name, or if a path was included, verify that the
+path is correct and try again.
+At line:1 char:1
++ .\venv\Scripts\Activate.ps1
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (.\venv\Scripts\Activate.ps1:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
 
 PS C:\Users\mahim>
