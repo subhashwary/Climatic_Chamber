@@ -99,3 +99,13 @@ if __name__ == "__main__":
 
     while True:
         time.sleep(1)
+
+
+
+
+
+py -m PyInstaller --onefile --add-data "templates;templates" --add-data "images;images" launcher.py
+
+
+cd dist
+.\launcher.exe
