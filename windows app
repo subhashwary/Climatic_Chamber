@@ -1,5 +1,1 @@
-pyinstaller --onefile --windowed ^
---add-data "templates;templates" ^
---add-data "static;static" ^
---hidden-import flask_cors ^
-launcher.py
+pyinstaller --onefile --windowed --add-data "templates;templates" --add-data "static;static" --hidden-import flask_cors launcher.py
