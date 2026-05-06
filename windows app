@@ -59,3 +59,6 @@ app = Flask(
 )
 
 
+@app.route('/')
+def serve_ui():
+    return render_template("index.html")
