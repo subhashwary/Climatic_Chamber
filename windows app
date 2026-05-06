@@ -1,5 +1,13 @@
-pyinstaller --onefile --windowed ^
---add-data "templates;templates" ^
---add-data "static;static" ^
---hidden-import flask_cors ^
-launcher.py
+successfully.
+49058 INFO: Build complete! The results are available in: D:\Wary\sensor_app\dist
+(venv) PS D:\Wary\sensor_app> .\launcher.exe
+.\launcher.exe : The term '.\launcher.exe' is not recognized as the name of a cmdlet, function, script file, or
+operable program. Check the spelling of the name, or if a path was included, verify that the path is correct and try
+again.
+At line:1 char:1
++ .\launcher.exe
++ ~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (.\launcher.exe:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(venv) PS D:\Wary\sensor_app>
