@@ -30,3 +30,6 @@ At line:1 char:1
  
 
 Suggestion [3,General]: The command launcher.exe was not found, but does exist in the current location. Windows PowerShell does not load commands from the current location by default. If you trust this command, instead type: ".\launcher.exe". See "get-help about_Command_Precedence" for more details.
+
+
+py -m PyInstaller --onefile --add-data "templates;templates" --add-data "images;images" launcher.py
