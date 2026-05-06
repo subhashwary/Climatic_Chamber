@@ -1,1 +1,4 @@
-pyinstaller --onefile --windowed --add-data "templates;templates" --add-data "static;static" --hidden-import flask_cors launcher.py
+<img src="{{ url_for('static', filename='images/cense.png') }}">
+<img src="{{ url_for('static', filename='images/IISc.png') }}">
+<img src="{{ url_for('static', filename='images/phone.png') }}">
+<img src="{{ url_for('static', filename='images/web.png') }}">
