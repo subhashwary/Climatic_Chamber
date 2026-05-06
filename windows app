@@ -6,3 +6,20 @@
 467 INFO: Python environment: D:\Wary\sensor_app\venv
 ERROR: Script file 'launcher.py' does not exist.
 (venv) PS D:\Wary\sensor_app\dist>
+467 INFO: Platform: Windows-10-10.0.19045-SP0
+467 INFO: Python environment: D:\Wary\sensor_app\venv
+ERROR: Script file 'launcher.py' does not exist.
+(venv) PS D:\Wary\sensor_app\dist> cd
+(venv) PS D:\Wary\sensor_app\dist> dir
+
+
+    Directory: D:\Wary\sensor_app\dist
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----        06-05-2026     12:29       13887731 launcher.exe
+-a----        06-05-2026     10:53       12786893 SensorApp.exe
+
+
+(venv) PS D:\Wary\sensor_app\dist>
