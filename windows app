@@ -109,3 +109,9 @@ py -m PyInstaller --onefile --add-data "templates;templates" --add-data "images;
 
 cd dist
 .\launcher.exe
+
+
+D:\Wary\sensor_app\dist
+
+launcher.exe → SensorApp.exe
+
