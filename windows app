@@ -1,1 +1,9 @@
-pyinstaller --onefile --add-data "templates;templates" --add-data "static;static" --hidden-import flask_cors launcher.py
+Installing collected packages: flask-cors
+Successfully installed flask-cors-6.0.2
+(venv) PS D:\Wary\sensor_app\dist> pyinstaller --onefile --add-data "templates;templates" --add-data "static;static" --hidden-import flask_cors launcher.py
+452 INFO: PyInstaller: 6.20.0, contrib hooks: 2026.5
+452 INFO: Python: 3.11.9
+467 INFO: Platform: Windows-10-10.0.19045-SP0
+467 INFO: Python environment: D:\Wary\sensor_app\venv
+ERROR: Script file 'launcher.py' does not exist.
+(venv) PS D:\Wary\sensor_app\dist>
