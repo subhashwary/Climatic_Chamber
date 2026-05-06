@@ -33,3 +33,9 @@ Suggestion [3,General]: The command launcher.exe was not found, but does exist i
 
 
 py -m PyInstaller --onefile --add-data "templates;templates" --add-data "images;images" launcher.py
+
+
+
+
+from flask import Flask, jsonify, request, Response, render_template
+
