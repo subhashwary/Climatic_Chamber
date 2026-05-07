@@ -1,1 +1,45 @@
-pyinstaller --noconsole --onefile --add-data "templates;templates" --add-data "static;static" --icon=static/images/app.ico launcher.py
+ce written to D:\Wary\sensor_app\build\launcher\xref-launcher.html
+55992 INFO: checking PYZ
+56079 INFO: checking PKG
+56109 INFO: Building because toc changed
+56109 INFO: Building PKG (CArchive) launcher.pkg
+59711 INFO: Building PKG (CArchive) launcher.pkg completed successfully.
+59719 INFO: Bootloader D:\Wary\sensor_app\venv\Lib\site-packages\PyInstaller\bootloader\Windows-64bit-intel\runw.exe
+59719 INFO: checking EXE
+59745 INFO: Building because icon changed
+59746 INFO: Building EXE from EXE-00.toc
+59748 INFO: Copying bootloader EXE to D:\Wary\sensor_app\dist\launcher.exe
+60089 INFO: Copying icon to EXE
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "D:\Wary\sensor_app\venv\Scripts\pyinstaller.exe\__main__.py", line 5, in <module>
+  File "D:\Wary\sensor_app\venv\Lib\site-packages\PyInstaller\__main__.py", line 231, in _console_script_run
+    run()
+  File "D:\Wary\sensor_app\venv\Lib\site-packages\PyInstaller\__main__.py", line 215, in run
+    run_build(pyi_config, spec_file, **vars(args))
+  File "D:\Wary\sensor_app\venv\Lib\site-packages\PyInstaller\__main__.py", line 70, in run_build
+    PyInstaller.building.build_main.main(pyi_config, spec_file, **kwargs)
+  File "D:\Wary\sensor_app\venv\Lib\site-packages\PyInstaller\building\build_main.py", line 1275, in main
+    build(specfile, distpath, workpath, clean_build)
+  File "D:\Wary\sensor_app\venv\Lib\site-packages\PyInstaller\building\build_main.py", line 1213, in build
+    exec(code, spec_namespace)
+  File "D:\Wary\sensor_app\launcher.spec", line 19, in <module>
+    exe = EXE(
+          ^^^^
+  File "D:\Wary\sensor_app\venv\Lib\site-packages\PyInstaller\building\api.py", line 675, in __init__
+    self.__postinit__()
+  File "D:\Wary\sensor_app\venv\Lib\site-packages\PyInstaller\building\datastruct.py", line 184, in __postinit__
+    self.assemble()
+  File "D:\Wary\sensor_app\venv\Lib\site-packages\PyInstaller\building\api.py", line 788, in assemble
+    self._retry_operation(icon.CopyIcons, build_name, self.icon)
+  File "D:\Wary\sensor_app\venv\Lib\site-packages\PyInstaller\building\api.py", line 1058, in _retry_operation
+    return func(*args)
+           ^^^^^^^^^^^
+  File "D:\Wary\sensor_app\venv\Lib\site-packages\PyInstaller\utils\win32\icon.py", line 206, in CopyIcons
+    srcpath = normalize_icon_type(srcpath, ("exe", "ico"), "ico", config.CONF["workpath"])
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Wary\sensor_app\venv\Lib\site-packages\PyInstaller\building\icon.py", line 34, in normalize_icon_type
+    raise FileNotFoundError(f"Icon input file {icon_path} not found")
+FileNotFoundError: Icon input file D:\Wary\sensor_app\static\images\app.ico not found
+(venv) PS D:\Wary\sensor_app>
