@@ -1,1 +1,20 @@
-pyinstaller --noconsole --onefile --add-data "templates;templates" --add-data "static;static" --icon=static/images/cense.ico launcher.py
+[Setup]
+AppName=GTRE Sensor Dashboard
+AppVersion=1.0
+DefaultDirName={autopf}\GTRE Sensor Dashboard
+DefaultGroupName=GTRE Sensor Dashboard
+OutputDir=installer_output
+OutputBaseFilename=GTRE_Sensor_Setup
+Compression=lzma
+SolidCompression=yes
+SetupIconFile=static\images\IISc.ico
+
+[Files]
+Source: "dist\launcher.exe"; DestDir: "{app}"; Flags: ignoreversion
+
+[Icons]
+Name: "{group}\GTRE Sensor Dashboard"; Filename: "{app}\launcher.exe"
+Name: "{commondesktop}\GTRE Sensor Dashboard"; Filename: "{app}\launcher.exe"
+
+[Run]
+Filename: "{app}\launcher.exe"; Description: "Launch Application"; Flags: nowait postinstall skipifsilent
