@@ -1,1 +1,3 @@
-<img class="iisc-logo" src="{{ url_for('static', filename='images/IISc.png') }}">
+.iisc-logo {
+    height: 95px;
+}
