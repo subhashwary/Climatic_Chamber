@@ -1047,7 +1047,7 @@ function autoScaleYAxis(chart) {
 
     if (allValues.length === 0) return;
 
-    // allValues = allValues.filter(v => Number.isFinite(v));
+    allValues = allValues.filter(v => Number.isFinite(v));
 
     let min = Math.min(...allValues);
     let max = Math.max(...allValues);
