@@ -1,11 +1,9 @@
-(venv) PS D:\Wary\sensor_app> .\dist\launcher.exe
-(venv) PS D:\Wary\sensor_app> pyhon launcher.py
-pyhon : The term 'pyhon' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path was included, verify that the
-path is correct and try again.
-At line:1 char:1
-+ pyhon launcher.py
-+ ~~~~~
-    + CategoryInfo          : ObjectNotFound: (pyhon:String) [], CommandNotFoundException
-    + FullyQualifiedErrorId : CommandNotFoundException
+/* IISc logo bigger */
+.iisc-logo {
+    height: 95px;
+}
 
-(venv) PS D:\Wary\sensor_app>
+/* CeNSE logo smaller */
+.cense-logo {
+    height: 65px;
+}
