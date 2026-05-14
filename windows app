@@ -1,11 +1,17 @@
-        <img src="/static/images/cense.png" alt="CeNSE">
-    </div>
+.banner-text h1 {
+    margin: 0;
+    font-size: 34px;   /* Centre for Nano Science and Engineering */
+    font-weight: bold;
+}
 
-    <div class="banner-text">
-        <h1>Centre for Nano Science and Engineering</h1>
-        <h2>Indian Institute of Science</h2>
-        <p>Bangalore, 560012</p>
-    </div>
+.banner-text h2 {
+    margin: 5px 0;
+    font-size: 24px;   /* Indian Institute of Science */
+    font-weight: 600;
+}
 
-    <div class="logo right">
-        <img src="/static/images/IISc.png" alt="IISc">
+.banner-text p {
+    margin: 0;
+    font-size: 20px;   /* Bangalore, 560012 */
+    font-weight: 500;
+}
