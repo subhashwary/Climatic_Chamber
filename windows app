@@ -1,20 +1,61 @@
 import serial
 import time
 
-ports = ["COM5", "COM6", "COM11", "COM12"]
 
-for port in ports:
-    try:
-        ser = serial.Serial(port, baudrate=9600, timeout=2)
+class SCPIInstrument:
+    def __init__(self, port, baudrate=9600, timeout=2):
+        self.port = port
+        self.ser = serial.Serial(port, baudrate=baudrate, timeout=timeout)
         time.sleep(1)
 
-        ser.write(b"*IDN?\n")
-        time.sleep(0.5)
+    def write(self, cmd):
+        if not cmd.endswith("\n"):
+            cmd += "\n"
+        self.ser.write(cmd.encode())
 
-        response = ser.readline().decode(errors='ignore').strip()
+    def query(self, cmd):
+        self.write(cmd)
+        time.sleep(0.2)
+        return self.ser.readline().decode(errors='ignore').strip()
 
-        print(f"{port}: {response if response else 'No response'}")
-        ser.close()
+    def close(self):
+        if self.ser.is_open:
+            self.ser.close()
 
-    except Exception as e:
-        print(f"{port}: Not available ({e})")
+
+class PowerSupply(SCPIInstrument):
+    def idn(self):
+        return self.query("*IDN?")
+
+    def set_voltage(self, voltage):
+        self.write(f"VSET1:{voltage}")
+
+    def set_current(self, current):
+        self.write(f"ISET1:{current}")
+
+    def get_voltage(self):
+        return self.query("VOUT1?")
+
+    def get_current(self):
+        return self.query("IOUT1?")
+
+    def output_on(self):
+        self.write("OUT1")
+
+    def output_off(self):
+        self.write("OUT0")
+
+
+class Multimeter(SCPIInstrument):
+    def idn(self):
+        return self.query("*IDN?")
+
+    def measure_voltage(self):
+        self.write("CONF:VOLT:DC")
+        time.sleep(0.3)
+        return self.query("READ?")
+
+    def continuity(self):
+        self.write("CONF:CONT")
+        time.sleep(0.3)
+        return self.query("READ?")
