@@ -1,2 +1,11 @@
-copy "D:\SomeFolder\cense.png" "D:\Wary\MEMS\static\images\"
-copy "D:\SomeFolder\IISc.png" "D:\Wary\MEMS\static\images\"
+        <img src="/static/images/cense.png" alt="CeNSE">
+    </div>
+
+    <div class="banner-text">
+        <h1>Centre for Nano Science and Engineering</h1>
+        <h2>Indian Institute of Science</h2>
+        <p>Bangalore, 560012</p>
+    </div>
+
+    <div class="logo right">
+        <img src="/static/images/IISc.png" alt="IISc">
