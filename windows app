@@ -1,61 +1,32 @@
-import serial
-import time
+import csv
+import os
+from datetime import datetime
+
+CSV_FILE = "sensor_data.csv"
 
 
-class SCPIInstrument:
-    def __init__(self, port, baudrate=9600, timeout=2):
-        self.port = port
-        self.ser = serial.Serial(port, baudrate=baudrate, timeout=timeout)
-        time.sleep(1)
-
-    def write(self, cmd):
-        if not cmd.endswith("\n"):
-            cmd += "\n"
-        self.ser.write(cmd.encode())
-
-    def query(self, cmd):
-        self.write(cmd)
-        time.sleep(0.2)
-        return self.ser.readline().decode(errors='ignore').strip()
-
-    def close(self):
-        if self.ser.is_open:
-            self.ser.close()
+def initialize_csv():
+    if not os.path.exists(CSV_FILE):
+        with open(CSV_FILE, "w", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow([
+                "Timestamp",
+                "Pressure_kPa",
+                "DMM_Voltage",
+                "PSU_Voltage",
+                "PSU_Current",
+                "Mode"
+            ])
 
 
-class PowerSupply(SCPIInstrument):
-    def idn(self):
-        return self.query("*IDN?")
-
-    def set_voltage(self, voltage):
-        self.write(f"VSET1:{voltage}")
-
-    def set_current(self, current):
-        self.write(f"ISET1:{current}")
-
-    def get_voltage(self):
-        return self.query("VOUT1?")
-
-    def get_current(self):
-        return self.query("IOUT1?")
-
-    def output_on(self):
-        self.write("OUT1")
-
-    def output_off(self):
-        self.write("OUT0")
-
-
-class Multimeter(SCPIInstrument):
-    def idn(self):
-        return self.query("*IDN?")
-
-    def measure_voltage(self):
-        self.write("CONF:VOLT:DC")
-        time.sleep(0.3)
-        return self.query("READ?")
-
-    def continuity(self):
-        self.write("CONF:CONT")
-        time.sleep(0.3)
-        return self.query("READ?")
+def log_data(pressure, dmm_voltage, psu_voltage, psu_current, mode):
+    with open(CSV_FILE, "a", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow([
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            pressure,
+            dmm_voltage,
+            psu_voltage,
+            psu_current,
+            mode
+        ])
