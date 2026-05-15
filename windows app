@@ -1,17 +1,7 @@
-.banner-text h1 {
-    margin: 0;
-    font-size: 34px;   /* Centre for Nano Science and Engineering */
-    font-weight: bold;
-}
+import pyvisa
 
-.banner-text h2 {
-    margin: 5px 0;
-    font-size: 24px;   /* Indian Institute of Science */
-    font-weight: 600;
-}
+rm = pyvisa.ResourceManager()
 
-.banner-text p {
-    margin: 0;
-    font-size: 20px;   /* Bangalore, 560012 */
-    font-weight: 500;
-}
+devices = rm.list_resources()
+
+print(devices)
