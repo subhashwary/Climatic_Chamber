@@ -1,20 +1,93 @@
-(venv) PS D:\Wary\MEMS> pip install pyvisa pyvisa-py
-  Using cached pyvisa-1.16.2-py3-none-any.whl.metadata (7.2 kB)
-Collecting pyvisa-py
-  Using cached pyvisa_py-0.8.1-py3-none-any.whl.metadata (6.8 kB)
-Collecting typing_extensions>=4.0.0 (from pyvisa)
-  Using cached typing_extensions-4.15.0-py3-none-any.whl.metadata (3.3 kB)
-Using cached pyvisa-1.16.2-py3-none-any.whl (181 kB)
-Using cached pyvisa_py-0.8.1-py3-none-any.whl (82 kB)
-Using cached typing_extensions-4.15.0-py3-none-any.whl (44 kB)
-Installing collected packages: typing_extensions, pyvisa, pyvisa-py
-Successfully installed pyvisa-1.16.2 pyvisa-py-0.8.1 typing_extensions-4.15.0
+;------------------------------------------------------------------------------
+; Comunication Device Class driver (CDC) INF FILE
+; (C)2010 Copyright DSO
+;------------------------------------------------------------------------------
 
-[notice] A new release of pip is available: 24.0 -> 26.1.1
-[notice] To update, run: python.exe -m pip install --upgrade pip
-(venv) PS D:\Wary\MEMS> python test_dmm.py
-D:\Wary\MEMS\venv\Lib\site-packages\pyvisa_py\tcpip.py:443: UserWarning: TCPIP:instr resource discovery is limited to the default interface.Install psutil: pip install psutil if you want to scan all interfaces.
-  warnings.warn(
-D:\Wary\MEMS\venv\Lib\site-packages\pyvisa_py\tcpip.py:122: UserWarning: TCPIP::hislip resource discovery requires the zeroconf package to be installed... try 'pip install zeroconf'
-  warnings.warn(
-('ASRL1::INSTR', 'TCPIP::10.56.10.35::INSTR')
+[Version]
+Signature="$Windows NT$"
+Class=Ports
+ClassGuid={4D36E978-E325-11CE-BFC1-08002BE10318}
+Provider=%MANUFACTURER%
+LayoutFile=layout.inf
+CatalogFile=%FILENAME%.cat
+
+DriverVer= 05/05/2015, 1.02.0
+
+[Manufacturer]
+%MANUFACTURER%=DeviceList,NTamd64
+
+[DestinationDirs]
+DefaultDestDir=12
+
+
+;------------------------------------------------------------------------------
+;              Windows 2000/XP/Vista/7/8 x86 Support
+;------------------------------------------------------------------------------
+[DriverInstall.nt]
+include=mdmcpq.inf
+;CopyFiles=DriverCopyFiles.nt
+CopyFiles = FakeModemCopyFileSection
+AddReg=DriverInstall.nt.AddReg
+
+[DriverInstall.nt.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,usbser.sys
+HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
+
+[DriverInstall.nt.Services]
+AddService=usbser, 0x00000002, DriverService.nt
+
+[DriverService.nt]
+DisplayName=%SERVICE%
+ServiceType=1
+StartType=3
+ErrorControl=1
+ServiceBinary=%12%\usbser.sys
+
+;------------------------------------------------------------------------------
+;              Windows XP/Vista/7/8 x64 Support
+;------------------------------------------------------------------------------
+
+[DriverInstall.NTamd64]
+include=mdmcpq.inf
+;CopyFiles=DriverCopyFiles.NTamd64
+CopyFiles = FakeModemCopyFileSection
+AddReg=DriverInstall.NTamd64.AddReg
+
+[DriverInstall.NTamd64.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,usbser.sys
+HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
+
+[DriverInstall.NTamd64.Services]
+AddService=usbser, 0x00000002, DriverService.NTamd64
+
+[DriverService.NTamd64]
+DisplayName=%SERVICE%
+ServiceType=1
+StartType=3
+ErrorControl=1
+ServiceBinary=%12%\usbser.sys
+
+
+;------------------------------------------------------------------------------
+;            VID/PID Settings
+;------------------------------------------------------------------------------
+[SourceDisksFiles]
+[SourceDisksNames]
+[DeviceList]
+%DESCRIPTION1%=DriverInstall, USB\VID_2184&PID_001A
+
+[DeviceList.NTamd64]
+%DESCRIPTION1%=DriverInstall, USB\VID_2184&PID_001A
+
+;------------------------------------------------------------------------------
+;              String Definitions
+;------------------------------------------------------------------------------
+[Strings]
+
+FILENAME="gdm_8261a"
+MANUFACTURER="GWinstek"
+INSTDISK="USB2UART"
+DESCRIPTION1="GDM-8261A"
+SERVICE="Virtual Com Driver"
