@@ -1,93 +1,15 @@
-;------------------------------------------------------------------------------
-; Comunication Device Class driver (CDC) INF FILE
-; (C)2010 Copyright DSO
-;------------------------------------------------------------------------------
+import serial.tools.list_ports
 
-[Version]
-Signature="$Windows NT$"
-Class=Ports
-ClassGuid={4D36E978-E325-11CE-BFC1-08002BE10318}
-Provider=%MANUFACTURER%
-LayoutFile=layout.inf
-CatalogFile=%FILENAME%.cat
+print("\nAvailable COM Ports:\n")
 
-DriverVer= 05/05/2015, 1.02.0
+ports = serial.tools.list_ports.comports()
 
-[Manufacturer]
-%MANUFACTURER%=DeviceList,NTamd64
+if len(ports) == 0:
+    print("No COM ports detected.")
 
-[DestinationDirs]
-DefaultDestDir=12
-
-
-;------------------------------------------------------------------------------
-;              Windows 2000/XP/Vista/7/8 x86 Support
-;------------------------------------------------------------------------------
-[DriverInstall.nt]
-include=mdmcpq.inf
-;CopyFiles=DriverCopyFiles.nt
-CopyFiles = FakeModemCopyFileSection
-AddReg=DriverInstall.nt.AddReg
-
-[DriverInstall.nt.AddReg]
-HKR,,DevLoader,,*ntkern
-HKR,,NTMPDriver,,usbser.sys
-HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
-
-[DriverInstall.nt.Services]
-AddService=usbser, 0x00000002, DriverService.nt
-
-[DriverService.nt]
-DisplayName=%SERVICE%
-ServiceType=1
-StartType=3
-ErrorControl=1
-ServiceBinary=%12%\usbser.sys
-
-;------------------------------------------------------------------------------
-;              Windows XP/Vista/7/8 x64 Support
-;------------------------------------------------------------------------------
-
-[DriverInstall.NTamd64]
-include=mdmcpq.inf
-;CopyFiles=DriverCopyFiles.NTamd64
-CopyFiles = FakeModemCopyFileSection
-AddReg=DriverInstall.NTamd64.AddReg
-
-[DriverInstall.NTamd64.AddReg]
-HKR,,DevLoader,,*ntkern
-HKR,,NTMPDriver,,usbser.sys
-HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
-
-[DriverInstall.NTamd64.Services]
-AddService=usbser, 0x00000002, DriverService.NTamd64
-
-[DriverService.NTamd64]
-DisplayName=%SERVICE%
-ServiceType=1
-StartType=3
-ErrorControl=1
-ServiceBinary=%12%\usbser.sys
-
-
-;------------------------------------------------------------------------------
-;            VID/PID Settings
-;------------------------------------------------------------------------------
-[SourceDisksFiles]
-[SourceDisksNames]
-[DeviceList]
-%DESCRIPTION1%=DriverInstall, USB\VID_2184&PID_001A
-
-[DeviceList.NTamd64]
-%DESCRIPTION1%=DriverInstall, USB\VID_2184&PID_001A
-
-;------------------------------------------------------------------------------
-;              String Definitions
-;------------------------------------------------------------------------------
-[Strings]
-
-FILENAME="gdm_8261a"
-MANUFACTURER="GWinstek"
-INSTDISK="USB2UART"
-DESCRIPTION1="GDM-8261A"
-SERVICE="Virtual Com Driver"
+else:
+    for port in ports:
+        print(f"Port: {port.device}")
+        print(f"Description: {port.description}")
+        print(f"HWID: {port.hwid}")
+        print("-" * 40)
