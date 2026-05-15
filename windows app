@@ -1,15 +1,14 @@
-import serial.tools.list_ports
+(venv) PS D:\Wary\MEMS> python test_dmm.py
+D:\Wary\MEMS\venv\Lib\site-packages\pyvisa_py\tcpip.py:443: UserWarning: TCPIP:instr resource discovery is limited to the default interface.Install psutil: pip install psutil if you want to scan all interfaces.
+  warnings.warn(
+D:\Wary\MEMS\venv\Lib\site-packages\pyvisa_py\tcpip.py:122: UserWarning: TCPIP::hislip resource discovery requires the zeroconf package to be installed... try 'pip install zeroconf'
+  warnings.warn(
+('ASRL1::INSTR', 'TCPIP::10.56.10.35::INSTR')
+(venv) PS D:\Wary\MEMS> python find_ports.py
 
-print("\nAvailable COM Ports:\n")
+Available COM Ports:
 
-ports = serial.tools.list_ports.comports()
-
-if len(ports) == 0:
-    print("No COM ports detected.")
-
-else:
-    for port in ports:
-        print(f"Port: {port.device}")
-        print(f"Description: {port.description}")
-        print(f"HWID: {port.hwid}")
-        print("-" * 40)
+Port: COM1
+Description: Communications Port (COM1)
+HWID: ACPI\PNP0501\1
+----------------------------------------
