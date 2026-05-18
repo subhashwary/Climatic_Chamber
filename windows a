@@ -1,19 +1,38 @@
-from instrument import Multimeter
+import serial
 import time
 
-# CONNECT TO DMM
-dmm = Multimeter("COM3")
 
-# PRINT DMM ID
-print("DMM ID:")
-print(dmm.idn())
+class Multimeter:
 
-print("\nReading Voltage...\n")
+    def __init__(self, port):
 
-while True:
+        self.ser = serial.Serial(
+            port=port,
+            baudrate=9600,
+            timeout=1
+        )
 
-    voltage = dmm.measure_voltage()
+        time.sleep(1)
 
-    print("Voltage =", voltage, "V")
+    def write(self, cmd):
+        self.ser.write((cmd + '\n').encode())
 
-    time.sleep(1)
+    def read(self):
+        return self.ser.readline().decode().strip()
+
+    def query(self, cmd):
+        self.write(cmd)
+        return self.read()
+
+    def idn(self):
+        return self.query("*IDN?")
+
+    def measure_voltage(self):
+
+        response = self.query("MEAS:VOLT:DC?")
+
+        print("RAW RESPONSE:", response)
+
+        value = response.split(',')[0]
+
+        return float(value)
