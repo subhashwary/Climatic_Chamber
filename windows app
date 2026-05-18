@@ -1,5 +1,6 @@
-(venv) PS D:\Wary\MEMS> python test_dmm.py
-GWInstek,GDM8261A,GEO882227,1.02
-RAW RESPONSE: +1.6332E-3,+0.0E+0
-Measurement Error: could not convert string to float: '+1.6332E-3,+0.0E+0'
-0.0
+response = response.strip()
+
+# Split primary and secondary readings
+primary_value = response.split(",")[0]
+
+return float(primary_value)
