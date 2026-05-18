@@ -1,44 +1,50 @@
-PS D:\Wary\MEMS> (Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned) ; (& d:\Wary\MEMS\venv\Scripts\Activate.ps1)
-(venv) PS D:\Wary\MEMS> python test_dmm.py
-  File "D:\Wary\MEMS\test_dmm.py", line 5, in <module>
-    print(dmm.idn())
-          ^^^^^^^^^
-  File "D:\Wary\MEMS\instrument.py", line 59, in idn
-    return self.query("*IDN?")
-           ^^^^^^^^^^
-AttributeError: 'Multimeter' object has no attribute 'query'
-(venv) PS D:\Wary\MEMS> python test_dmm.py
-GWInstek,GDM8261A,GEO882227,1.02
-RAW RESPONSE: +1.6332E-3,+0.0E+0
-Measurement Error: could not convert string to float: '+1.6332E-3,+0.0E+0'
-0.0
-(venv) PS D:\Wary\MEMS> ^C
-GWInstek,GDM8261A,GEO882227,1.02
-RAW RESPONSE: +1.4531E-3,+0.0E+0
-0.0014531
-GWInstek,GDM8261A,GEO882227,1.02
-RAW RESPONSE: +1.3247E-3,+0.0E+0
-0.0013247
-(venv) PS D:\Wary\MEMS> python app.py     
-PSU connection failed: could not open port 'COM6': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)
-Digital Multimeter connected: GWInstek,GDM8261A,GEO882227,1.02
- * Serving Flask app 'app'
- * Debug mode: on
-WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
- * Running on http://127.0.0.1:5000
-Press CTRL+C to quit
- * Restarting with stat
-PSU connection failed: could not open port 'COM6': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)
-DMM connection failed: could not open port 'COM3': PermissionError(13, 'Access is denied.', None, 5)
- * Debugger is active!
- * Debugger PIN: 426-709-488
-(venv) PS D:\Wary\MEMS> python app.py
-PSU connection failed: could not open port 'COM6': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)
-Digital Multimeter connected: GWInstek,GDM8261A,GEO882227,1.02
- * Serving Flask app 'app'
- * Debug mode: on
-WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
- * Running on http://127.0.0.1:5000
-Press CTRL+C to quit
-(venv) PS D:\Wary\MEMS> ^C
-(venv) PS D:\Wary\MEMS> ^C
+import serial.tools.list_ports
+
+# =========================================================
+# GET AVAILABLE COM PORTS
+# =========================================================
+@app.route('/ports')
+def get_ports():
+
+    ports = serial.tools.list_ports.comports()
+
+    port_list = []
+
+    for port in ports:
+        port_list.append({
+            "device": port.device,
+            "description": port.description
+        })
+
+    return jsonify(port_list)
+
+
+# =========================================================
+# CONNECT DMM
+# =========================================================
+@app.route('/connect_dmm', methods=['POST'])
+def connect_dmm():
+
+    global dmm
+
+    data = request.json
+    com_port = data.get("port")
+
+    try:
+        dmm = Multimeter(com_port)
+
+        return jsonify({
+            "status": "connected",
+            "id": dmm.idn()
+        })
+
+    except Exception as e:
+
+        dmm = None
+
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+
