@@ -1,3 +1,1 @@
-// DMM REAL-TIME DISPLAY
-document.getElementById('dmmVoltage').value =
-    Number(data.dmm_voltage).toFixed(4).padStart(8, '0');
+<input type="text" id="dmmVoltage" readonly value="000.0000">
