@@ -1,35 +1,7 @@
-import serial
-import time
-
-class Multimeter:
-
-    def __init__(self, port):
-
-        self.ser = serial.Serial(
-            port=port,
-            baudrate=9600,
-            timeout=1
-        )
-
-        time.sleep(1)
-
-    def write(self, cmd):
-        self.ser.write((cmd + '\n').encode())
-
-    def read(self):
-        return self.ser.readline().decode().strip()
-
-    def query(self, cmd):
-        self.write(cmd)
-        return self.read()
-
-    def idn(self):
-        return self.query("*IDN?")
-
-    def measure_voltage(self):
-
-        response = self.query("MEAS:VOLT:DC?")
-
-        value = response.split(',')[0]
-
-        return float(value)
+PS D:\Wary\MEMS> python test_dmm.py                                                                                             
+Traceback (most recent call last):
+  File "D:\Wary\MEMS\test_dmm.py", line 1, in <module>
+    from instrument import Multimeter
+  File "D:\Wary\MEMS\instrument.py", line 1, in <module>
+    import serial
+ModuleNotFoundError: No module named 'serial'
