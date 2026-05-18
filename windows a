@@ -1,15 +1,29 @@
-<div style="margin-bottom:15px;">
+// ============================================
+// LOAD AVAILABLE COM PORTS
+// ============================================
 
-    <select id="comPortSelect" style="
-        padding:8px;
-        border-radius:6px;
-        width:140px;
-    ">
-        <option>Loading...</option>
-    </select>
+function loadPorts() {
 
-    <button onclick="connectDMM()" class="control-btn">
-        Connect
-    </button>
+    fetch('/ports')
+    .then(res => res.json())
+    .then(ports => {
 
-</div>
+        const select = document.getElementById('comPortSelect');
+
+        select.innerHTML = '';
+
+        ports.forEach(port => {
+
+            const option = document.createElement('option');
+
+            option.value = port.device;
+
+            option.text =
+                `${port.device} - ${port.description}`;
+
+            select.appendChild(option);
+        });
+    });
+}
+
+loadPorts();
