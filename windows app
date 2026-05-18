@@ -1,7 +1,12 @@
-from instrument import Multimeter
+PS D:\Wary\MEMS> (Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned) ; (& d:\Wary\MEMS\venv\Scripts\Activate.ps1)
+(venv) PS D:\Wary\MEMS> python test_dmm.py
+Traceback (most recent call last):
+  File "D:\Wary\MEMS\test_dmm.py", line 5, in <module>
+    print(dmm.idn())
+          ^^^^^^^^^
+  File "D:\Wary\MEMS\instrument.py", line 59, in idn
+    return self.query("*IDN?")
+           ^^^^^^^^^^
+AttributeError: 'Multimeter' object has no attribute 'query'
+(venv) PS D:\Wary\MEMS> 
 
-dmm = Multimeter("COM3")
-
-print(dmm.idn())
-
-print(dmm.measure_voltage())
