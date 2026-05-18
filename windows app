@@ -1,26 +1,11 @@
-class Multimeter(SCPIInstrument):
+def query(self, cmd):
 
-    def idn(self):
-        return self.query("*IDN?")
+    self.ser.reset_input_buffer()
 
-    def measure_voltage(self):
+    self.write(cmd)
 
-        try:
-            # Set DC Voltage mode
-            self.write("CONF:VOLT:DC")
+    time.sleep(0.5)
 
-            time.sleep(0.5)
+    response = self.ser.readline()
 
-            # Request reading
-            response = self.query("READ?")
-
-            print("RAW DMM RESPONSE:", response)
-
-            # Clean response
-            response = response.replace("VDC", "").strip()
-
-            return float(response)
-
-        except Exception as e:
-            print("Voltage measurement error:", e)
-            return 0.0
+    return response.decode(errors='ignore').strip()
