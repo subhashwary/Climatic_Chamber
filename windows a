@@ -1,0 +1,8 @@
+const liveVoltage = parseFloat(data.dmm_voltage);
+
+// Convert to millivolts for DMM-style display
+const mv = liveVoltage * 1000;
+
+// Show exact real-time value
+document.getElementById('dmmVoltage').innerText =
+    mv.toFixed(4);
