@@ -1,11 +1,7 @@
-def query(self, cmd):
+from instrument import Multimeter
 
-    self.ser.reset_input_buffer()
+dmm = Multimeter("COM3")
 
-    self.write(cmd)
+print(dmm.idn())
 
-    time.sleep(0.5)
-
-    response = self.ser.readline()
-
-    return response.decode(errors='ignore').strip()
+print(dmm.measure_voltage())
