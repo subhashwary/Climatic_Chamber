@@ -1,2 +1,3 @@
-if __name__ == '__main__':
-    app.run(debug=True, use_reloader=False)
+<div id="dmmVoltage" class="dmm-display">
+    000.0000
+</div>
