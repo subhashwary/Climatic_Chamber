@@ -1,0 +1,32 @@
+(venv) PS D:\Wary\MEMS> pip install pyserial flask
+Requirement already satisfied: pyserial in d:\wary\mems\venv\lib\site-packages (3.5)
+Requirement already satisfied: flask in d:\wary\mems\venv\lib\site-packages (3.1.3)
+Requirement already satisfied: blinker>=1.9.0 in d:\wary\mems\venv\lib\site-packages (from flask) (1.9.0)
+Requirement already satisfied: click>=8.1.3 in d:\wary\mems\venv\lib\site-packages (from flask) (8.3.3)
+Requirement already satisfied: jinja2>=3.1.2 in d:\wary\mems\venv\lib\site-packages (from flask) (3.1.6)
+Requirement already satisfied: markupsafe>=2.1.1 in d:\wary\mems\venv\lib\site-packages (from flask) (3.0.3)
+Requirement already satisfied: werkzeug>=3.1.0 in d:\wary\mems\venv\lib\site-packages (from flask) (3.1.8)
+Requirement already satisfied: colorama in d:\wary\mems\venv\lib\site-packages (from click>=8.1.3->flask) (0.4.6)
+
+[notice] A new release of pip is available: 24.0 -> 26.1.1
+[notice] To update, run: python.exe -m pip install --upgrade pip
+(venv) PS D:\Wary\MEMS> python test_dmm.py
+DMM ID:
+GWInstek,GDM8261A,GEO882227,1.02
+
+Reading Voltage...
+
+RAW RESPONSE: +1.20224E+1,+0.0E+0
+Voltage = 12.0224 V
+RAW RESPONSE: +1.20224E+1,+0.0E+0
+Voltage = 12.0224 V
+RAW RESPONSE: +1.20223E+1,+0.0E+0
+Voltage = 12.0223 V
+RAW RESPONSE: +1.20223E+1,+0.0E+0
+Voltage = 12.0223 V
+RAW RESPONSE: +1.20223E+1,+0.0E+0
+Voltage = 12.0223 V
+RAW RESPONSE: +1.20223E+1,+0.0E+0
+Voltage = 12.0223 V
+
+
