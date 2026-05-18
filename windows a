@@ -1,9 +1,1 @@
-PS D:\Wary\MEMS> python test_dmm.py  
-GWInstek,GDM8261A,GEO882227,1.02
-RAW RESPONSE: +1.0435E-3,+0.0E+0
-0.0010435
-PS D:\Wary\MEMS> python app.py     
-Traceback (most recent call last):
-  File "D:\Wary\MEMS\app.py", line 1, in <module>
-    from flask import Flask, jsonify, request, render_template, send_file
-ModuleNotFoundError: No module named 'flask'
+(Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned) ; (& d:\Wary\MEMS\venv\Scripts\Activate.ps1)
