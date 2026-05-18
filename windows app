@@ -1,12 +1,111 @@
-PS D:\Wary\MEMS> (Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned) ; (& d:\Wary\MEMS\venv\Scripts\Activate.ps1)
-(venv) PS D:\Wary\MEMS> python test_dmm.py
-Traceback (most recent call last):
-  File "D:\Wary\MEMS\test_dmm.py", line 5, in <module>
-    print(dmm.idn())
-          ^^^^^^^^^
-  File "D:\Wary\MEMS\instrument.py", line 59, in idn
-    return self.query("*IDN?")
-           ^^^^^^^^^^
-AttributeError: 'Multimeter' object has no attribute 'query'
-(venv) PS D:\Wary\MEMS> 
+import serial
+import time
 
+
+class SCPIInstrument:
+
+    def __init__(self, port, baudrate=115200, timeout=2):
+
+        self.port = port
+
+        self.ser = serial.Serial(
+            port=port,
+            baudrate=baudrate,
+            timeout=timeout
+        )
+
+        time.sleep(1)
+
+    # -------------------------------------------------
+    # WRITE COMMAND
+    # -------------------------------------------------
+    def write(self, cmd):
+
+        if not cmd.endswith("\n"):
+            cmd += "\n"
+
+        self.ser.write(cmd.encode())
+
+    # -------------------------------------------------
+    # QUERY COMMAND
+    # -------------------------------------------------
+    def query(self, cmd):
+
+        self.ser.reset_input_buffer()
+
+        self.write(cmd)
+
+        time.sleep(0.5)
+
+        response = self.ser.readline()
+
+        return response.decode(errors='ignore').strip()
+
+    # -------------------------------------------------
+    # CLOSE PORT
+    # -------------------------------------------------
+    def close(self):
+
+        if self.ser.is_open:
+            self.ser.close()
+
+
+# =====================================================
+# POWER SUPPLY CLASS
+# =====================================================
+
+class PowerSupply(SCPIInstrument):
+
+    def idn(self):
+        return self.query("*IDN?")
+
+    def set_voltage(self, voltage):
+        self.write(f"VSET1:{voltage}")
+
+    def set_current(self, current):
+        self.write(f"ISET1:{current}")
+
+    def get_voltage(self):
+        return self.query("VOUT1?")
+
+    def get_current(self):
+        return self.query("IOUT1?")
+
+    def output_on(self):
+        self.write("OUT1")
+
+    def output_off(self):
+        self.write("OUT0")
+
+
+# =====================================================
+# MULTIMETER CLASS
+# =====================================================
+
+class Multimeter(SCPIInstrument):
+
+    def idn(self):
+
+        return self.query("*IDN?")
+
+    def measure_voltage(self):
+
+        try:
+
+            self.write("CONF:VOLT:DC")
+
+            time.sleep(0.5)
+
+            response = self.query("READ?")
+
+            print("RAW RESPONSE:", response)
+
+            response = response.replace("VDC", "").strip()
+
+            return float(response)
+
+        except Exception as e:
+
+            print("Measurement Error:", e)
+
+            return 0.0
