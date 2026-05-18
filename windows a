@@ -1,50 +1,15 @@
-import serial.tools.list_ports
+<div style="margin-bottom:15px;">
 
-# =========================================================
-# GET AVAILABLE COM PORTS
-# =========================================================
-@app.route('/ports')
-def get_ports():
+    <select id="comPortSelect" style="
+        padding:8px;
+        border-radius:6px;
+        width:140px;
+    ">
+        <option>Loading...</option>
+    </select>
 
-    ports = serial.tools.list_ports.comports()
+    <button onclick="connectDMM()" class="control-btn">
+        Connect
+    </button>
 
-    port_list = []
-
-    for port in ports:
-        port_list.append({
-            "device": port.device,
-            "description": port.description
-        })
-
-    return jsonify(port_list)
-
-
-# =========================================================
-# CONNECT DMM
-# =========================================================
-@app.route('/connect_dmm', methods=['POST'])
-def connect_dmm():
-
-    global dmm
-
-    data = request.json
-    com_port = data.get("port")
-
-    try:
-        dmm = Multimeter(com_port)
-
-        return jsonify({
-            "status": "connected",
-            "id": dmm.idn()
-        })
-
-    except Exception as e:
-
-        dmm = None
-
-        return jsonify({
-            "status": "error",
-            "message": str(e)
-        }), 500
-
-
+</div>
