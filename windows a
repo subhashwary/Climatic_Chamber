@@ -1,29 +1,39 @@
 // ============================================
-// LOAD AVAILABLE COM PORTS
+// CONNECT DMM
 // ============================================
 
-function loadPorts() {
+function connectDMM() {
 
-    fetch('/ports')
+    const port =
+        document.getElementById('comPortSelect').value;
+
+    fetch('/connect_dmm', {
+
+        method: 'POST',
+
+        headers: {
+            'Content-Type': 'application/json'
+        },
+
+        body: JSON.stringify({
+            port: port
+        })
+
+    })
     .then(res => res.json())
-    .then(ports => {
+    .then(data => {
 
-        const select = document.getElementById('comPortSelect');
+        if (data.status === "connected") {
 
-        select.innerHTML = '';
+            alert(
+                "DMM Connected:\n" + data.id
+            );
 
-        ports.forEach(port => {
+        } else {
 
-            const option = document.createElement('option');
-
-            option.value = port.device;
-
-            option.text =
-                `${port.device} - ${port.description}`;
-
-            select.appendChild(option);
-        });
+            alert(
+                "Connection Failed:\n" + data.message
+            );
+        }
     });
 }
-
-loadPorts();
