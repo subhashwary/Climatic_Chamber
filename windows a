@@ -1,341 +1,519 @@
-PS D:\Wary\MEMS> (Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned) ; (& d:\Wary\MEMS\venv\Scripts\Activate.ps1)
-(venv) PS D:\Wary\MEMS> python app.py                                                                                                  
+(venv) PS D:\Wary\MEMS> python app.py
  * Serving Flask app 'app'
  * Debug mode: off
 WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
  * Running on http://127.0.0.1:5000
 Press CTRL+C to quit
-127.0.0.1 - - [19/May/2026 12:51:11] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:51:12] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:51:13] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:51:14] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:51:15] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:51:16] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:51:17] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:51:18] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:51:18] "POST /dmm/start HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:51:18] "POST /connect_dmm HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:51:21] "POST /dmm/start HTTP/1.1" 200 -
-RAW RESPONSE: +1.20226E+1
-127.0.0.1 - - [19/May/2026 12:51:23] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20225E+1
-127.0.0.1 - - [19/May/2026 12:51:26] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20225E+1
-127.0.0.1 - - [19/May/2026 12:51:29] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20225E+1
-127.0.0.1 - - [19/May/2026 12:51:32] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20225E+1
-127.0.0.1 - - [19/May/2026 12:51:36] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20224E+1
-127.0.0.1 - - [19/May/2026 12:51:39] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20224E+1
-127.0.0.1 - - [19/May/2026 12:51:42] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20226E+1
-127.0.0.1 - - [19/May/2026 12:51:45] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20225E+1
-127.0.0.1 - - [19/May/2026 12:51:48] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.2560E-3
-127.0.0.1 - - [19/May/2026 12:51:49] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +0.9960E-3
-RAW RESPONSE: 
-127.0.0.1 - - [19/May/2026 12:51:51] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:51:51] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +0.4220E-3
-RAW RESPONSE: 
-127.0.0.1 - - [19/May/2026 12:51:53] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:51:53] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +0.2394E-3
-RAW RESPONSE: 
-127.0.0.1 - - [19/May/2026 12:51:55] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:51:55] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +0.2455E-3
-RAW RESPONSE: 
-127.0.0.1 - - [19/May/2026 12:51:57] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:51:57] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.9861E-3
-RAW RESPONSE: 
-127.0.0.1 - - [19/May/2026 12:51:59] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:51:59] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +206E1
-RAW RESPONSE: 1.22+
-Measurement Error: could not convert string to float: '1.22+'
-127.0.0.1 - - [19/May/2026 12:52:01] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:01] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +202+
-RAW RESPONSE: 1.25E1
-127.0.0.1 - - [19/May/2026 12:52:03] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:03] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +202E1
-RAW RESPONSE: 1.26+
-Measurement Error: could not convert string to float: '1.26+'
-127.0.0.1 - - [19/May/2026 12:52:05] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:05] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: 1.2E1
-RAW RESPONSE: +2025+
-127.0.0.1 - - [19/May/2026 12:52:07] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:07] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +2E+
-RAW RESPONSE: 1.20251
-Measurement Error: could not convert string to float: '+2E+'
-127.0.0.1 - - [19/May/2026 12:52:09] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:09] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: 1.25E1
-RAW RESPONSE: +202+
-127.0.0.1 - - [19/May/2026 12:52:11] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:11] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +206E1
-RAW RESPONSE: 1.22+
-Measurement Error: could not convert string to float: '1.22+'
-127.0.0.1 - - [19/May/2026 12:52:13] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:13] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: 1.22E+
-RAW RESPONSE: +2061
-Measurement Error: could not convert string to float: '1.22E+'
-127.0.0.1 - - [19/May/2026 12:52:15] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:15] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: 1222+1
-RAW RESPONSE: +.06E
-Measurement Error: could not convert string to float: '+.06E'
-127.0.0.1 - - [19/May/2026 12:52:17] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:17] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +.225+
-RAW RESPONSE: 102E1
-Measurement Error: could not convert string to float: '+.225+'
-127.0.0.1 - - [19/May/2026 12:52:19] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:19] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +202+1
-RAW RESPONSE: 1.25E
-Measurement Error: could not convert string to float: '1.25E'
-127.0.0.1 - - [19/May/2026 12:52:21] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:21] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +.051
-RAW RESPONSE: 1222E+
-Measurement Error: could not convert string to float: '1222E+'
-127.0.0.1 - - [19/May/2026 12:52:23] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:23] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +2051
-RAW RESPONSE: 1.22E+
-Measurement Error: could not convert string to float: '1.22E+'
-127.0.0.1 - - [19/May/2026 12:52:25] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:25] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: 1.022E1
-RAW RESPONSE: +25+
-127.0.0.1 - - [19/May/2026 12:52:27] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:27] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: 1204E
-RAW RESPONSE: +.22+1
-Measurement Error: could not convert string to float: '+.22+1'
-Measurement Error: could not convert string to float: '1204E'
-127.0.0.1 - - [19/May/2026 12:52:29] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:29] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +202+
-RAW RESPONSE: 1.25E
-Measurement Error: could not convert string to float: '1.25E'
-127.0.0.1 - - [19/May/2026 12:52:31] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:31] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: 1.2+1
-Measurement Error: could not convert string to float: '1.2+1'
-RAW RESPONSE: +2025E
-Measurement Error: could not convert string to float: '+2025E'
-127.0.0.1 - - [19/May/2026 12:52:33] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:33] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: 1225+1
-RAW RESPONSE: +.02E
-Measurement Error: could not convert string to float: '+.02E'
-127.0.0.1 - - [19/May/2026 12:52:35] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:35] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: 1.05E+
-RAW RESPONSE: +2221
-Measurement Error: could not convert string to float: '1.05E+'
-127.0.0.1 - - [19/May/2026 12:52:37] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:37] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +222E1
-RAW RESPONSE: 1.05+
-Measurement Error: could not convert string to float: '1.05+'
-127.0.0.1 - - [19/May/2026 12:52:39] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:39] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +205E1
-RAW RESPONSE: 1.22+
-Measurement Error: could not convert string to float: '1.22+'
-127.0.0.1 - - [19/May/2026 12:52:41] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:41] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: 1.22+
-Measurement Error: could not convert string to float: '1.22+'
-RAW RESPONSE: +205E1
-127.0.0.1 - - [19/May/2026 12:52:43] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:43] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +222E
-RAW RESPONSE: 1.06+1
-Measurement Error: could not convert string to float: '+222E'
-Measurement Error: could not convert string to float: '1.06+1'
-127.0.0.1 - - [19/May/2026 12:52:45] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:45] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +22251
-RAW RESPONSE: 1.0E+
-Measurement Error: could not convert string to float: '1.0E+'
-127.0.0.1 - - [19/May/2026 12:52:47] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:47] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: 1.02E1
-RAW RESPONSE: +226+
-127.0.0.1 - - [19/May/2026 12:52:49] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:49] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +22+
-RAW RESPONSE: 1.205E1
-127.0.0.1 - - [19/May/2026 12:52:51] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:51] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: 1202E+1
-RAW RESPONSE: +.25
-127.0.0.1 - - [19/May/2026 12:52:53] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:53] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +202E
-RAW RESPONSE: 1.25+1
-Measurement Error: could not convert string to float: '1.25+1'
-Measurement Error: could not convert string to float: '+202E'
-127.0.0.1 - - [19/May/2026 12:52:55] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:55] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: 1204E
-RAW RESPONSE: +.22+1
-Measurement Error: could not convert string to float: '+.22+1'
-Measurement Error: could not convert string to float: '1204E'
-127.0.0.1 - - [19/May/2026 12:52:57] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:57] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: 1.0251
-RAW RESPONSE: +22E+
-Measurement Error: could not convert string to float: '+22E+'
-127.0.0.1 - - [19/May/2026 12:52:59] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:52:59] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: 12024E1
-RAW RESPONSE: +.2+
-Measurement Error: could not convert string to float: '+.2+'
-127.0.0.1 - - [19/May/2026 12:53:01] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:53:01] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: 1.2E1
-RAW RESPONSE: +2025+
-127.0.0.1 - - [19/May/2026 12:53:03] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:53:03] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: 12E1
-RAW RESPONSE: +.2024+
-Measurement Error: could not convert string to float: '+.2024+'
-127.0.0.1 - - [19/May/2026 12:53:05] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:53:05] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: 1222E+
-RAW RESPONSE: +.041
-Measurement Error: could not convert string to float: '1222E+'
-127.0.0.1 - - [19/May/2026 12:53:07] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:53:07] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: 1.22+1
-RAW RESPONSE: +204E
-Measurement Error: could not convert string to float: '1.22+1'
-Measurement Error: could not convert string to float: '+204E'
-127.0.0.1 - - [19/May/2026 12:53:09] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:53:09] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: 1.02+1
-RAW RESPONSE: +224E
-Measurement Error: could not convert string to float: '+224E'
-Measurement Error: could not convert string to float: '1.02+1'
-127.0.0.1 - - [19/May/2026 12:53:11] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:53:11] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +.02E
-Measurement Error: could not convert string to float: '+.02E'
-RAW RESPONSE: 1224+1
-127.0.0.1 - - [19/May/2026 12:53:13] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:53:13] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +.51
-RAW RESPONSE: 12022E+
-Measurement Error: could not convert string to float: '12022E+'
-127.0.0.1 - - [19/May/2026 12:53:15] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:53:15] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: 1.22+
-RAW RESPONSE: +205E1
-Measurement Error: could not convert string to float: '1.22+'
-127.0.0.1 - - [19/May/2026 12:53:17] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:53:17] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +2051
-RAW RESPONSE: 1.22E+
-Measurement Error: could not convert string to float: '1.22E+'
-127.0.0.1 - - [19/May/2026 12:53:19] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:53:19] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +.02E+
-RAW RESPONSE: 12251
-Measurement Error: could not convert string to float: '+.02E+'
-127.0.0.1 - - [19/May/2026 12:53:21] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:53:21] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: 1.24+
-RAW RESPONSE: +202E1
-Measurement Error: could not convert string to float: '1.24+'
-127.0.0.1 - - [19/May/2026 12:53:23] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:53:23] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +.22E1
-RAW RESPONSE: 1205+
-127.0.0.1 - - [19/May/2026 12:53:25] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:53:25] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +20261
-RAW RESPONSE: 1.2E+
-Measurement Error: could not convert string to float: '1.2E+'
-127.0.0.1 - - [19/May/2026 12:53:27] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:53:27] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +221
-RAW RESPONSE: 1.025E+
-Measurement Error: could not convert string to float: '1.025E+'
-127.0.0.1 - - [19/May/2026 12:53:29] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:53:29] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +2051
-RAW RESPONSE: 1.22E+
-Measurement Error: could not convert string to float: '1.22E+'
-127.0.0.1 - - [19/May/2026 12:53:31] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:53:31] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: 1.05E1
-RAW RESPONSE: +222+
-127.0.0.1 - - [19/May/2026 12:53:33] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:53:33] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: 1.24E+
-Measurement Error: could not convert string to float: '1.24E+'
-RAW RESPONSE: +2021
-127.0.0.1 - - [19/May/2026 12:53:35] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:53:35] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +.22E+
-Measurement Error: could not convert string to float: '+.22E+'
-RAW RESPONSE: 12051
-127.0.0.1 - - [19/May/2026 12:53:37] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:53:37] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +2025+
-RAW RESPONSE: 1.2E1
-127.0.0.1 - - [19/May/2026 12:53:39] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:53:39] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +225+
-RAW RESPONSE: 1.02E1
-127.0.0.1 - - [19/May/2026 12:53:41] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:53:41] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: 1.022+1
-RAW RESPONSE: +25E
-Measurement Error: could not convert string to float: '+25E'
-Measurement Error: could not convert string to float: '1.022+1'
-127.0.0.1 - - [19/May/2026 12:53:43] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:53:43] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +.22E1
-RAW RESPONSE: 1025+
-127.0.0.1 - - [19/May/2026 12:53:45] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:53:45] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +.2E+1
-RAW RESPONSE: 12025
-127.0.0.1 - - [19/May/2026 12:53:47] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:53:47] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:24:00] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:24:01] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:24:02] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:24:03] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:24:04] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:24:05] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:24:06] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:24:07] "POST /connect_dmm HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:24:09] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:24:10] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:24:11] "POST /dmm/start HTTP/1.1" 200 -
+RAW RESPONSE: +1.20358E+1
+127.0.0.1 - - [19/May/2026 14:24:14] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +1.20356E+1
+127.0.0.1 - - [19/May/2026 14:24:17] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +1.20353E+1
+127.0.0.1 - - [19/May/2026 14:24:21] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +1.20352E+1
+127.0.0.1 - - [19/May/2026 14:24:24] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +1.20350E+1
+127.0.0.1 - - [19/May/2026 14:24:27] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +1.20347E+1
+127.0.0.1 - - [19/May/2026 14:24:30] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +1.20345E+1
+127.0.0.1 - - [19/May/2026 14:24:33] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +1.20343E+1
+127.0.0.1 - - [19/May/2026 14:24:36] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +1.20341E+1
+127.0.0.1 - - [19/May/2026 14:24:39] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +1.20338E+1
+127.0.0.1 - - [19/May/2026 14:24:41] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1237+
+RAW RESPONSE: +.03E1
+127.0.0.1 - - [19/May/2026 14:24:43] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:24:43] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 12036+
+RAW RESPONSE: +.3E1
+127.0.0.1 - - [19/May/2026 14:24:45] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:24:45] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.05E
+RAW RESPONSE: +233+1
+Measurement Error: could not convert string to float: '1.05E'
+127.0.0.1 - - [19/May/2026 14:24:47] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:24:47] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +.033+
+RAW RESPONSE: 123E1
+Measurement Error: could not convert string to float: '+.033+'
+127.0.0.1 - - [19/May/2026 14:24:49] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:24:49] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 122E
+RAW RESPONSE: +.033+1
+Measurement Error: could not convert string to float: '122E'
+Measurement Error: could not convert string to float: '+.033+1'
+127.0.0.1 - - [19/May/2026 14:24:51] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:24:51] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1202E1
+RAW RESPONSE: +.33+
+Measurement Error: could not convert string to float: '+.33+'
+127.0.0.1 - - [19/May/2026 14:24:53] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:24:53] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +.39E
+Measurement Error: could not convert string to float: '+.39E'
+RAW RESPONSE: 1202+1
+127.0.0.1 - - [19/May/2026 14:24:55] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:24:55] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 12281
+RAW RESPONSE: +.03E+
+Measurement Error: could not convert string to float: '+.03E+'
+127.0.0.1 - - [19/May/2026 14:24:57] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:24:57] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +232+
+RAW RESPONSE: 1.08E1
+127.0.0.1 - - [19/May/2026 14:24:59] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:24:59] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +.23E+
+RAW RESPONSE: 10271
+Measurement Error: could not convert string to float: '+.23E+'
+127.0.0.1 - - [19/May/2026 14:25:01] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:01] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.32+1
 RAW RESPONSE: +206E
-RAW RESPONSE: 1.22+1
-Measurement Error: could not convert string to float: '1.22+1'
 Measurement Error: could not convert string to float: '+206E'
-127.0.0.1 - - [19/May/2026 12:53:49] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:53:49] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: 1.251
-RAW RESPONSE: +202E+
-Measurement Error: could not convert string to float: '+202E+'
-127.0.0.1 - - [19/May/2026 12:53:51] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:53:51] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +.2E1
-RAW RESPONSE: 12025+
-127.0.0.1 - - [19/May/2026 12:53:53] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:53:53] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +025
-RAW RESPONSE: 1.22E+1
-127.0.0.1 - - [19/May/2026 12:53:55] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [19/May/2026 12:53:55] "GET /data HTTP/1.1" 200 -
+Measurement Error: could not convert string to float: '1.32+1'
+127.0.0.1 - - [19/May/2026 14:25:03] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:03] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +.3251
+RAW RESPONSE: 120E+
+Measurement Error: could not convert string to float: '120E+'
+127.0.0.1 - - [19/May/2026 14:25:05] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:05] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +02E+
+RAW RESPONSE: 1.2341
+Measurement Error: could not convert string to float: '+02E+'
+127.0.0.1 - - [19/May/2026 14:25:07] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:07] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.33+
+RAW RESPONSE: +202E1
+Measurement Error: could not convert string to float: '1.33+'
+127.0.0.1 - - [19/May/2026 14:25:09] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:09] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +202E1
+RAW RESPONSE: 1.32+
+Measurement Error: could not convert string to float: '1.32+'
+127.0.0.1 - - [19/May/2026 14:25:11] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:11] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1200+1
+RAW RESPONSE: +.32E
+Measurement Error: could not convert string to float: '+.32E'
+127.0.0.1 - - [19/May/2026 14:25:13] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:13] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.32E1
+RAW RESPONSE: +200+
+127.0.0.1 - - [19/May/2026 14:25:15] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:15] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +231+
+RAW RESPONSE: 1.09E1
+127.0.0.1 - - [19/May/2026 14:25:17] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:17] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +.237+
+Measurement Error: could not convert string to float: '+.237+'
+RAW RESPONSE: 101E1
+127.0.0.1 - - [19/May/2026 14:25:19] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:19] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +.2311
+RAW RESPONSE: 106E+
+Measurement Error: could not convert string to float: '106E+'
+127.0.0.1 - - [19/May/2026 14:25:21] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:21] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.3E+
+RAW RESPONSE: +20161
+Measurement Error: could not convert string to float: '1.3E+'
+127.0.0.1 - - [19/May/2026 14:25:23] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:23] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 131+
+RAW RESPONSE: +.204E1
+127.0.0.1 - - [19/May/2026 14:25:25] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:25] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 123E1
+RAW RESPONSE: +.013+
+Measurement Error: could not convert string to float: '+.013+'
+127.0.0.1 - - [19/May/2026 14:25:27] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:27] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1202E1
+RAW RESPONSE: +.31+
+Measurement Error: could not convert string to float: '+.31+'
+127.0.0.1 - - [19/May/2026 14:25:29] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:29] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +23E1
+RAW RESPONSE: 1.012+
+Measurement Error: could not convert string to float: '1.012+'
+127.0.0.1 - - [19/May/2026 14:25:31] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:31] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +.01E+
+RAW RESPONSE: 12301
+Measurement Error: could not convert string to float: '+.01E+'
+127.0.0.1 - - [19/May/2026 14:25:33] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:33] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.31E1
+RAW RESPONSE: +200+
+127.0.0.1 - - [19/May/2026 14:25:35] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:35] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +.30+
+Measurement Error: could not convert string to float: '+.30+'
+RAW RESPONSE: 1209E1
+127.0.0.1 - - [19/May/2026 14:25:37] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:37] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +03E+
+Measurement Error: could not convert string to float: '+03E+'
+RAW RESPONSE: 1.2081
+127.0.0.1 - - [19/May/2026 14:25:39] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:39] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.0+
+RAW RESPONSE: +2307E1
+Measurement Error: could not convert string to float: '1.0+'
+127.0.0.1 - - [19/May/2026 14:25:41] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:41] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.00+1
+RAW RESPONSE: +236E
+Measurement Error: could not convert string to float: '1.00+1'
+Measurement Error: could not convert string to float: '+236E'
+127.0.0.1 - - [19/May/2026 14:25:43] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:43] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +.205E+1
+RAW RESPONSE: 103
+127.0.0.1 - - [19/May/2026 14:25:45] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:45] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1200E1
+RAW RESPONSE: +.34+
+Measurement Error: could not convert string to float: '+.34+'
+127.0.0.1 - - [19/May/2026 14:25:47] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:47] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1204+
+RAW RESPONSE: +.03E1
+127.0.0.1 - - [19/May/2026 14:25:49] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:49] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +203E1
+RAW RESPONSE: 1.30+
+Measurement Error: could not convert string to float: '1.30+'
+127.0.0.1 - - [19/May/2026 14:25:51] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:51] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1202E
+RAW RESPONSE: +.30+1
+Measurement Error: could not convert string to float: '1202E'
+Measurement Error: could not convert string to float: '+.30+1'
+127.0.0.1 - - [19/May/2026 14:25:53] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:53] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +201E1
+RAW RESPONSE: 1.30+
+Measurement Error: could not convert string to float: '1.30+'
+127.0.0.1 - - [19/May/2026 14:25:55] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:55] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.0E
+RAW RESPONSE: +2030+1
+Measurement Error: could not convert string to float: '1.0E'
+127.0.0.1 - - [19/May/2026 14:25:57] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:57] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +209E
+Measurement Error: could not convert string to float: '+209E'
+RAW RESPONSE: 1.29+1
+Measurement Error: could not convert string to float: '1.29+1'
+127.0.0.1 - - [19/May/2026 14:25:59] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:25:59] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1209+
+RAW RESPONSE: +.29E1
+127.0.0.1 - - [19/May/2026 14:26:01] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:01] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +20E1
+RAW RESPONSE: 1.298+
+Measurement Error: could not convert string to float: '1.298+'
+127.0.0.1 - - [19/May/2026 14:26:03] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:03] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.09+
+RAW RESPONSE: +227E1
+Measurement Error: could not convert string to float: '1.09+'
+127.0.0.1 - - [19/May/2026 14:26:05] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:05] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.29E+
+RAW RESPONSE: +206
+Measurement Error: could not convert string to float: '1.29E+'
+127.0.0.1 - - [19/May/2026 14:26:07] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:07] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.201
+RAW RESPONSE: +295E+
+Measurement Error: could not convert string to float: '+295E+'
+127.0.0.1 - - [19/May/2026 14:26:09] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:09] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +20E+
+RAW RESPONSE: 1.2941
+Measurement Error: could not convert string to float: '+20E+'
+127.0.0.1 - - [19/May/2026 14:26:11] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:11] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.041
+RAW RESPONSE: +229E+
+Measurement Error: could not convert string to float: '+229E+'
+127.0.0.1 - - [19/May/2026 14:26:13] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:13] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +204E
+Measurement Error: could not convert string to float: '+204E'
+RAW RESPONSE: 1.29+1
+Measurement Error: could not convert string to float: '1.29+1'
+127.0.0.1 - - [19/May/2026 14:26:15] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:15] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.29E1
+RAW RESPONSE: +202+
+127.0.0.1 - - [19/May/2026 14:26:17] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:17] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.01E+
+RAW RESPONSE: +2291
+Measurement Error: could not convert string to float: '1.01E+'
+127.0.0.1 - - [19/May/2026 14:26:19] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:19] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +209+
+RAW RESPONSE: 1.21E1
+127.0.0.1 - - [19/May/2026 14:26:21] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:21] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.001
+RAW RESPONSE: +229E+
+Measurement Error: could not convert string to float: '+229E+'
+127.0.0.1 - - [19/May/2026 14:26:23] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:23] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.2090+
+RAW RESPONSE: +2E1
+Measurement Error: could not convert string to float: '1.2090+'
+127.0.0.1 - - [19/May/2026 14:26:25] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:25] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.89
+RAW RESPONSE: +202E+1
+127.0.0.1 - - [19/May/2026 14:26:27] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:27] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1208
+RAW RESPONSE: +.28+1
+Measurement Error: could not convert string to float: '+.28+1'
+127.0.0.1 - - [19/May/2026 14:26:29] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:29] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.288+
+RAW RESPONSE: +20E1
+Measurement Error: could not convert string to float: '1.288+'
+127.0.0.1 - - [19/May/2026 14:26:31] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:31] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.227E
+Measurement Error: could not convert string to float: '1.227E'
+RAW RESPONSE: +08+1
+127.0.0.1 - - [19/May/2026 14:26:33] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:33] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +.6E1
+RAW RESPONSE: 12028+
+127.0.0.1 - - [19/May/2026 14:26:35] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:35] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 122E1
+RAW RESPONSE: +.085+
+Measurement Error: could not convert string to float: '+.085+'
+127.0.0.1 - - [19/May/2026 14:26:37] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:37] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.28E+1
+RAW RESPONSE: +024
+127.0.0.1 - - [19/May/2026 14:26:39] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:39] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1208E1
+RAW RESPONSE: +.23+
+Measurement Error: could not convert string to float: '+.23+'
+127.0.0.1 - - [19/May/2026 14:26:41] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:41] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.08+
+RAW RESPONSE: +223E1
+Measurement Error: could not convert string to float: '1.08+'
+127.0.0.1 - - [19/May/2026 14:26:43] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:43] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 122+
+RAW RESPONSE: +.082E1
+127.0.0.1 - - [19/May/2026 14:26:45] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:45] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +201E
+RAW RESPONSE: 1.28+1
+Measurement Error: could not convert string to float: '1.28+1'
+Measurement Error: could not convert string to float: '+201E'
+127.0.0.1 - - [19/May/2026 14:26:47] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:47] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +.28+1
+RAW RESPONSE: 1201E
+Measurement Error: could not convert string to float: '1201E'
+Measurement Error: could not convert string to float: '+.28+1'
+127.0.0.1 - - [19/May/2026 14:26:49] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:49] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.28E
+RAW RESPONSE: +201+1
+Measurement Error: could not convert string to float: '1.28E'
+127.0.0.1 - - [19/May/2026 14:26:51] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:51] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +220E+1
+RAW RESPONSE: 1.0
+127.0.0.1 - - [19/May/2026 14:26:53] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:53] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +220+
+RAW RESPONSE: 1.08E1
+127.0.0.1 - - [19/May/2026 14:26:55] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:55] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.79+
+Measurement Error: could not convert string to float: '1.79+'
+RAW RESPONSE: +202E1
+127.0.0.1 - - [19/May/2026 14:26:57] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:26:57] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +227E
+Measurement Error: could not convert string to float: '+227E'
+RAW RESPONSE: 1.07+1
+Measurement Error: could not convert string to float: '1.07+1'
+127.0.0.1 - - [19/May/2026 14:27:00] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:00] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +.7E
+RAW RESPONSE: 12027+1
+Measurement Error: could not convert string to float: '+.7E'
+127.0.0.1 - - [19/May/2026 14:27:02] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:02] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +27E
+RAW RESPONSE: 1.027+1
+Measurement Error: could not convert string to float: '1.027+1'
+Measurement Error: could not convert string to float: '+27E'
+127.0.0.1 - - [19/May/2026 14:27:04] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:04] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +.27E1
+RAW RESPONSE: 1207+
+127.0.0.1 - - [19/May/2026 14:27:06] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:06] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 12025E1
+RAW RESPONSE: +.7+
+Measurement Error: could not convert string to float: '+.7+'
+127.0.0.1 - - [19/May/2026 14:27:08] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:08] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.07+1
+RAW RESPONSE: +224E
+Measurement Error: could not convert string to float: '1.07+1'
+Measurement Error: could not convert string to float: '+224E'
+127.0.0.1 - - [19/May/2026 14:27:10] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:10] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.274E
+RAW RESPONSE: +02+1
+Measurement Error: could not convert string to float: '1.274E'
+127.0.0.1 - - [19/May/2026 14:27:12] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:12] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.23E
+RAW RESPONSE: +207+1
+Measurement Error: could not convert string to float: '1.23E'
+127.0.0.1 - - [19/May/2026 14:27:14] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:14] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +202+
+RAW RESPONSE: 1.27E1
+127.0.0.1 - - [19/May/2026 14:27:16] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:16] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +203E1
+RAW RESPONSE: 1.27+
+Measurement Error: could not convert string to float: '1.27+'
+127.0.0.1 - - [19/May/2026 14:27:18] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:18] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +222E
+RAW RESPONSE: 1.07+1
+Measurement Error: could not convert string to float: '+222E'
+Measurement Error: could not convert string to float: '1.07+1'
+127.0.0.1 - - [19/May/2026 14:27:20] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:20] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +.21+
+RAW RESPONSE: 1207E1
+Measurement Error: could not convert string to float: '+.21+'
+127.0.0.1 - - [19/May/2026 14:27:22] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:22] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.7E1
+RAW RESPONSE: +2021+
+127.0.0.1 - - [19/May/2026 14:27:24] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:24] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +.07E+
+RAW RESPONSE: 12201
+Measurement Error: could not convert string to float: '+.07E+'
+127.0.0.1 - - [19/May/2026 14:27:26] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:26] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +.26E
+RAW RESPONSE: 1209+1
+Measurement Error: could not convert string to float: '+.26E'
+127.0.0.1 - - [19/May/2026 14:27:28] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:28] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +2061
+RAW RESPONSE: 1.29E+
+Measurement Error: could not convert string to float: '1.29E+'
+127.0.0.1 - - [19/May/2026 14:27:30] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:30] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +206+1
+RAW RESPONSE: 1.29E
+Measurement Error: could not convert string to float: '1.29E'
+127.0.0.1 - - [19/May/2026 14:27:32] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:32] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1228+
+RAW RESPONSE: +.06E1
+127.0.0.1 - - [19/May/2026 14:27:34] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:34] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +226E1
+RAW RESPONSE: 1.08+
+Measurement Error: could not convert string to float: '1.08+'
+127.0.0.1 - - [19/May/2026 14:27:36] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:36] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1206E1
+RAW RESPONSE: +.27+
+Measurement Error: could not convert string to float: '+.27+'
+127.0.0.1 - - [19/May/2026 14:27:38] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:38] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +.266+1
+RAW RESPONSE: 120E
+Measurement Error: could not convert string to float: '+.266+1'
+Measurement Error: could not convert string to float: '120E'
+127.0.0.1 - - [19/May/2026 14:27:40] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:40] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +205E
+RAW RESPONSE: 1.26+1
+Measurement Error: could not convert string to float: '1.26+1'
+Measurement Error: could not convert string to float: '+205E'
+127.0.0.1 - - [19/May/2026 14:27:42] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:42] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.26E
+RAW RESPONSE: +206+1
+Measurement Error: could not convert string to float: '1.26E'
+127.0.0.1 - - [19/May/2026 14:27:44] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:44] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.06E+
+RAW RESPONSE: +2251
+Measurement Error: could not convert string to float: '1.06E+'
+127.0.0.1 - - [19/May/2026 14:27:46] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:46] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +.2E
+RAW RESPONSE: 12064+
+Measurement Error: could not convert string to float: '+.2E'
+127.0.0.1 - - [19/May/2026 14:27:48] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:48] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +.26+
+Measurement Error: could not convert string to float: '+.26+'
+RAW RESPONSE: 1205E1
+127.0.0.1 - - [19/May/2026 14:27:50] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:50] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +2041
+RAW RESPONSE: 1.26E+
+Measurement Error: could not convert string to float: '1.26E+'
+127.0.0.1 - - [19/May/2026 14:27:52] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:52] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 106+1
+RAW RESPONSE: +.223E
+Measurement Error: could not convert string to float: '+.223E'
+127.0.0.1 - - [19/May/2026 14:27:54] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:54] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: 1.06+
+RAW RESPONSE: +223E1
+Measurement Error: could not convert string to float: '1.06+'
+127.0.0.1 - - [19/May/2026 14:27:56] "GET /data HTTP/1.1" 200 -
+127.0.0.1 - - [19/May/2026 14:27:56] "GET /data HTTP/1.1" 200 -
+RAW RESPONSE: +22631
+RAW RESPONSE: 1.0E+
+127.0.0.1 - - [19/May/2026 14:27:58] "GET /data HTTP/1.1" 200 -
+Measurement Error: could not convert string to float: '1.0E+'
+127.0.0.1 - - [19/May/2026 14:27:58] "GET /data HTTP/1.1" 200 -
