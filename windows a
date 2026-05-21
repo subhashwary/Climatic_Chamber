@@ -1,648 +1,1122 @@
-PS D:\Wary\MEMS> (Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned) ; (& d:\Wary\MEMS\venv\Scripts\Activate.ps1)
-(venv) PS D:\Wary\MEMS> python app.py                                                                                                  
- * Serving Flask app 'app'
- * Debug mode: off
-WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
- * Running on http://127.0.0.1:5000
-Press CTRL+C to quit
-127.0.0.1 - - [20/May/2026 11:55:51] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [20/May/2026 11:55:52] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [20/May/2026 11:55:54] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [20/May/2026 11:55:55] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [20/May/2026 11:55:56] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [20/May/2026 11:55:58] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [20/May/2026 11:55:59] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [20/May/2026 11:56:00] "GET /data HTTP/1.1" 200 -
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MEMS Pressure Dashboard</title>
 
-Trying baudrate: 9600
-127.0.0.1 - - [20/May/2026 11:56:02] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [20/May/2026 11:56:03] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [20/May/2026 11:56:05] "GET /data HTTP/1.1" 200 -
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-Trying baudrate: 9600
-FAILED at 9600: could not open port 'COM3': PermissionError(13, 'Access is denied.', None, 5)
+    <style>
+        body {
+            font-family: Arial;
+            margin: 0;
+            background: #f4f7fb;
+        }
 
-Trying baudrate: 19200
-FAILED at 19200: could not open port 'COM3': PermissionError(13, 'Access is denied.', None, 5)
+        .header {
+            background: #1f2937;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+        }
 
-Trying baudrate: 38400
-FAILED at 38400: could not open port 'COM3': PermissionError(13, 'Access is denied.', None, 5)
+        .container {
+            padding: 20px;
+        }
 
-Trying baudrate: 57600
-FAILED at 57600: could not open port 'COM3': PermissionError(13, 'Access is denied.', None, 5)
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
 
-Trying baudrate: 115200
-FAILED at 115200: could not open port 'COM3': PermissionError(13, 'Access is denied.', None, 5)
-127.0.0.1 - - [20/May/2026 11:56:06] "POST /connect_dmm HTTP/1.1" 500 -
-SCPI QUERY [*IDN?] -> GWInstek,GDM8261A,GEO882227,1.02
-RAW ID RESPONSE: GWInstek,GDM8261A,GEO882227,1.02
+        .value {
+            font-size: 40px;
+            font-weight: bold;
+        }
 
-================================
-DMM CONNECTED SUCCESSFULLY
-PORT: COM3
-BAUDRATE: 9600
-DMM ID: GWInstek,GDM8261A,GEO882227,1.02
-================================
+        .unit {
+            font-size: 18px;
+            color: gray;
+        }
 
-127.0.0.1 - - [20/May/2026 11:56:06] "POST /connect_dmm HTTP/1.1" 200 -
-127.0.0.1 - - [20/May/2026 11:56:09] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [20/May/2026 11:56:10] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [20/May/2026 11:56:11] "GET /data HTTP/1.1" 200 -
-127.0.0.1 - - [20/May/2026 11:56:11] "POST /dmm/start HTTP/1.1" 200 -
-127.0.0.1 - - [20/May/2026 11:56:11] "POST /dmm/start HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:56:16] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21686E+1
-127.0.0.1 - - [20/May/2026 11:56:19] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21686E+1
-127.0.0.1 - - [20/May/2026 11:56:22] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21686E+1
-127.0.0.1 - - [20/May/2026 11:56:25] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:56:28] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:56:31] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:56:34] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:56:38] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:56:41] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:56:44] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21684E+1
-127.0.0.1 - - [20/May/2026 11:56:47] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:56:50] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21684E+1
-127.0.0.1 - - [20/May/2026 11:56:53] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:56:56] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:56:59] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:57:02] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.1603E-3
-127.0.0.1 - - [20/May/2026 11:57:05] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +0.5526E-3
-127.0.0.1 - - [20/May/2026 11:57:07] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +0.4432E-3
-127.0.0.1 - - [20/May/2026 11:57:09] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +0.3839E-3
-127.0.0.1 - - [20/May/2026 11:57:11] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +0.3564E-3
-127.0.0.1 - - [20/May/2026 11:57:13] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +0.3382E-3
-127.0.0.1 - - [20/May/2026 11:57:16] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +0.3389E-3
-127.0.0.1 - - [20/May/2026 11:57:18] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:57:21] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:57:24] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:57:27] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:57:30] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21684E+1
-127.0.0.1 - - [20/May/2026 11:57:33] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:57:37] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:57:40] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:57:43] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21684E+1
-127.0.0.1 - - [20/May/2026 11:57:46] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:57:49] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:57:52] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:57:55] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21686E+1
-127.0.0.1 - - [20/May/2026 11:57:58] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:58:01] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:58:05] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:58:08] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:58:11] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:58:14] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:58:17] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21686E+1
-127.0.0.1 - - [20/May/2026 11:58:20] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:58:23] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:58:26] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:58:30] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:58:33] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:58:36] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:58:39] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:58:42] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21684E+1
-127.0.0.1 - - [20/May/2026 11:58:45] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:58:48] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:58:51] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:58:54] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:58:58] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:59:01] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:59:04] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21684E+1
-127.0.0.1 - - [20/May/2026 11:59:07] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21685E+1
-127.0.0.1 - - [20/May/2026 11:59:10] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21684E+1
-127.0.0.1 - - [20/May/2026 11:59:13] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21662E+1
-127.0.0.1 - - [20/May/2026 11:59:16] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20651E+1
-127.0.0.1 - - [20/May/2026 11:59:19] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.197352E+1
-127.0.0.1 - - [20/May/2026 11:59:22] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.197512E+1
-127.0.0.1 - - [20/May/2026 11:59:25] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.199302E+1
-127.0.0.1 - - [20/May/2026 11:59:28] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20772E+1
-127.0.0.1 - - [20/May/2026 11:59:31] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20583E+1
-127.0.0.1 - - [20/May/2026 11:59:34] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20260E+1
-127.0.0.1 - - [20/May/2026 11:59:37] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 11:59:40] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 11:59:44] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20082E+1
-127.0.0.1 - - [20/May/2026 11:59:47] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +0.228928E-1
-127.0.0.1 - - [20/May/2026 11:59:50] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: -0.80805E-2
-127.0.0.1 - - [20/May/2026 11:59:52] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20082E+1
-127.0.0.1 - - [20/May/2026 11:59:55] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 11:59:58] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +0.64040E-2
-127.0.0.1 - - [20/May/2026 12:00:00] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: -0.97306E-2
-127.0.0.1 - - [20/May/2026 12:00:02] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: -1.19247E-2
-127.0.0.1 - - [20/May/2026 12:00:05] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: -1.27748E-2
-127.0.0.1 - - [20/May/2026 12:00:08] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 12:00:11] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20079E+1
-127.0.0.1 - - [20/May/2026 12:00:14] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20080E+1
-127.0.0.1 - - [20/May/2026 12:00:17] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 12:00:20] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20080E+1
-127.0.0.1 - - [20/May/2026 12:00:23] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20080E+1
-127.0.0.1 - - [20/May/2026 12:00:26] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +0.8717E-3
-127.0.0.1 - - [20/May/2026 12:00:28] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +0.5044E-3
-127.0.0.1 - - [20/May/2026 12:00:31] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +0.4514E-3
-127.0.0.1 - - [20/May/2026 12:00:33] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +0.3755E-3
-127.0.0.1 - - [20/May/2026 12:00:35] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +0.3324E-3
-127.0.0.1 - - [20/May/2026 12:00:38] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +0.3380E-3
-127.0.0.1 - - [20/May/2026 12:00:40] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +0.2838E-3
-127.0.0.1 - - [20/May/2026 12:00:43] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +0.3262E-3
-127.0.0.1 - - [20/May/2026 12:00:45] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 12:00:49] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 12:00:52] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 12:00:55] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20080E+1
-127.0.0.1 - - [20/May/2026 12:00:58] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.8390E-3
-127.0.0.1 - - [20/May/2026 12:01:01] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +0.9598E-3
-127.0.0.1 - - [20/May/2026 12:01:03] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +0.4655E-3
-127.0.0.1 - - [20/May/2026 12:01:05] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +0.4086E-3
-127.0.0.1 - - [20/May/2026 12:01:07] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +0.4469E-3
-127.0.0.1 - - [20/May/2026 12:01:09] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +0.2932E-3
-127.0.0.1 - - [20/May/2026 12:01:12] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20082E+1
-127.0.0.1 - - [20/May/2026 12:01:15] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 12:01:18] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20080E+1
-127.0.0.1 - - [20/May/2026 12:01:21] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20080E+1
-127.0.0.1 - - [20/May/2026 12:01:24] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20080E+1
-127.0.0.1 - - [20/May/2026 12:01:27] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 12:01:30] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 12:01:33] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 12:01:37] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 12:01:40] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 12:01:43] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 12:01:46] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 12:01:49] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20080E+1
-127.0.0.1 - - [20/May/2026 12:01:52] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 12:01:55] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 12:01:58] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 12:02:02] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 12:02:05] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 12:02:08] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 12:02:11] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 12:02:14] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 12:02:17] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 12:02:20] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 12:02:23] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 12:02:26] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 12:02:30] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.2639E-3
-127.0.0.1 - - [20/May/2026 12:02:32] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +0.5442E-3
-127.0.0.1 - - [20/May/2026 12:02:35] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +0.4628E-3
-127.0.0.1 - - [20/May/2026 12:02:37] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20081E+1
-127.0.0.1 - - [20/May/2026 12:02:41] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.20080E+1
-127.0.0.1 - - [20/May/2026 12:02:44] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21256E+1
-127.0.0.1 - - [20/May/2026 12:02:47] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.22380E+1
-127.0.0.1 - - [20/May/2026 12:02:50] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.22379E+1
-127.0.0.1 - - [20/May/2026 12:02:53] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.22379E+1
-127.0.0.1 - - [20/May/2026 12:02:57] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.22379E+1
-127.0.0.1 - - [20/May/2026 12:03:00] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.22379E+1
-127.0.0.1 - - [20/May/2026 12:03:03] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.22379E+1
-127.0.0.1 - - [20/May/2026 12:03:06] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.22379E+1
-127.0.0.1 - - [20/May/2026 12:03:09] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.22379E+1
-127.0.0.1 - - [20/May/2026 12:03:12] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.22380E+1
-127.0.0.1 - - [20/May/2026 12:03:15] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.22380E+1
-127.0.0.1 - - [20/May/2026 12:03:18] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.22379E+1
-127.0.0.1 - - [20/May/2026 12:03:22] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.22059E+1
-127.0.0.1 - - [20/May/2026 12:03:25] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21246E+1
-127.0.0.1 - - [20/May/2026 12:03:28] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.195898E+1
-127.0.0.1 - - [20/May/2026 12:03:31] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179736E+1
-127.0.0.1 - - [20/May/2026 12:03:33] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179739E+1
-127.0.0.1 - - [20/May/2026 12:03:36] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179745E+1
-127.0.0.1 - - [20/May/2026 12:03:39] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179741E+1
-127.0.0.1 - - [20/May/2026 12:03:42] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179741E+1
-127.0.0.1 - - [20/May/2026 12:03:45] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179741E+1
-127.0.0.1 - - [20/May/2026 12:03:48] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179745E+1
-127.0.0.1 - - [20/May/2026 12:03:51] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179740E+1
-127.0.0.1 - - [20/May/2026 12:03:54] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179745E+1
-127.0.0.1 - - [20/May/2026 12:03:56] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179739E+1
-127.0.0.1 - - [20/May/2026 12:03:59] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179740E+1
-127.0.0.1 - - [20/May/2026 12:04:02] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179744E+1
-127.0.0.1 - - [20/May/2026 12:04:05] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179740E+1
-127.0.0.1 - - [20/May/2026 12:04:08] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179738E+1
-127.0.0.1 - - [20/May/2026 12:04:11] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179742E+1
-127.0.0.1 - - [20/May/2026 12:04:14] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179743E+1
-127.0.0.1 - - [20/May/2026 12:04:16] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179747E+1
-127.0.0.1 - - [20/May/2026 12:04:19] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179741E+1
-127.0.0.1 - - [20/May/2026 12:04:22] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179749E+1
-127.0.0.1 - - [20/May/2026 12:04:25] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179743E+1
-127.0.0.1 - - [20/May/2026 12:04:28] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179740E+1
-127.0.0.1 - - [20/May/2026 12:04:31] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179736E+1
-127.0.0.1 - - [20/May/2026 12:04:34] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179737E+1
-127.0.0.1 - - [20/May/2026 12:04:37] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179742E+1
-127.0.0.1 - - [20/May/2026 12:04:39] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179739E+1
-127.0.0.1 - - [20/May/2026 12:04:42] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179741E+1
-127.0.0.1 - - [20/May/2026 12:04:45] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179741E+1
-127.0.0.1 - - [20/May/2026 12:04:48] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179740E+1
-127.0.0.1 - - [20/May/2026 12:04:51] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179741E+1
-127.0.0.1 - - [20/May/2026 12:04:54] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179740E+1
-127.0.0.1 - - [20/May/2026 12:04:57] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179742E+1
-127.0.0.1 - - [20/May/2026 12:05:00] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179744E+1
-127.0.0.1 - - [20/May/2026 12:05:02] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179741E+1
-127.0.0.1 - - [20/May/2026 12:05:05] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179743E+1
-127.0.0.1 - - [20/May/2026 12:05:08] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179744E+1
-127.0.0.1 - - [20/May/2026 12:05:11] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179747E+1
-127.0.0.1 - - [20/May/2026 12:05:14] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179746E+1
-127.0.0.1 - - [20/May/2026 12:05:17] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179749E+1
-127.0.0.1 - - [20/May/2026 12:05:20] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179746E+1
-127.0.0.1 - - [20/May/2026 12:05:22] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179746E+1
-127.0.0.1 - - [20/May/2026 12:05:25] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179746E+1
-127.0.0.1 - - [20/May/2026 12:05:28] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179748E+1
-127.0.0.1 - - [20/May/2026 12:05:31] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179744E+1
-127.0.0.1 - - [20/May/2026 12:05:34] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179741E+1
-127.0.0.1 - - [20/May/2026 12:05:37] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179742E+1
-127.0.0.1 - - [20/May/2026 12:05:40] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179739E+1
-127.0.0.1 - - [20/May/2026 12:05:43] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179742E+1
-127.0.0.1 - - [20/May/2026 12:05:45] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179745E+1
-127.0.0.1 - - [20/May/2026 12:05:48] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179744E+1
-127.0.0.1 - - [20/May/2026 12:05:51] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179745E+1
-127.0.0.1 - - [20/May/2026 12:05:54] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179744E+1
-127.0.0.1 - - [20/May/2026 12:05:57] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179743E+1
-127.0.0.1 - - [20/May/2026 12:06:00] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179746E+1
-127.0.0.1 - - [20/May/2026 12:06:03] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179743E+1
-127.0.0.1 - - [20/May/2026 12:06:05] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179744E+1
-127.0.0.1 - - [20/May/2026 12:06:08] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179737E+1
-127.0.0.1 - - [20/May/2026 12:06:11] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179740E+1
-127.0.0.1 - - [20/May/2026 12:06:14] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179742E+1
-127.0.0.1 - - [20/May/2026 12:06:17] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179740E+1
-127.0.0.1 - - [20/May/2026 12:06:20] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179736E+1
-127.0.0.1 - - [20/May/2026 12:06:23] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179742E+1
-127.0.0.1 - - [20/May/2026 12:06:26] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179748E+1
-127.0.0.1 - - [20/May/2026 12:06:28] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179746E+1
-127.0.0.1 - - [20/May/2026 12:06:31] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179746E+1
-127.0.0.1 - - [20/May/2026 12:06:34] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179746E+1
-127.0.0.1 - - [20/May/2026 12:06:37] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179749E+1
-127.0.0.1 - - [20/May/2026 12:06:40] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179749E+1
-127.0.0.1 - - [20/May/2026 12:06:43] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179746E+1
-127.0.0.1 - - [20/May/2026 12:06:46] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179741E+1
-127.0.0.1 - - [20/May/2026 12:06:48] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179748E+1
-127.0.0.1 - - [20/May/2026 12:06:51] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179747E+1
-127.0.0.1 - - [20/May/2026 12:06:54] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179746E+1
-127.0.0.1 - - [20/May/2026 12:06:57] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179747E+1
-127.0.0.1 - - [20/May/2026 12:07:00] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179748E+1
-127.0.0.1 - - [20/May/2026 12:07:03] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179746E+1
-127.0.0.1 - - [20/May/2026 12:07:06] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179747E+1
-127.0.0.1 - - [20/May/2026 12:07:09] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179743E+1
-127.0.0.1 - - [20/May/2026 12:07:11] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179740E+1
-127.0.0.1 - - [20/May/2026 12:07:14] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179748E+1
-127.0.0.1 - - [20/May/2026 12:07:17] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179747E+1
-127.0.0.1 - - [20/May/2026 12:07:20] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179743E+1
-127.0.0.1 - - [20/May/2026 12:07:23] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179740E+1
-127.0.0.1 - - [20/May/2026 12:07:26] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179745E+1
-127.0.0.1 - - [20/May/2026 12:07:29] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179749E+1
-127.0.0.1 - - [20/May/2026 12:07:31] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179749E+1
-127.0.0.1 - - [20/May/2026 12:07:34] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179746E+1
-127.0.0.1 - - [20/May/2026 12:07:37] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179746E+1
-127.0.0.1 - - [20/May/2026 12:07:40] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179743E+1
-127.0.0.1 - - [20/May/2026 12:07:43] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179744E+1
-127.0.0.1 - - [20/May/2026 12:07:46] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179742E+1
-127.0.0.1 - - [20/May/2026 12:07:49] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179743E+1
-127.0.0.1 - - [20/May/2026 12:07:52] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179745E+1
-127.0.0.1 - - [20/May/2026 12:07:54] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179747E+1
-127.0.0.1 - - [20/May/2026 12:07:57] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179745E+1
-127.0.0.1 - - [20/May/2026 12:08:00] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179747E+1
-127.0.0.1 - - [20/May/2026 12:08:03] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179749E+1
-127.0.0.1 - - [20/May/2026 12:08:06] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179750E+1
-127.0.0.1 - - [20/May/2026 12:08:09] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179749E+1
-127.0.0.1 - - [20/May/2026 12:08:12] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179747E+1
-127.0.0.1 - - [20/May/2026 12:08:14] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179746E+1
-127.0.0.1 - - [20/May/2026 12:08:17] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179748E+1
-127.0.0.1 - - [20/May/2026 12:08:20] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179747E+1
-127.0.0.1 - - [20/May/2026 12:08:23] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179746E+1
-127.0.0.1 - - [20/May/2026 12:08:26] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179754E+1
-127.0.0.1 - - [20/May/2026 12:08:29] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179749E+1
-127.0.0.1 - - [20/May/2026 12:08:32] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179749E+1
-127.0.0.1 - - [20/May/2026 12:08:35] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179752E+1
-127.0.0.1 - - [20/May/2026 12:08:37] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179751E+1
-127.0.0.1 - - [20/May/2026 12:08:40] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179756E+1
-127.0.0.1 - - [20/May/2026 12:08:43] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179751E+1
-127.0.0.1 - - [20/May/2026 12:08:46] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179750E+1
-127.0.0.1 - - [20/May/2026 12:08:49] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179750E+1
-127.0.0.1 - - [20/May/2026 12:08:52] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179752E+1
-127.0.0.1 - - [20/May/2026 12:08:55] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179756E+1
-127.0.0.1 - - [20/May/2026 12:08:58] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179755E+1
-127.0.0.1 - - [20/May/2026 12:09:00] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179754E+1
-127.0.0.1 - - [20/May/2026 12:09:03] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179754E+1
-127.0.0.1 - - [20/May/2026 12:09:06] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.179752E+1
-127.0.0.1 - - [20/May/2026 12:09:09] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.181463E+1
-127.0.0.1 - - [20/May/2026 12:09:12] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.181458E+1
-127.0.0.1 - - [20/May/2026 12:09:15] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21522E+1
-127.0.0.1 - - [20/May/2026 12:09:18] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21520E+1
-127.0.0.1 - - [20/May/2026 12:09:21] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21514E+1
-127.0.0.1 - - [20/May/2026 12:09:24] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21514E+1
-127.0.0.1 - - [20/May/2026 12:09:27] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21514E+1
-127.0.0.1 - - [20/May/2026 12:09:30] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21515E+1
-127.0.0.1 - - [20/May/2026 12:09:33] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21514E+1
-127.0.0.1 - - [20/May/2026 12:09:37] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21514E+1
-127.0.0.1 - - [20/May/2026 12:09:40] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21514E+1
-127.0.0.1 - - [20/May/2026 12:09:43] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21514E+1
-127.0.0.1 - - [20/May/2026 12:09:46] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21514E+1
-127.0.0.1 - - [20/May/2026 12:09:49] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21514E+1
-127.0.0.1 - - [20/May/2026 12:09:52] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21514E+1
-127.0.0.1 - - [20/May/2026 12:09:55] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21514E+1
-127.0.0.1 - - [20/May/2026 12:09:58] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21514E+1
-127.0.0.1 - - [20/May/2026 12:10:01] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21514E+1
-127.0.0.1 - - [20/May/2026 12:10:05] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21514E+1
-127.0.0.1 - - [20/May/2026 12:10:08] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21515E+1
-127.0.0.1 - - [20/May/2026 12:10:11] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21515E+1
-127.0.0.1 - - [20/May/2026 12:10:14] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21515E+1
-127.0.0.1 - - [20/May/2026 12:10:17] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21516E+1
-127.0.0.1 - - [20/May/2026 12:10:20] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21515E+1
-127.0.0.1 - - [20/May/2026 12:10:23] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21515E+1
-127.0.0.1 - - [20/May/2026 12:10:26] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21514E+1
-127.0.0.1 - - [20/May/2026 12:10:29] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21514E+1
-127.0.0.1 - - [20/May/2026 12:10:33] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21514E+1
-127.0.0.1 - - [20/May/2026 12:10:36] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21514E+1
-127.0.0.1 - - [20/May/2026 12:10:39] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21515E+1
-127.0.0.1 - - [20/May/2026 12:10:42] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21515E+1
-127.0.0.1 - - [20/May/2026 12:10:45] "GET /data HTTP/1.1" 200 -
-RAW RESPONSE: +1.21514E+1
-127.0.0.1 - - [20/May/2026 12:10:48] "GET /data HTTP/1.1" 200 -
+        .status {
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            color: white;
+            font-weight: bold;
+        }
+
+        .normal { background: #10b981; }
+        .warning { background: #f59e0b; }
+        .critical { background: #ef4444; }
+
+        button {
+            padding: 10px 15px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .btn-primary { background: #3b82f6; color: white; }
+        .btn-danger { background: #ef4444; color: white; }
+
+        .cycle {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .cycle.bottom {
+            justify-content: center;
+        }
+
+        .box {
+            background: #e0f2fe;
+            padding: 15px 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .wide-box {
+            grid-column: span 2;   /* takes 2 columns width */
+        }
+
+        .arrow {
+            margin: 0 10px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .sub-header {
+            background: #374151;
+            color: #e5e7eb;
+            text-align: center;
+            padding: 8px;
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+
+        .ess-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            justify-content: space-between;
+        }
+
+        .small-box {
+            height: 120px;
+            font-size: 14px;
+        }
+
+        /* Big left box */
+        .large {
+            grid-row: span 2;
+        }
+
+        /* Right side grid */
+        .ess-right {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .ess-box {
+            background: #e0f2fe;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            font-weight: bold;
+            height: 150px;
+
+            display: flex;
+            flex-direction: column;
+
+            justify-content: flex-start;   /* move content to top */
+            align-items: center;
+
+            padding-top: 15px;             /* control how much up */
+        }
+
+
+        .big-value {
+            font-size: 28px;
+            margin-top: 10px;
+        }
+
+        .label {
+            font-size: 14px;
+            color: #374151;
+        }
+
+        /* Top Banner */
+        .top-banner {
+            background: #cbd5e1;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 10px;
+            text-align: center;
+        }
+
+        .banner-content h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .banner-content h2 {
+            margin: 5px 0;
+            font-size: 20px;
+        }
+
+        .banner-content p {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        /* Title Section */
+        .title-section {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .title-section h2 {
+            margin: 0;
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        .title-section p {
+            margin: 5px 0;
+            font-size: 18px;
+            color: gray;
+        }
+
+        /* MEMS Header */
+        .mems-header {
+            background: linear-gradient(to right, #1f2937, #334155);
+            color: white;
+            text-align: center;
+            padding: 12px;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .manual-box {
+            height: 80px;
+            padding: 18px;
+
+            width: 120px;
+            max-width: 180px;
+
+            justify-self: center;   /* center inside grid cell */
+            margin: 0 auto;         /* extra safety centering */
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* ESS Line */
+        .ess-line {
+            background: #e5e7eb;
+            text-align: center;
+            padding: 12px;
+            font-size: 18px;
+            margin: 10px;
+            border-radius: 8px;
+            letter-spacing: 1px;
+        }
+
+        .header {
+            background: linear-gradient(to right, #1f2937, #334155);
+            color: white;
+            text-align: center;
+            padding: 12px;
+            font-size: 22px;
+            font-weight: bold;
+            margin: 10px;
+            border-radius: 8px;
+        }
+
+.top-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #cbd5e1;
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin: 10px;
+    gap: 20px;
+}
+
+.banner-text {
+    flex: 1;
+    text-align: center;
+}
+
+.logo {
+    flex-shrink: 0;
+}
+
+.top-label-box {
+    text-align: center;
+    font-size: 14px;        /* bigger text */
+    font-weight: bold;
+    color: white;
+
+    background: #3b82f6;
+    border-radius: 8px;
+
+    padding: 6px 14px;      /* bigger box */
+    min-width: 70px;        /* consistent width */
+    
+    margin: 0 auto -10px auto; /* center + closer to box */
+}
+
+/* Center Text */
+.banner-text {
+    text-align: center;
+    flex: 1;
+}
+
+.banner-text h1 {
+    margin: 0;
+    font-size: 30px;   /* Centre for Nano Science and Engineering */
+    font-weight: bold;
+}
+
+.banner-text h2 {
+    margin: 5px 0;
+    font-size: 24px;   /* Indian Institute of Science */
+    font-weight: 600;
+}
+
+.banner-text p {
+    margin: 0;
+    font-size: 20px;   /* Bangalore, 560012 */
+    font-weight: 500;
+}
+
+/* Logos */
+.logo img {
+    width: 100px;   /* try 80–120px */
+    height: auto;
+}
+
+/* Left & Right spacing */
+.logo.left {
+    margin-right: 10px;
+}
+
+.logo.right {
+    margin-left: 10px;
+}
+
+.mode-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    margin: 3px 0;
+}
+
+.mode-btn {
+    width: 30px;
+    height: 30px;
+    margin-right: 8px;
+
+    border: none;
+    border-radius: 6px;
+
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.mode-btn {
+    width: 30px;
+    height: 30px;
+    margin-right: 8px;
+
+    border: none;
+    border-radius: 6px;
+
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+
+    background: #ef4444; /* default = OFF (red) */
+}
+
+.control-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.control-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    color: white;
+    background: #3b82f6;
+}
+
+.control-btn:hover {
+    background: #2563eb;
+}
+
+/* ON state */
+.active {
+    background: #10b981 !important; /* green */
+    outline: 3px solid #1f2937;
+}
+
+.active-manual {
+    outline: 3px solid #1f2937;
+    background: #10b981 !important; /* green */
+}
+
+.active-auto {
+    outline: 3px solid #1f2937;
+    background: #ef4444 !important; /* red */
+}
+
+.instrument-box {
+    width: 80%;   /* instead of 480px */
+    max-width: 480px;
+    height: 200px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+    padding: 25px;
+}
+
+.ps-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;  /* 2 buttons per row */
+    gap: 8px;
+    margin-top: 15px;
+    width: 50%;
+    justify-items: center;
+}
+
+.ps-control {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 15px;
+    width: 100%;
+}
+
+.ps-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.ps-row input {
+    width: 100px;
+    padding: 5px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    text-align: center;
+}
+
+.ps-row-top {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.ps-item input {
+    width: 120px;
+    padding: 5px;
+    text-align: center;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.ps-row-units {
+    display: flex;
+    justify-content: center;
+    gap: 110px;   /* aligns V and A under inputs */
+    margin-top: 5px;
+    font-weight: bold;
+    color: #374151;
+}
+
+.ps-row-bottom {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 15px;
+}
+
+.start-btn {
+    background: #10b981;
+    color: white;
+    width: 100px;
+}
+
+.stop-btn {
+    background: #ef4444;
+    color: white;
+    width: 100px;
+}
+
+.ps-title {
+    font-size: 20px;        /* bigger text */
+    font-weight: bold;
+    margin-top: -10px;      /* moves it upward */
+    margin-bottom: 30px;    /* spacing below */
+    color: #111827;
+}
+
+.dmm-title {
+    font-size: 20px;        /* bigger text */
+    font-weight: bold;
+    margin-top: -10px;      /* move upward */
+    margin-bottom: 30px;
+    color: #111827;
+    letter-spacing: 0.5px;
+}
+
+.dmm-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: -10px;
+    margin-bottom: 30px;
+    color: #111827;
+}
+
+.dmm-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.dmm-row input {
+    width: 120px;
+    padding: 5px;
+    text-align: center;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.unit-label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #374151;
+}
+
+.dmm-bottom {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.start-btn {
+    background: #10b981;
+    color: white;
+    width: 100px;
+}
+
+.stop-btn {
+    background: #ef4444;
+    color: white;
+    width: 100px;
+}
+
+.ess-box.instrument-box:nth-child(2) {
+    margin-top: -20px;   /* moves DMM upward */
+}
+
+.instrument-row {
+    display: grid;
+    grid-template-columns: 140px 1fr 140px;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin: 6px 0;
+}
+
+.instrument-row input {
+    width: 100%;
+    padding: 6px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    text-align: center;
+}
+
+.instrument-label {
+    font-size: 14px;
+    color: #374151;
+    font-weight: bold;
+}
+
+.instrument-inline {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.inline-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.inline-group input {
+    width: 80px;
+    padding: 6px;
+    text-align: center;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.channel-row {
+    display: flex;
+    justify-content: space-between;
+    width: 80%;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #1f2937;
+}
+
+.instrument-inline {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-top: 5px;
+}
+
+.inline-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.inline-group input {
+    width: 80px;
+    padding: 6px;
+    text-align: center;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.ps-grid-clean {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 20px;
+    width: 90%;
+    margin-top: 5px;
+    text-align: center;
+}
+
+.ps-head {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.ps-label {
+    font-size: 14px;
+    color: #374151;
+    font-weight: 600;
+}
+
+.ps-input {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+}
+
+.ps-input input {
+    width: 80px;
+    padding: 6px;
+    text-align: center;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.dmm-display {
+    width: 180px;
+    height: 55px;
+
+    background: black;
+    color: #00ff66;
+
+    font-size: 32px;
+    font-family: "Courier New", monospace;
+    font-weight: bold;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 8px;
+    border: 3px solid #1f2937;
+
+    letter-spacing: 2px;
+
+    box-shadow:
+        inset 0 0 10px rgba(0,255,100,0.3),
+        0 0 8px rgba(0,255,100,0.2);
+}
+
+    </style>
+</head>
+
+<body>
+
+    <!-- Top Banner -->
+<div class="top-banner">
+
+    <div class="logo left">
+        <img src="/static/images/cense.png" alt="CeNSE">
+    </div>
+
+    <div class="banner-text">
+        <h1>Centre for Nano Science and Engineering</h1>
+        <h2>Indian Institute of Science</h2>
+        <p>Bangalore, 560012</p>
+    </div>
+
+    <div class="logo right">
+        <img src="/static/images/IISc.png" alt="IISc">
+    </div>
+
+</div>
+
+<!-- MEMS Header -->
+<div class="mems-header">
+    MEMS Pressure Transducer
+</div>
+
+<div class="mems-header">
+    Environmental Stress Screening (ESS) Cycle Test
+</div>
+
+<div class="card">
+    
+    <div class="ess-grid">
+
+            <!-- TOP LABELS -->
+            <div class="top-label-box">COM6</div>
+            <div></div>
+            <div class="top-label-box">COM5</div>
+
+<div class="ess-box instrument-box">
+
+    <div class="ps-title">DC Power Supply</div>
+
+    <!-- CHANNEL LABELS -->
+<div class="ps-grid-clean">
+
+    <!-- Row 1 -->
+    <div class="ps-head">CH1</div>
+    <div class="ps-head">CH2</div>
+
+    <!-- Row 2 -->
+    <div class="ps-label">Voltage</div>
+    <div class="ps-label">Current</div>
+
+    <!-- Row 3 -->
+    <div class="ps-input">
+        <input type="number">
+        <span>Volt</span>
+    </div>
+
+    <div class="ps-input">
+        <input type="number">
+        <span>Amp</span>
+    </div>
+
+</div>
+
+    <div class="ps-row-bottom">
+        <button class="control-btn start-btn">Start</button>
+        <button class="control-btn stop-btn">Stop</button>
+    </div>
+
+</div>
+
+<div class="ess-box instrument-box dmm-box">
+
+    <div class="dmm-title">Digital Multimeter</div>
+
+
+
+<div style="margin-bottom:15px;">
+
+    <select id="comPortSelect" style="
+        padding:8px;
+        border-radius:6px;
+        width:140px;
+    ">
+        <option>Loading...</option>
+    </select>
+
+    <button onclick="connectDMM()" class="control-btn">
+        Connect
+    </button>
+
+</div>
+
+
+
+    <div class="instrument-row">
+        <span class="instrument-label">Voltage</span>
+        <div id="dmmVoltage" class="dmm-display">
+            000.0000
+        </div>
+        <span>VDC</span>
+    </div>
+
+    <div class="ps-row-bottom">
+        <button class="control-btn start-btn" onclick="startDMM()">Start</button>
+        <button class="control-btn stop-btn" onclick="stopDMM()">Stop</button>
+    </div>
+
+</div>
+
+        <!-- NEW SMALL BOX -->
+<div class="ess-box small-box manual-box">
+    
+    <div class="mode-row">
+        <button class="mode-btn" id="manualBtn"></button>
+        <span class="label">Manual</span>
+    </div>
+
+    <div class="mode-row">
+        <button class="mode-btn" id="autoBtn"></button>
+        <span class="label">Auto</span>
+    </div>
+
+</div>
+
+<!-- ROW 3 -->
+
+<div class="ess-box instrument-box" style="grid-column: 2;">
+    <div style="font-size:20px;font-weight:bold;margin-bottom:10px;">
+        Time Delay
+    </div>
+
+    <div class="instrument-row">
+        <span class="instrument-label">Voltage 1</span>
+        <input type="number" placeholder="000">
+        <span>Initial OFF</span>
+    </div>
+
+    <div class="instrument-row">
+        <span class="instrument-label">Voltage 2</span>
+        <input type="number" placeholder="000">
+        <span>ON Time</span>
+    </div>
+
+    <div class="instrument-row">
+        <span class="instrument-label">Voltage 3</span>
+        <input type="number" placeholder="000">
+        <span>OFF Time</span>
+    </div>
+
+    <div class="instrument-row">
+        <span class="instrument-label">Voltage 4</span>
+        <input type="number" placeholder="000">
+        <span>No. of Cycles</span>
+    </div>
+</div>
+
+        <!-- Empty placeholder (keeps grid aligned) -->
+        <div></div>
+
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- Live Value -->
+    <div class="card">
+        <div>Current Pressure</div>
+        <div class="value" id="pressure">0</div>
+        <div class="unit">kPa</div>
+        <br>
+        <div id="status" class="status normal">NORMAL</div>
+    </div>
+
+    <!-- Chart -->
+    <div class="card">
+        <canvas id="chart"></canvas>
+    </div>
+
+    <!-- Controls -->
+    <div class="card">
+        <button class="btn-primary" onclick="resetData()">Reset</button>
+        <button class="btn-danger" onclick="downloadCSV()">Download CSV</button>
+    </div>
+
+</div>
+
+<script>
+let dataPoints = [];
+let labels = [];
+
+const ctx = document.getElementById('chart').getContext('2d');
+
+const chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: labels,
+        datasets: [{
+            label: 'Pressure (kPa)',
+            data: dataPoints,
+            borderWidth: 2,
+            fill: false
+        }]
+    }
+});
+
+// Simulated data (replace with API)
+setInterval(() => {
+    fetch('/data')
+        .then(res => res.json())
+        .then(data => {
+
+            // PRESSURE
+            document.getElementById('pressure').innerText = data.pressure;
+
+            // DMM REAL-TIME DISPLAY
+            const voltage = parseFloat(data.dmm_voltage || 0);
+
+            document.getElementById('dmmVoltage').innerText =
+                voltage.toFixed(6);
+
+
+            // MODE SYNC (IMPORTANT)
+            if (data.mode === "manual") {
+                manualBtn.classList.add("active");
+                autoBtn.classList.remove("active");
+            } else {
+                autoBtn.classList.add("active");
+                manualBtn.classList.remove("active");
+            }
+
+            // STATUS
+            let statusEl = document.getElementById('status');
+            if (data.pressure < 50) {
+                statusEl.innerText = "NORMAL";
+                statusEl.className = "status normal";
+            } else if (data.pressure < 80) {
+                statusEl.innerText = "WARNING";
+                statusEl.className = "status warning";
+            } else {
+                statusEl.innerText = "CRITICAL";
+                statusEl.className = "status critical";
+            }
+
+            // GRAPH
+            dataPoints.push(data.pressure);
+            labels.push(new Date().toLocaleTimeString());
+
+            if (dataPoints.length > 50) {
+                dataPoints.shift();
+                labels.shift();
+            }
+
+            if (data.mode === "auto") {
+                dmmStartBtn.disabled = true;
+                dmmStopBtn.disabled = true;
+                dmmStartBtn.style.opacity = 0.5;
+                dmmStopBtn.style.opacity = 0.5;
+            } else {
+                dmmStartBtn.disabled = false;
+                dmmStopBtn.disabled = false;
+                dmmStartBtn.style.opacity = 1;
+                dmmStopBtn.style.opacity = 1;
+            }
+
+            chart.update();
+        });
+
+}, 1500);
+
+// Reset
+function resetData() {
+    dataPoints = [];
+    labels = [];
+    chart.data.labels = labels;
+    chart.data.datasets[0].data = dataPoints;
+    chart.update();
+}
+
+// Download CSV
+function downloadCSV() {
+    window.location.href = "/download";
+}
+
+const manualBtn = document.getElementById("manualBtn");
+const autoBtn = document.getElementById("autoBtn");
+
+const dmmStartBtn = document.querySelector(".dmm-box .start-btn");
+const dmmStopBtn = document.querySelector(".dmm-box .stop-btn");
+
+// default state (optional)
+manualBtn.classList.add("active"); // Manual ON
+
+manualBtn.onclick = () => {
+    fetch('/mode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: "manual" })
+    });
+
+    manualBtn.classList.add("active");
+    autoBtn.classList.remove("active");
+};
+
+autoBtn.onclick = () => {
+    fetch('/mode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: "auto" })
+    });
+
+    autoBtn.classList.add("active");
+    manualBtn.classList.remove("active");
+};
+
+let voltOn = false;
+let ampOn = false;
+
+function startDMM() {
+    fetch('/dmm/start', { method: 'POST' })
+    .then(res => res.json())
+    .then(data => {
+        if (data.error) alert(data.error);
+    });
+}
+
+function stopDMM() {
+    fetch('/dmm/stop', { method: 'POST' })
+    .then(res => res.json())
+    .then(data => {
+        if (data.error) alert(data.error);
+    });
+}
+
+function sendCycleConfig() {
+    const config = {
+        t1: document.querySelectorAll("input")[2].value,
+        t2: document.querySelectorAll("input")[3].value,
+        t3: document.querySelectorAll("input")[4].value,
+        cycles: document.querySelectorAll("input")[5].value
+    };
+
+    fetch('/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(config)
+    });
+}
+
+// ============================================
+// LOAD AVAILABLE COM PORTS
+// ============================================
+
+function loadPorts() {
+
+    fetch('/ports')
+    .then(res => res.json())
+    .then(ports => {
+
+        const select = document.getElementById('comPortSelect');
+
+        select.innerHTML = '';
+
+        ports.forEach(port => {
+
+            const option = document.createElement('option');
+
+            option.value = port.device;
+
+            option.text =
+                `${port.device} - ${port.description}`;
+
+            select.appendChild(option);
+        });
+    });
+}
+
+loadPorts();
+
+// ============================================
+// CONNECT DMM
+// ============================================
+
+function connectDMM() {
+
+    const port =
+        document.getElementById('comPortSelect').value;
+
+    fetch('/connect_dmm', {
+
+        method: 'POST',
+
+        headers: {
+            'Content-Type': 'application/json'
+        },
+
+        body: JSON.stringify({
+            port: port
+        })
+
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if (data.status === "connected") {
+
+            alert(
+                "DMM Connected:\n" + data.id
+            );
+
+        } else {
+
+            alert(
+                "Connection Failed:\n" + data.message
+            );
+        }
+    });
+}
+
+
+
+</script>
+
+</body>
+</html>
